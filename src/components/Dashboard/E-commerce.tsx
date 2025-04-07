@@ -1,0 +1,29 @@
+"use client";
+import dynamic from "next/dynamic";
+import React from "react";
+import ChartOne from "../Charts/ChartOne";
+import ChartTwo from "../Charts/ChartTwo";
+import ChatCard from "../Chat/ChatCard";
+import TableOne from "../Tables/TableOne";
+import CardDataStats from "../CardDataStats";
+import ContactUs from "../ContactUs";
+import ProductList from "../ProductList";
+import Footer from "@/components/Footer";
+
+const ECommerce: React.FC = () => {
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-4  sm:col-span-12 xl:col-span-12 2xl:col-span-12 3xl:col-span-12">
+          <ProductList />
+      </div>
+      {/** */}
+      <div className="md:pt-10 md:pb-[47.7px] pt-15 pb-12.5 bg-[#fff]">
+      <ContactUs />
+      </div>
+      <Footer/>
+        
+    </>
+  );
+};
+
+export default ECommerce;

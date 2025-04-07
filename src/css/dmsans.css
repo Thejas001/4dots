@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 400; /* Regular */
+    src: local('DM Sans Regular'), url('DMSans-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: italic;
+    font-weight: 400; /* Regular Italic */
+    src: local('DM Sans Italic'), url('DMSans-Italic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 500; /* Medium */
+    src: local('DM Sans Medium'), url('DMSans-Medium.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: italic;
+    font-weight: 500; /* Medium Italic */
+    src: local('DM Sans Medium Italic'), url('DMSans-MediumItalic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 700; /* Bold */
+    src: local('DM Sans Bold'), url('DMSans-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: italic;
+    font-weight: 700; /* Bold Italic */
+    src: local('DM Sans Bold Italic'), url('DMSans-BoldItalic.woff') format('woff');
+}

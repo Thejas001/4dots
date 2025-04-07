@@ -1,0 +1,35 @@
+[33mcommit d29f8dbf3f73a34bf7dae6e765b75ae1af219579[m[33m ([m[1;36mHEAD -> [m[1;32mlandingpage[m[33m, [m[1;31morigin/landingpage[m[33m, [m[1;32mdevelopment[m[33m)[m
+Author: Thejas <thejasvelgi@gmail.com>
+Date:   Wed Jan 8 09:02:41 2025 +0530
+
+    Footer
+
+[33mcommit f020df513913e401a5a1327391a02cad5c841fec[m
+Author: Thejas <thejasvelgi@gmail.com>
+Date:   Tue Jan 7 18:19:49 2025 +0530
+
+    Header
+
+[33mcommit 83e79bb98b69d3de78bd32bfc64868764c60c0d6[m[33m ([m[1;31morigin/development[m[33m)[m
+Author: Deepu <deepu.geethamoni@subhosting.net>
+Date:   Thu Jan 2 20:21:34 2025 +0530
+
+    adding the next.js template files
+
+[33mcommit b2d4018a0fff7ce93a26579b994d6332e78aa221[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Deepu <deepu.geethamoni@subhosting.net>
+Date:   Thu Jan 2 20:19:23 2025 +0530
+
+    adding the gitignore file
+
+[33mcommit 9b927b95acf1131210bc03553be618c952211dd7[m
+Author: Deepu <deepu.geethamoni@subhosting.net>
+Date:   Thu Jan 2 20:16:27 2025 +0530
+
+    adding the gitignore file
+
+[33mcommit e6bc6098cd88915aa7815eb559111bcc5ac0c5a4[m
+Author: aathirakb90 <aathirakb90@hotmail.com>
+Date:   Sun Dec 8 21:38:32 2024 +0000
+
+    Added README.md

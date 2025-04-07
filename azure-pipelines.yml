@@ -1,0 +1,27 @@
+trigger:
+- main  # or whatever branch you want
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: staticwebapp-keys
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+    npm run build
+  displayName: 'Build React App'
+
+- task: AzureStaticWebApp@0
+  inputs:
+    app_location: '/'
+    output_location: 'build'
+    azure_static_web_apps_api_token: $(deployment_token)
+  env:
+    azure_static_web_apps_api_token: $(deployment_token)
