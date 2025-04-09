@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import DropDown from "./DropDoun";
 import AddOnService from "./AddOnService";
-import FileUploader from "./fileupload";
+import FileUploader from "./Fileupload";
 import { fetchProductDetails } from "@/utils/api";
 import {
   Addon,
@@ -16,9 +16,10 @@ import PriceCalculator from "./PriceCalculator";
 import { addToCartPaperPrint } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 
-const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
+const ProductUpload = ({ product }: { product: any }) => {
+  const dataId = product?.dataId;
   const [selectedOption, setSelectedOption] = useState<"B/W" | "Color">("B/W");
-  const [productDetails, setProductDetails] = useState<Product | null>(null);
+  const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>(""); // Size selected
   const [noOfCopies, setNoOfCopies] = useState<number>(1); // Number of copies selected
   const [pageCount, setPageCount] = useState(1);
@@ -60,23 +61,6 @@ const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
     setSelectedBinderColor(binderColor);
     // You can also perform other actions here if needed
   };
-
-  // Fetch product details when component mounts
-  const loadProductDetails = useCallback(async () => {
-    if (!dataId) return;
-
-    try {
-      const data = await fetchProductDetails(dataId);
-      console.log("Fetched Product Details:", data);
-      setProductDetails(data);
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-    }
-  }, [dataId]);
-
-  useEffect(() => {
-    loadProductDetails();
-  }, [loadProductDetails]);
 
   // Validate Printing Rules
   useEffect(() => {
@@ -174,7 +158,6 @@ const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
     if (!isLoggedIn()) {
       const pendingItem = {
         productType: "paperprinting",
-        dataId,
         selectedPricingRule,
         pageCount, // ✅ Store page count
         selectedBindingType, // ✅ Store binding type

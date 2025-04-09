@@ -1,5 +1,4 @@
-"use client";
-import { useParams, useSearchParams  } from "next/navigation";
+import { fetchProductDetails } from "@/utils/api";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import ProductDescription from "@/components/ProductDescription";
 import PaperPrint from "@/components/ProductUpload/PaperPrint";
@@ -12,34 +11,42 @@ import PolaroidCard from "@/components/ProductUpload/PolaroidCard";
 import CustomNameSlip from "@/components/ProductUpload/CustomNameSlip";
 import { Metadata } from "next";
 
- const metadata: Metadata = {
+export const metadata: Metadata = {
   title: "4 Dots",
   description:
     "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
 };
 
-const ProductComponents: Record<string, React.FC<{ id: string; dataId: number }>> = {
-  "paper-print": PaperPrint, 
+// ✅ Ensure correct mapping of product components
+const ProductComponents: Record<string, React.FC<{ product: any }>> = {
+  "paper-print": PaperPrint,
   "photo-frame": PhotoFrame,
   "business-card": BusinessCard,
   "offset-printing": offSetPrinting,
   "letter-head": LetterHead,
   "canvas-printing": CanvasPrinting,
   "polaroid-card": PolaroidCard,
-  "custom-name-slip":  CustomNameSlip,// ✅ Ensure key matches the expected URL
+  "custom-name-slip": CustomNameSlip,
 };
 
-const PageDetails = () => {
-  const { id } = useParams(); // ✅ Extract dynamic ID
-  const searchParams = useSearchParams();
-  const dataId =Number(searchParams.get("dataId"));
-  console.log("Product ID:", dataId); 
-  
-  if (!id || typeof id !== "string") {
+export default async function PageDetails({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { dataId: string };
+}) {
+  const { id } = params;
+  const dataId = Number(searchParams.dataId);
+
+  // ✅ Fetch product details server-side
+  const product = await fetchProductDetails(dataId);
+
+  if (!product) {
     return <p>Product not found</p>;
   }
 
-  const SpecificProductComponent = ProductComponents[id.toLowerCase()]; // ✅ Ensures case-insensitive matching
+  const SpecificProductComponent = ProductComponents[id.toLowerCase()];
 
   if (!SpecificProductComponent) {
     return <p>Product not found</p>;
@@ -47,10 +54,11 @@ const PageDetails = () => {
 
   return (
     <DefaultLayout>
-      <ProductDescription dataId={dataId} />
-      <SpecificProductComponent id={id} dataId={dataId} />
+      {/* ✅ Pass fetched product details to ProductDescription */}
+      <ProductDescription product={product} />
+
+      {/* ✅ Pass product data to the specific product component */}
+      <SpecificProductComponent product={product} />
     </DefaultLayout>
   );
-};
-
-export default PageDetails;
+}

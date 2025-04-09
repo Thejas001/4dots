@@ -7,27 +7,22 @@ import type { UploadFile, UploadProps } from "antd/es/upload";
 
 const FileUploader = ({
   quantity,
-  onImagesChange,
+  uploadedImages,
+  setUploadedImages,
 }: {
   quantity: number | null;
-  onImagesChange: (files: UploadFile[]) => void;
+  uploadedImages: UploadFile[];
+  setUploadedImages: React.Dispatch<React.SetStateAction<UploadFile[]>>;
 }) => {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Ensure fileList updates only when quantity changes
   useEffect(() => {
     if (quantity === null || quantity === 0) {
-      setFileList([]); 
-    } else if (fileList.length > quantity) {
-      setFileList((prev) => prev.slice(0, quantity));
+      setUploadedImages([]);
+    } else if (uploadedImages.length > quantity) {
+      setUploadedImages((prev) => prev.slice(0, quantity));
     }
-  }, [quantity]); 
-
-  // ✅ Fix: Move onImagesChange to a separate useEffect
-  useEffect(() => {
-    onImagesChange(fileList);
-  }, [fileList]); // Now updates only when fileList changes
+  }, [quantity, setUploadedImages]);
 
   const props: UploadProps = {
     name: "file",
@@ -40,7 +35,7 @@ const FileUploader = ({
         return false;
       }
 
-      if (fileList.length + newFileList.length > quantity) {
+      if (uploadedImages.length + newFileList.length > quantity) {
         message.error(`You can only upload up to ${quantity} images.`);
         return false;
       }
@@ -53,24 +48,28 @@ const FileUploader = ({
         status: "done" as UploadFile["status"],
       };
 
-      setFileList((prev) => [...prev, newFile]);
+      setUploadedImages((prev) => [...prev, newFile]);
 
-      return false; // Prevent default upload behavior
+      return false;
     },
-    fileList,
+    fileList: uploadedImages,
     maxCount: quantity ?? undefined,
   };
 
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [uploadedImages]);
+
   const handleNext = () => {
-    if (fileList.length > 1) {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % fileList.length);
+    if (uploadedImages.length > 1) {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % uploadedImages.length);
     }
   };
 
   const handlePrevious = () => {
-    if (fileList.length > 1) {
-      setCurrentImageIndex((prevIndex) => 
-        prevIndex === 0 ? fileList.length - 1 : prevIndex - 1
+    if (uploadedImages.length > 1) {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === 0 ? uploadedImages.length - 1 : prevIndex - 1
       );
     }
   };
@@ -87,11 +86,11 @@ const FileUploader = ({
         </Button>
       </Upload>
 
-      {fileList.length > 0 && (
+      {uploadedImages.length > 0 && (
         <div className="mt-[11px] relative">
           <img
-            src={fileList[currentImageIndex]?.url}
-            alt={fileList[currentImageIndex]?.name}
+            src={uploadedImages[currentImageIndex]?.url}
+            alt={uploadedImages[currentImageIndex]?.name}
             className="w-[350px] h-[445px] object-contain rounded-md"
             onError={(e) => (e.currentTarget.src = "https://placehold.co/200")}
           />
@@ -104,13 +103,13 @@ const FileUploader = ({
         </div>
       )}
 
-      {fileList.length > 0 && (
+      {uploadedImages.length > 0 && (
         <div
           className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-[11px] px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px] 
           flex justify-center items-center text-center"
           style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
         >
-          {currentImageIndex + 1} / {fileList.length}
+          {currentImageIndex + 1} / {uploadedImages.length}
         </div>
       )}
     </div>

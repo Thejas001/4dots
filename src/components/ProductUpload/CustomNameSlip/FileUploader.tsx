@@ -5,7 +5,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
-const FileUploader = ({ pageCount, setPageCount }: { pageCount: number; setPageCount: (count: number) => void }) => {
+const FileUploader = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<"pdf" | null>(null);
 
@@ -67,20 +67,6 @@ const FileUploader = ({ pageCount, setPageCount }: { pageCount: number; setPageC
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
         )}
-      </div>
-
-      {/* Pagination */}
-      <div
-        className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-[11px] px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px]"
-        style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
-      > 
-        <input
-          type="number"
-          value={pageCount}
-          min="1"
-          className="w-full bg-transparent text-center outline-none"
-          onChange={(e) => setPageCount(Number(e.target.value))}
-        />
       </div>
     </div>
   );

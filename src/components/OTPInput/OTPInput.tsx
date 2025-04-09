@@ -56,6 +56,7 @@ function OTPInputComponent() {
       // Verify OTP API call
       const token = await verifyOTP(phoneNumber, otpString);
       console.log("JWT Token from verifyOTP:", token);
+      document.cookie = `jwtToken=${token}; path=/; max-age=604800; SameSite=Lax; Secure`;
 
       if(!token){
         throw new Error("Invalid Otp");
@@ -75,6 +76,7 @@ function OTPInputComponent() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     let timer: string | number | NodeJS.Timeout | undefined;
     if (showOTP && timeLeft > 0) {

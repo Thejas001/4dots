@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { PhotoFramePricingRule, Product } from "@/app/models/products";
@@ -12,9 +13,9 @@ import CartButton from "./CartButton";
 
 
 
-const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
-  const [productDetails, setProductDetails] = useState<Product | null>(null);
-//stores state from dropdown and passed to princingfrle finder
+const ProductUpload = ({ product }: { product: any }) => {
+  const dataId = product.id;
+  const productDetails = product;//stores state from dropdown and passed to princingfrle finder
    const [selectedSize, setSelectedSize] = useState<string>("");
    const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
    const [errorMessage, setErrorMessage] = useState<string>("");
@@ -26,21 +27,7 @@ const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
    
    const router = useRouter();
 
-  const loadProductDetails = useCallback(async () => {
-    if (!dataId) return;
 
-    try {
-      const data = await fetchProductDetails(dataId);
-      console.log("Fetched Product Details:", data);
-      setProductDetails(data);
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-    }
-  }, [dataId]);
-
-  useEffect(() => {
-    loadProductDetails();
-  }, [loadProductDetails]);
 
   useEffect(() => {
     if (!productDetails || !selectedSize || !selectedQuantity) return;
@@ -72,7 +59,11 @@ const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader quantity={selectedQuantity}  onImagesChange={setFileList}/>
+        <FileUploader 
+              quantity={selectedQuantity}  
+              uploadedImages={fileList} 
+              setUploadedImages={setFileList} 
+            />
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between px-4 md:px-7 py-[25px] rounded shadow">
         {productDetails && <Product1DropDown 

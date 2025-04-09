@@ -157,7 +157,7 @@ const OrderPayment = () => {
 
             {/* Payment Calculator */}
             <div className="col-span-12 xl:col-span-1 ml-[22px] mr-20">
-              <PaymentCal userId={userId} cartItemIds={orders.map(order => order.OrderId)} totalPrice={orders.reduce((sum, order) => sum + order.TotalAmount, 0)} />
+              <PaymentCal  />
             </div>
           </>
         ) : (
