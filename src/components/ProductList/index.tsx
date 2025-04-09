@@ -13,42 +13,28 @@ import { Metadata } from "next";
     "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
 };
 
-const ProductList = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  
-  useEffect(() => {
-    const loadProducts = async () => {
-      const data = await fetchProducts();
-
-      // Transform API response to match the datamodel
-      const transformedData  = data.map((product: any) => ({
-        id: product.ProductID,
-        name: formatName(product.ProductName),
-      }));
-
-      setProducts(transformedData);
+interface ProductListProps {
+  products: Product[];
+}
 
 
-      console.log(data); // Log to check the fetched data
-
-    };
-
-    loadProducts();
-  }, []);
-
+const ProductList: React.FC<ProductListProps> = ({ products }) => {
   const formatName = (name: string) => {
-  if (!name) return "";
-  return name
-    .toLowerCase() // Convert entire string to lowercase
-    .split(" ") // Split into words
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
-    .join(" "); // Join words back into a string
-};
+    if (!name) return "";
+    return name
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
-
+  const transformedData = products.map((product) => ({
+    id: product.id,
+    name: formatName(product.name),
+  }));
+  
   const getProductDetails = (id: number) => {
-    return products.find((product) => product.id === id);  
-   
+    return transformedData.find((product) => product.id === id);
   };
 
   return (

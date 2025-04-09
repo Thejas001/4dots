@@ -7,9 +7,11 @@ import { NameSlipPricingRule, Product } from "@/app/models/products";
 import { findNameSlipPricingRule } from "@/utils/priceFinder";
 import { addToCartNameSlip } from "@/utils/cart";
 import { useRouter } from "next/navigation";
+import FileUploader from "./FileUploader";
 
-const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
-  const [productDetails, setProductDetails] = useState<Product | null>(null);
+const ProductUpload = ({ product }: { product: any }) => {
+  const dataId = product?.dataId;
+  const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<string | null>(null);
   const [price, setPrice] = useState<number | null>(null);
@@ -35,22 +37,6 @@ const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
     setError(error);
   };
 
-  // Fetch product details when component mounts
-  const loadProductDetails = useCallback(async () => {
-    if (!dataId) return;
-
-    try {
-      const data = await fetchProductDetails(dataId);
-      console.log("Fetched Product Details:", data);
-      setProductDetails(data);
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-    }
-  }, [dataId]);
-
-  useEffect(() => {
-    loadProductDetails();
-  }, [loadProductDetails]);
 
   useEffect(() => {
     // Check if all necessary data is available before proceeding
@@ -144,38 +130,7 @@ const ProductUpload = ({ id, dataId }: { id: string; dataId: number }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <div className="flex h-[571px] w-full flex-col items-center bg-[#F7F7F7] px-4 shadow md:w-[486px] md:px-[67px]">
-          {/* Button */}
-          <div className="relative flex h-10 w-[164px] cursor-pointer items-center justify-center gap-1.5 rounded-[30px] bg-[#242424] px-5 py-2">
-            <img
-              className=""
-              src="/images/icon/upload-icon.svg"
-              alt="Upload Icon"
-            />
-            <span className="text-base font-medium leading-6 tracking-tight text-[#fff]">
-              Upload File
-            </span>
-          </div>
-
-          {/* Photo */}
-          <div className="relative mt-[11px]">
-            <img src="/images/product/Rectangle970.svg" alt="" />
-            <div className="absolute -left-7 top-1/2 cursor-pointer">
-              <img src="/images/icon/vector-left.svg" alt="" />
-            </div>
-            <div className="absolute -right-7 top-1/2 cursor-pointer">
-              <img src="/images/icon/vector-right.svg" alt="" />
-            </div>
-          </div>
-          {/* 1/04 */}
-          <div
-            className="mt-[11px] h-10 w-[75px] rounded-[30px] bg-[#fff] px-5 py-2 text-sm font-medium leading-6 tracking-[-0.2px] text-[#242424]"
-            style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
-          >
-            1 / 04
-          </div>
-        </div>
-
+        <FileUploader />
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
           {productDetails && (

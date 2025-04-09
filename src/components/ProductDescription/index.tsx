@@ -1,15 +1,25 @@
-import React, { useState , useEffect } from "react";
+"use client";
+import React, { useState } from "react";
 import Link from "next/link";
-import { fetchProductDetails } from "@/utils/api";
-import { Product } from "@/app/models/products";
 
-interface ProductDescriptionProps {
-  dataId: number; // ✅ Ensure it's a number (no null/undefined)
+interface Product {
+  name: string;
+  description: string;
 }
 
-const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
-  const [productDetails, setProductDetails] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+interface ProductDescriptionProps {
+  product: Product | null;
+}
+
+const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
+  console.log("Received Product Data:", product);
+
+  const fallbackProduct: Product = {
+    name: "Default Product Name",
+    description: "Default Product Description",
+  };
+
+  const displayProduct = product || fallbackProduct;
 
   const images = [
     "/images/product/Rectangle971.svg",
@@ -19,17 +29,6 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const loadProductDetails = async () => {
-      setLoading(true);
-      const data = await fetchProductDetails(dataId); // ✅ Use the API function
-      console.log("Product Details:", data);
-      setProductDetails(data);
-      setLoading(false);
-    };
-    loadProductDetails();
-  }, [dataId]);
 
   const prevImage = () => {
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -43,7 +42,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
     <div className="px-4 md:px-20 py-6">
       {/* Back Button */}
       <div className="mb-4">
-        <Link href="/">
+        <Link href="/" passHref>
           <div className="flex items-center cursor-pointer">
             <img src="/images/login/back-arrow.svg" alt="Back" className="w-6 h-6" />
           </div>
@@ -54,10 +53,12 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
       <div className="flex flex-col-reverse lg:flex-row items-center gap-6 lg:gap-16">
         {/* Left Section (Text) */}
         <div className="w-full lg:w-1/2 text-black">
-          <h1 className="text-lg lg:text-[34px] font-semibold">{productDetails?.name || "Product Name"}</h1>
+          <h1 className="text-lg lg:text-[34px] font-semibold">
+            {displayProduct.name}
+          </h1>
           <p className="mt-2 lg:mt-4 text-sm lg:text-xl text-gray-700">Product Description</p>
           <p className="mt-3 text-sm lg:text-base text-gray-500 leading-relaxed">
-            {productDetails?.description || "Product Name"}
+            {displayProduct.description}
           </p>
           <div className="mt-4">
             <a href="#" className="text-blue-600 hover:text-blue-800 text-sm lg:text-base underline italic">
@@ -67,7 +68,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
         </div>
 
         {/* Right Section (Image Carousel) */}
-        <div className=" lg:w-2/5 md:h-[330px] flex flex-col items-center relative">
+        <div className="lg:w-2/5 md:h-[330px] flex flex-col items-center relative">
           {/* Image Display */}
           <div className="relative w-full max-w-md">
             {/* Left Arrow */}
@@ -82,7 +83,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
             {/* Main Image */}
             <img
               src={images[currentIndex]}
-              alt="Product"
+              alt={displayProduct.name}
               className="w-full object-contain rounded-lg transition-opacity duration-300"
             />
 
@@ -90,7 +91,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ dataId }) => {
             <button
               onClick={nextImage}
               aria-label="Next Image"
-              className="absolute top-1/2  md:-right-5 transform -translate-y-1/2 bg-[#FFFFFF80] p-2 flex items-center justify-center rounded-[38px] cursor-pointer"
+              className="absolute top-1/2 md:-right-5 transform -translate-y-1/2 bg-[#FFFFFF80] p-2 flex items-center justify-center rounded-[38px] cursor-pointer"
             >
               <img src="/images/icon/image-right-arrow.svg" alt="Next" className="w-5 h-5" />
             </button>

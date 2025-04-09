@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     }
 
     // Simulate backend API request (replace with your actual API)
-    const response = await fetch("https://fourdotsapi.azurewebsites.net/api/Account/verify-otp", {
+    const response = await fetch("https://localhost:7049/api/Account/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone, otp }),

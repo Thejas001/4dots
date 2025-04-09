@@ -1,4 +1,5 @@
 import axios from "axios";
+import https from "https"; 
 import { Product } from "@/app/models/products";
 import { extractPhotoFramePricingRules, 
         extractPaperPrintingPricingRules, 
@@ -10,21 +11,27 @@ import { extractPhotoFramePricingRules,
         extractCanvasPricingRules,
       } from "@/utils/extractPricingRule";
 import { CartItems } from "@/app/models/CartItems";
+const agent = new https.Agent({  
+  rejectUnauthorized: false, // ✅ Allow self-signed certificates
+}); 
 
 export const API = axios.create({
-  baseURL: "https://fourdotsapi.azurewebsites.net/api", // Change this if calling an external API
+  baseURL: "https://fourdotsapi.azurewebsites.net/api",
   headers: { "Content-Type": "application/json" },
+  httpsAgent: agent, // ✅ Use the custom HTTPS agent
 });
-// Set Authorization header with JWT token
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("jwtToken");  // Get JWT from localStorage
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;  // Add token to Authorization header
-  }
 
-  console.log("Authorization Header:", config.headers["Authorization"]);
+// ✅ Check for localStorage only in the browser
+API.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
   return config;
 });
+
 
 // Send OTP to user's phone
  export const sendOtp = async (phoneNumber: string) => {
@@ -59,15 +66,23 @@ API.interceptors.request.use((config) => {
   };
   
   // Fetch products from the server
-  export const fetchProducts = async () => {
+  export const fetchProducts = async (): Promise<Product[]> => {
     try {
       const response = await API.get("/products");
-      return response.data;
+  
+      const transformed = response.data.map((product: any) => ({
+        id: product.ProductID,
+        name: product.ProductName,
+        description: product.Description,
+      }));
+  
+      return transformed;
     } catch (error) {
       console.error("Error fetching products:", error);
       return [];
     }
   };
+  
 
 // Fetch product details by ID
 export const fetchProductDetails = async (dataId: number): Promise<Product | null> => {
@@ -198,7 +213,7 @@ export const placeOrder = async (
 };
 
 
-export const fetchUserOrder = async (userId: number) => {
+export const fetchUserOrder = async () => {
   try {
     const response = await API.get(`/order/user`);
 
@@ -212,9 +227,5 @@ export const fetchUserOrder = async (userId: number) => {
     throw new Error(error.response?.data?.message || "Failed to fetch orders");
   }
 };
-
-
-
-
 
 export default API;

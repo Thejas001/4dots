@@ -14,18 +14,16 @@ const ImageSection = ({
   const [startIndex, setStartIndex] = useState(0);
   const maxVisible = 5; // Maximum images shown at a time
 
-  const handleRemove = (uid: string | undefined, name: string) => {
+  const handleRemove = (indexToRemove: number) => {
     setUploadedImages((prev) => {
-      const updatedList = prev.filter((file) => file.uid !== uid && file.name !== name);
-      console.log("Updated List:", updatedList); // Debugging step
+      const updatedImages = prev.filter((_, index) => index !== indexToRemove);
       
-      // Update the selected quantity after removing an image
-      setSelectedQuantity(updatedList.length > 0 ? updatedList.length : null);
+      // Update the selected quantity based on the new number of images
+      setSelectedQuantity(updatedImages.length);
   
-      return updatedList;
+      return updatedImages;
     });
   };
-  
   
   useEffect(() => {
     setStartIndex((prevIndex) => Math.max(0, Math.min(prevIndex, uploadedImages.length - maxVisible)));
@@ -72,7 +70,7 @@ const ImageSection = ({
               )}
               <CloseCircleOutlined
                 className="absolute top-0 right-0 text-red-500 cursor-pointer"
-                onClick={() => handleRemove(file.uid, file.name)}
+                onClick={() => handleRemove(index)}
               />
             </div>
           ))
