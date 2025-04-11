@@ -12,8 +12,6 @@ interface ProductDescriptionProps {
 }
 
 const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
-  console.log("Received Product Data:", product);
-
   const fallbackProduct: Product = {
     name: "Default Product Name",
     description: "Default Product Description",
@@ -29,6 +27,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   const prevImage = () => {
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -37,6 +36,9 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
   const nextImage = () => {
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
+
+  const isLongDescription = displayProduct.description.length > 150;
+  const shortDescription = displayProduct.description.slice(0, 150) + "...";
 
   return (
     <div className="px-4 md:px-20 py-6">
@@ -56,16 +58,27 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
           <h1 className="text-lg lg:text-[34px] font-semibold">
             {displayProduct.name}
           </h1>
-          <p className="mt-2 lg:mt-4 text-sm lg:text-xl text-gray-700">Product Description</p>
-          <p className="mt-3 text-sm lg:text-base text-gray-500 leading-relaxed">
-            {displayProduct.description}
+          <p className="mt-2 lg:mt-4 text-sm lg:text-xl text-gray-700">
+            Product Description
           </p>
-          <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:text-blue-800 text-sm lg:text-base underline italic">
-              View Details
-            </a>
-          </div>
+          <p className="mt-3 text-sm lg:text-base text-gray-500 leading-relaxed">
+            {isLongDescription && !showFullDescription
+              ? shortDescription
+              : displayProduct.description}
+          </p>
+
+          {isLongDescription && (
+            <div className="mt-4">
+              <button
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                className="text-blue-600 hover:text-blue-800 text-sm lg:text-base underline italic"
+              >
+                {showFullDescription ? "Hide Details" : "View Details"}
+              </button>
+            </div>
+          )}
         </div>
+
 
         {/* Right Section (Image Carousel) */}
         <div className="lg:w-2/5 md:h-[330px] flex flex-col items-center relative">

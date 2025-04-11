@@ -1,13 +1,25 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const CartButton = () => {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push("/Cart");
-  };
+const CartButton = () => { 
+    const router = useRouter(); 
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+    const handleClick = () => {
+        if (!isClient) return;
+    
+        const token = localStorage.getItem("jwtToken");
+    
+        if (token) {
+          router.push("/Cart");
+        } else {
+          localStorage.setItem("redirectAfterLogin", "/Order");
+          router.push("/auth/signin");
+        }
+      };
 
   return (
     <div

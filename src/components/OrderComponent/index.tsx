@@ -53,7 +53,7 @@ const OrderComponent = () => {
       };
   
       loadOrders();
-    }, [userId]);
+    }, []);
   
     if (loading) {
       return <p>Loading orders...</p>;

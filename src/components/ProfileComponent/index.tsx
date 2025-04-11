@@ -16,6 +16,8 @@ const ProfileComponent = () => {
   const router = useRouter();
 
   const handleLogout = () => {
+    document.cookie = "jwtToken=; path=/; max-age=0; SameSite=Lax; Secure";
+
     localStorage.removeItem("jwtToken"); // Clear stored authentication token
     router.push("/"); // Navigate to landing page
   };
