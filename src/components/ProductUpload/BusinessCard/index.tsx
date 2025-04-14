@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import FileUploader from "./Fileuploader";
 
 const ProductUpload = ({ product }: { product: any }) => {
-  const dataId = product?.dataId;
+  const dataId = product.id;
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedCard, setSelectedCard] = useState<string>("");
   const [selectedSurface, setSelectedSurface] = useState<string>("");

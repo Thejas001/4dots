@@ -92,6 +92,10 @@ export interface Product {
   description: string;
   imageUrl: string;
   sizes: string[];
+  ProductDetailsImages: {
+    Id: number;
+    ImageUrl: string;
+  }[];
   colors: string[];
   quantity: number[];
   cardType: string[];

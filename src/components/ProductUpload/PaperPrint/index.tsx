@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import DropDown from "./DropDoun";
 import AddOnService from "./AddOnService";
-import FileUploader from "./Fileupload";
+import FileUploader from "./fileupload";
 import { fetchProductDetails } from "@/utils/api";
 import {
   Addon,
@@ -17,7 +17,7 @@ import { addToCartPaperPrint } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 
 const ProductUpload = ({ product }: { product: any }) => {
-  const dataId = product?.dataId;
+  const dataId = product.id;
   const [selectedOption, setSelectedOption] = useState<"B/W" | "Color">("B/W");
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>(""); // Size selected

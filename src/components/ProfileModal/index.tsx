@@ -1,8 +1,32 @@
-import React from "react";
-import { IoClose } from "react-icons/io5"; 
+import React, { useState } from "react";
+import { IoClose } from "react-icons/io5";
+import { updateUserDetails } from "@/utils/api";  
 
-const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const ProfileModal = ({ isOpen, onClose, onProfileUpdated  }: { isOpen: boolean; onClose: () => void;  onProfileUpdated: () => void   }) => {
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  
   if (!isOpen) return null; // Prevent rendering when closed
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      await updateUserDetails({ FirstName: name });
+      setSuccess(true);
+      onProfileUpdated();
+      onClose(); // Close modal after successful update
+    } catch (err: any) {
+      setError(err || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -24,12 +48,15 @@ const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                  </button>
                </div>
         {/* Form */}
-        <form className="space-y-5">
-          {/* Name Field */}
+        <form className="space-y-5" onSubmit={handleUpdate}>
+        {/* Name Field */}
           <div>
             <label className="block text-base font-normal text-[#242424] mb-2.5">Name</label>
             <input
               type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
               placeholder="Enter your name"
               className="w-full md:h-11.5   p-2 rounded-md border border-gray-300 bg-white"
             />
@@ -58,10 +85,13 @@ const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
           {/* Update Button */}
             <div className="flex justify-end mt-6">
-                <button className="md:w-[179px] bg-black text-white py-3 rounded-lg hover:bg-gray-900 transition">
-                    Update Profile
+                <button disabled={loading} type="submit" className="md:w-[179px] bg-black text-white py-3 rounded-lg hover:bg-gray-900 transition">
+                 {loading ? "Updating..." : "Update Profile"}
                 </button>
             </div>
+            {/* Optional Feedback */}
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          {success && <p className="text-green-600 text-sm mt-2">Profile updated successfully!</p>}
         </form>
       </div>
     </div>
