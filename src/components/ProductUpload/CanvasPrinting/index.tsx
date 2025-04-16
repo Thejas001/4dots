@@ -9,7 +9,7 @@ import { addToCartCanvasPrinting } from "@/utils/cart";
 import FileUploader from "./FileUploader";
 
 const ProductUpload = ({ product }: { product: any }) => {
-    const dataId = product?.dataId;
+    const dataId = product.id;
     const productDetails = product;//stores state from dropdown and passed to princingfrle finder
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [sqftRange, setSqftRange] = useState<number | null>(null);

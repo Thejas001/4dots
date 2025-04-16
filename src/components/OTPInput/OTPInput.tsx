@@ -56,6 +56,7 @@ function OTPInputComponent() {
       // Verify OTP API call
       const token = await verifyOTP(phoneNumber, otpString);
       console.log("JWT Token from verifyOTP:", token);
+      // Set JWT token in cookies 
       document.cookie = `jwtToken=${token}; path=/; max-age=604800; SameSite=Lax; Secure`;
 
       if(!token){

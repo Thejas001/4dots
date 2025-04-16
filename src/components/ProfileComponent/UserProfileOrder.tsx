@@ -43,7 +43,7 @@ const UserProfileOrder = () => {
     useEffect(() => {
         const loadOrders = async () => {
             try {
-                const data = await fetchUserOrder(userId);
+                const data = await fetchUserOrder();
                 setOrders(data);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);

@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
 
 const ProductUpload = ({ product }: { product: any }) => {
-  const dataId = product?.dataId;
+  const dataId = product.id;
   const [selectedOption, setSelectedOption] = useState("");
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>("");

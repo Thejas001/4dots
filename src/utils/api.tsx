@@ -32,6 +32,45 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+export const getUserDetails = async () => {
+  try {
+    const response = await API.get("/account/profile");
+    return response.data; // Assuming the API returns user details directly
+  } catch (error: any) {
+    console.error("Error fetching user details:", error);
+    throw error.response?.data?.message || "Failed to fetch user details";
+  }
+};
+
+export const getUserAddress = async () => {
+  try {
+    const response = await API.get("/address");
+    return response.data; // Assuming the API returns user address directly
+  } catch (error: any) {
+    console.error("Error fetching user address:", error);
+    throw error.response?.data?.message || "Failed to fetch user address";
+  }
+}
+
+export const addUserAddress = async (address: any) => {
+  try {
+    const response = await API.post("/address", address);
+    return response.data; // Assuming the API returns user address directly
+  } catch (error: any) {
+    console.error("Error adding user address:", error);
+    throw error.response?.data?.message || "Failed to add user address";
+  }
+}
+
+export const updateUserDetails = async (userDetails: any) => {
+  try {
+    const response = await API.put("/account/update-name", userDetails);
+    return response.data; // Assuming the API returns updated user details directly
+  } catch (error: any) {
+    console.error("Error updating user details:", error);
+    throw error.response?.data?.message || "Failed to update user details";
+  }
+}
 
 // Send OTP to user's phone
  export const sendOtp = async (phoneNumber: string) => {
@@ -133,6 +172,8 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
       sizes: extractSize(Data.Attributes),
       price: Data.Price || 0,
       imageUrl: Data.ImageUrl || "",
+      ProductDetailsImages: Data.ProductDetailsImages || [],
+      // ✅ Use the getValues function to extract values from attributes
       colors: getValues(
         Data.Attributes?.find((attr: any) => attr.AttributeName.toLowerCase() === "color name")
       ),

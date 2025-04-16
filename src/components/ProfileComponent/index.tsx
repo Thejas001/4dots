@@ -1,5 +1,5 @@
 "use client";
-import React , { useState } from "react";
+import React , { useState , useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import Image from "next/image";
 import Link from "next/link";
@@ -8,14 +8,58 @@ import Address from "@/components/OrderPayment/Address";
 import { motion } from "framer-motion";
 import { IoIosLogOut } from "react-icons/io";
 import UserProfileOrder from "./UserProfileOrder";
+import { getUserDetails } from "@/utils/api"; // adjust path if needed
 
+interface UserDetails {
+  Name: string;
+  PhoneNumber: string;
+}
 
 const ProfileComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [userName, setUserName] = useState("");
   const router = useRouter();
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  
+// In ProfileComponent.tsx, update the refreshUser function:
+  const refreshUser = async (currentName?: string) => {
+    try {
+      const data = await getUserDetails();
+      console.log("Fetched user data:", data);
+      // Only update if the fetched name differs (avoids overwriting optimistic update)
+      if (data.Name !== currentName) {
+        setUserName(data.Name || "");
+        setUserDetails(data);
+      }
+    } catch (err) {
+      console.error("Failed to refresh user:", err);
+    }
+  };
+  
+  const handleProfileUpdated = () => {
+    refreshUser(); // Re-fetch or update local state
+  };
+  useEffect(() => {
+    refreshUser();
+  }, []);
+  
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const data = await getUserDetails();
+        setUserDetails(data);
+      } catch (err) {
+        console.error("Failed to fetch user details:", err);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   const handleLogout = () => {
+    document.cookie = "jwtToken=; path=/; max-age=0; SameSite=Lax; Secure";
     localStorage.removeItem("jwtToken"); // Clear stored authentication token
     router.push("/"); // Navigate to landing page
   };
@@ -68,11 +112,11 @@ const ProfileComponent = () => {
 
       {/** User Details */}
       <div className="flex ml-[17px] flex-col gap-5 flex-grow">
-        <div className="text-[#000] text-xl font-normal">userName</div>
+        <div className="text-[#000] text-xl font-normal">{userDetails?.Name || "UserName"}</div>
         <div>
           <span className="text-base font-normal text-[#000]">Mobile Number :</span>
           <span className="pl-2.5 text-[#06f] text-base font-normal leading-[26px] underline decoration-solid decoration-auto underline-offset-auto">
-            +91982345566
+            {userDetails?.PhoneNumber || ""}         
           </span>
         </div>
       </div>
@@ -85,7 +129,7 @@ const ProfileComponent = () => {
           </svg>
           Edit Details
         </button>
-        <ProfileModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        <ProfileModal isOpen={isOpen} onClose={() => setIsOpen(false)} onProfileUpdated={handleProfileUpdated} />
       </div>
     </div>
   
@@ -93,9 +137,9 @@ const ProfileComponent = () => {
       <UserProfileOrder />
     </div>
       {/**Address Section*/}
-        <div className="col-span-12 xl:col-span-1 ml-6 mr-20 rounded-[10px] border border-[#ECECEC] max-h-40 overflow-auto">
-            <Address hideLabel buttonAlignment="left" buttonStyle="black" />
-          </div>
+      <div className="col-span-12 xl:col-span-1 ml-6 mr-20 p-4 rounded-[10px] border border-[#ECECEC] h-20  min-h-[300px]">
+        <Address hideLabel buttonAlignment="left" buttonStyle="black" />
+        </div>
 
     </div>
 

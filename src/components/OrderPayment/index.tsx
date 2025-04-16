@@ -45,7 +45,7 @@ const OrderPayment = () => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const data = await fetchUserOrder(userId);
+        const data = await fetchUserOrder();
         setOrders(data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -157,7 +157,8 @@ const OrderPayment = () => {
 
             {/* Payment Calculator */}
             <div className="col-span-12 xl:col-span-1 ml-[22px] mr-20">
-              <PaymentCal  />
+            
+            {/*<PaymentCal  />*/}
             </div>
           </>
         ) : (
