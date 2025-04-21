@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { fetchUserOrder } from "@/utils/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getUserAddress } from "@/utils/api";
+
 
 interface Attribute {
   OrderItemAttributeId: number;
@@ -34,9 +36,19 @@ interface Order {
   Items: Item[];
 }
 
+interface AddressType {
+  Id: number;
+  Address: string;
+  City: string;
+  Country: string;
+  PinCode: string;
+  IsPrimary: boolean;
+}
+
 const OrderComponent = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [address, setAddress] = useState<AddressType[]>([]);
     const router = useRouter();
     const userId = 2; // Replace with actual user ID
 
@@ -54,6 +66,23 @@ const OrderComponent = () => {
   
       loadOrders();
     }, []);
+
+    
+      useEffect(() => {
+        const fetchAddress = async () => {
+          setLoading(true);
+          try {
+            const data = await getUserAddress();
+            setAddress(data); // ✅ Adjust if your API returns nested structure
+          } catch (err) {
+            console.error("Failed to fetch address", err);
+          } finally {
+            setLoading(false);
+          }
+        };
+    
+        fetchAddress();
+      }, []);
   
     if (loading) {
       return <p>Loading orders...</p>;
@@ -190,15 +219,15 @@ const OrderComponent = () => {
               <div className="ml-4 flex flex-1 flex-col mt-2">
                 <div className=" flex items-center justify-between">
                     <div className="">
-                    {order.Items.length > 3 ? (
+                    {order.Items.length > 1 ? (
                        <Link href={`/Order/${order.OrderId}`}>
                         <span className="flex-grow text-md  font-semibold text-[#000] xl:text-xl">
-                        {order.Items.slice(0, 2).map(item => item.ProductName).join(", ")} and more...
+                        {order.Items.slice(0, 2).map(item => item.ProductName).join(", ")}<span className='text-blue-600'> and more...</span>
                         </span>
                         </Link>
                     ) : (
                       <span className="flex-grow text-md  font-semibold text-[#000] xl:text-xl">
-                      {order.Items.map(item => item.ProductName).join(", ")}
+                      {order.Items.map(item => item.ProductName)}
                     </span>
                     )}
                     </div>
@@ -208,18 +237,31 @@ const OrderComponent = () => {
                 </div>
 
               {/*Address*/}
-              <div className="mt-3 mb-0 flex items-start">
-                  <div className="flex-shrink-0">
-                    <label className="text-sm font-medium text-[#000] xl:text-base ">
-                      Address :
-                    </label>
-                  </div>
-                  <div className="ml-2">
-                    <span className="h-auto text-sm font-medium text-[#000] xl:text-base">
-                      206, 2nd Floor, Valiulla Complex, Nagdevi Street, Nagdevi - 400003
-                    </span>
-                  </div>
-              </div>
+                      {/*Address*/}
+
+                      <div className="mb-0 mt-3 flex items-start">
+                        <div className="flex-shrink-0">
+                          <label className="text-sm font-medium text-[#000] xl:text-base ">
+                            Address :
+                          </label>
+                        </div>
+                        <div className="ml-2">
+                          {loading ? (
+                            <span className="text-sm font-medium text-[#000] xl:text-base">
+                              Loading...
+                            </span>
+                          ) : address.length > 0 ? (
+                            <span className="h-auto text-sm font-medium text-[#000] xl:text-base">
+                              {address[0].Address}, {address[0].City},{" "}
+                              {address[0].Country} - {address[0].PinCode}
+                            </span>
+                          ) : (
+                            <span className="text-sm font-medium text-[#000] xl:text-base">
+                              No address found
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
               <div className="flex items-center mt-4 justify-between">
               <div className="flex items-center space-x-1">
@@ -231,7 +273,11 @@ const OrderComponent = () => {
                   <span className="text-sm font-semibold text-[#000]">{order.TotalAmount}</span>
                 </span>
               </div>
-              <div className="text-[#272727] text-[18px] font-normal leading-[24px] tracking-[-0.2px] underline decoration-solid decoration-skip-ink-none decoration-auto underline-offset-auto">View Detail</div>
+              {order.Items.length === 1 && (
+  <div className="text-[#272727] text-[18px] font-normal leading-[24px] tracking-[-0.2px] underline decoration-solid decoration-skip-ink-none decoration-auto underline-offset-auto">
+    View Detail
+  </div>
+)}
             </div>
             </div>
           </div>

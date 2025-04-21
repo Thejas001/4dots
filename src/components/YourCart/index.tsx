@@ -7,7 +7,6 @@ import AddressOption from "./AddressOption";
 import PaymentCal from "./PaymentCal";
 import { fetchCartItems , deleteCartItem } from "@/utils/cart"; //api
 import { CartData } from "@/app/models/CartItems"; //model
-import {addToCartPhotoFrame} from '@/utils/cart';
 import { processPendingCartItem } from "@/utils/processPendingCartItem";
 import PopupModal from "../PopUpModal";
 
