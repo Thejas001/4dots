@@ -10,6 +10,8 @@ import { LetterHeadPricingRule } from "@/app/models/products";
 import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
 
+
+
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
   const [selectedOption, setSelectedOption] = useState("");
@@ -18,6 +20,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<string>("");
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] =
     useState<LetterHeadPricingRule | null>(null);
@@ -27,6 +30,11 @@ const ProductUpload = ({ product }: { product: any }) => {
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
     return !!token;
+  };
+
+  const handleUploadSuccess = (documentId: number) => {
+    console.log("Received Document ID from child:", documentId);
+    setUploadedDocumentId(documentId);
   };
 
   useEffect(() => {
@@ -87,11 +95,11 @@ const ProductUpload = ({ product }: { product: any }) => {
     const pendingCartItem = sessionStorage.getItem("pendingCartItem");
     if (!pendingCartItem) return;
 
-    const { dataId: pendingDataId, selectedPricingRule: pendingPricingRule } =
+    const { dataId: pendingDataId, selectedPricingRule: pendingPricingRule, uploadedDocumentId: pendingDocumentId, } =
       JSON.parse(pendingCartItem);
 
     try {
-      await addToCart(pendingDataId, pendingPricingRule);
+      await addToCart(pendingDataId, pendingPricingRule, pendingDocumentId,);
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
     } catch (error) {
@@ -109,13 +117,14 @@ const ProductUpload = ({ product }: { product: any }) => {
         productType: "letterhead",
         dataId,
         selectedPricingRule,
+        uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
       return;
     }
     try {
-      await addToCart(dataId, selectedPricingRule);
+      await addToCart(dataId, selectedPricingRule, uploadedDocumentId ?? undefined );
       router.push("/Cart");
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
@@ -133,7 +142,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader />
+        <FileUploader onUploadSuccess={handleUploadSuccess} />
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
           <div className="mb-10 flex flex-row space-x-10">

@@ -15,7 +15,14 @@ const ProductUpload = ({ product }: { product: any }) => {
     const [sqftRange, setSqftRange] = useState<number | null>(null);
     const [selectedPricingRule, setSelectedPricingRule] = useState<CanvasPricingRule | null>(null);
     const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+    const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
     const router = useRouter();
+
+    
+  const handleUploadSuccess = (documentId: number) => {
+    console.log("Received Document ID from child:", documentId);
+    setUploadedDocumentId(documentId);
+  };
 
     const isLoggedIn = () => {
       const token = localStorage.getItem("jwtToken");
@@ -35,11 +42,11 @@ const ProductUpload = ({ product }: { product: any }) => {
       const pendingCartItem = sessionStorage.getItem("pendingCartItem");
       if (!pendingCartItem) return;
   
-      const { dataId: pendingDataId, selectedPricingRule: pendingPricingRule, selectedQuantity: pendingQuantity } = 
+      const { dataId: pendingDataId, selectedPricingRule: pendingPricingRule, selectedQuantity: pendingQuantity, uploadedDocumentId: pendingDocumentId} = 
         JSON.parse(pendingCartItem);
   
       try {
-        await addToCartCanvasPrinting(pendingDataId, pendingPricingRule, sqftRange as number);
+        await addToCartCanvasPrinting(pendingDataId, pendingPricingRule, sqftRange as number, pendingDocumentId);
         sessionStorage.removeItem("pendingCartItem");
         router.push("/Cart");
       } catch (error) {
@@ -54,7 +61,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         }
 
         if (!isLoggedIn()) {
-          const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange };
+          const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
           sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
           router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
           return;
@@ -62,7 +69,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     
         try {
-          await addToCartCanvasPrinting(dataId, selectedPricingRule, Number(sqftRange));
+          await addToCartCanvasPrinting(dataId, selectedPricingRule, Number(sqftRange), uploadedDocumentId ?? undefined);
           router.push("/Cart"); // ✅ Redirect to Cart page after adding
         } catch (error) {
           alert("Failed to add to cart. Please try again.");
@@ -80,7 +87,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader />
+        <FileUploader onUploadSuccess={handleUploadSuccess} />
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between px-4 md:px-7 py-[25px] rounded shadow">
          

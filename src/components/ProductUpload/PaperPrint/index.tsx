@@ -25,6 +25,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [pageCount, setPageCount] = useState(1);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [selectedBindingType, setSelectedBindingType] = useState("");
   const [selectedBinderColor, setSelectedBinderColor] = useState("");
   const [copySelection, setCopySelection] = useState<string>("");
@@ -60,6 +61,11 @@ const ProductUpload = ({ product }: { product: any }) => {
   const handleBinderColorChange = (binderColor: string) => {
     setSelectedBinderColor(binderColor);
     // You can also perform other actions here if needed
+  };
+
+  const handleUploadSuccess = (documentId: number) => {
+    console.log("Received Document ID from child:", documentId);
+    setUploadedDocumentId(documentId);
   };
 
   // Validate Printing Rules
@@ -207,7 +213,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader pageCount={pageCount} setPageCount={setPageCount} />
+        <FileUploader onUploadSuccess={handleUploadSuccess} pageCount={pageCount} setPageCount={setPageCount} />
         {/* Right Section */}
         {productDetails && (
           <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">

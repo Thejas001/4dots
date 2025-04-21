@@ -96,20 +96,25 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Dropdown Menu for Small Screens */}
+
       {isOpen && (
         <div id="mobile-menu" className="sm:hidden absolute top-[60px] right-0 w-full shadow-lg py-4 z-50 bg-white">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
             Your Cart
           </button>
+          
+          <Link href="/Order">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
-            <Link href="/Order">Your Order</Link>
+            Your Order
           </button>
+          </Link>
+          
+          <Link href="/auth/signin">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
-            <Link href="/auth/signin">
               <span>Login</span>
-            </Link>
           </button>
+          </Link>
+
         </div>
   )}
 </header>

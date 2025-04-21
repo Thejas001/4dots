@@ -1,8 +1,6 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
 import DropDown from "./DropDown";
-import { fetchProductDetails } from "@/utils/api";
 import { NameSlipPricingRule, Product } from "@/app/models/products";
 import { findNameSlipPricingRule } from "@/utils/priceFinder";
 import { addToCartNameSlip } from "@/utils/cart";
@@ -18,6 +16,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [error, setError] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] =
     useState<NameSlipPricingRule | null>(null);
   const router = useRouter();
@@ -35,6 +34,11 @@ const ProductUpload = ({ product }: { product: any }) => {
   ) => {
     setPrice(price);
     setError(error);
+  };
+
+  const handleUploadSuccess = (documentId: number) => {
+    console.log("Received Document ID from child:", documentId);
+    setUploadedDocumentId(documentId);
   };
 
 
@@ -72,6 +76,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       dataId: pendingDataId,
       selectedPricingRule: pendingPricingRule,
       selectedQuantity: pendingQuantity,
+      uploadedDocumentId: pendingDocumentId,
     } = JSON.parse(pendingCartItem);
 
     try {
@@ -79,6 +84,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         pendingDataId,
         pendingPricingRule,
         pendingQuantity as number,
+        pendingDocumentId,
       );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
@@ -100,6 +106,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         dataId,
         selectedPricingRule,
         selectedQuantity,
+        uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
@@ -111,6 +118,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         dataId,
         selectedPricingRule,
         Number(selectedQuantity),
+        uploadedDocumentId ?? undefined 
       );
       router.push("/Cart"); // ✅ Redirect to Cart page after adding
     } catch (error) {
@@ -130,7 +138,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader />
+        <FileUploader onUploadSuccess={handleUploadSuccess} />
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
           {productDetails && (

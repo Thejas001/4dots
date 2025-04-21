@@ -87,15 +87,19 @@ const Cart = () => {
       {cartData.Items.length > 0 ? (
        <> 
       <div className="flex flex-col  ">
-         {cartData.Items.map((item) => (
-      <div 
-      key={item.CartItemId}
-      className="flex rounded-[10px] border border-[#ECECEC] pr-2.5 mb-4 col-span-12 xl:col-span-1">
+         {cartData.Items.map((item) => {
+           const document = item.Documents?.[0];
+           const isPdf = document?.ContentType === "application/pdf";
+           const imageUrl = isPdf ? "/images/product/pdf.png" : document?.DocumentUrl;
+           return (
+          <div 
+          key={item.CartItemId}
+          className="flex rounded-[10px] border border-[#ECECEC] pr-2.5 mb-4 col-span-12 xl:col-span-1">
         <div className="flex">
           <img
-            src="/images/product/Rectangle984.svg"
+            src="/images/product/pdf.png"
             alt="Product Image"
-            className="object-cover"
+            className="mt-5 w-35 h-35 object-cover"
           />
         </div>
         <div className="flex flex-col flex-1">
@@ -177,7 +181,8 @@ const Cart = () => {
           </div>
         </div>
       </div>
-    ))}
+        );
+})}
   </div>
         <div className="col-span-12 xl:col-span-1 ml-6 mr-20">
         <DeliveryOption selectedOption={selectedOption} setSelectedOption={setSelectedOption} />

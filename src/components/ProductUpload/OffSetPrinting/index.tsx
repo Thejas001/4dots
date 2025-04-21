@@ -9,6 +9,8 @@ import { findOffsetPrintingPricingRule } from "@/utils/priceFinder";
 import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
 
+
+
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
@@ -18,12 +20,18 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] = useState<OffsetPrintingPricingRule | null>(null);
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const router = useRouter();
 
     // Check if user is logged in
     const isLoggedIn = () => {
       const token = localStorage.getItem("jwtToken");
       return !!token;
+    };
+
+    const handleUploadSuccess = (documentId: number) => {
+      console.log("Received Document ID from child:", documentId);
+      setUploadedDocumentId(documentId);
     };
 
   // Fetch product details when component mounts
@@ -61,13 +69,15 @@ const ProductUpload = ({ product }: { product: any }) => {
       const {
         dataId: pendingDataId,
         selectedPricingRule: pendingPricingRule,
+        uploadedDocumentId: pendingDocumentId,
       } = JSON.parse(pendingCartItem);
   
       try {
         await addToCartOffSetPrinting(
           pendingDataId,
           pendingPricingRule,
-          2
+          2,
+          pendingDocumentId,
         );
         sessionStorage.removeItem("pendingCartItem");
         router.push("/Cart");
@@ -85,13 +95,19 @@ const ProductUpload = ({ product }: { product: any }) => {
               productType: "offsetPrinting",
               dataId,
               selectedPricingRule,
+              uploadedDocumentId,
             };
             sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
             router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
             return;
           }
           try{
-            await addToCartOffSetPrinting(dataId, selectedPricingRule,2); //2= buddle quantity change that
+            await addToCartOffSetPrinting(
+              dataId, 
+              selectedPricingRule,
+              2,
+              uploadedDocumentId ?? undefined
+            ); //2= buddle quantity change that
             router.push("/Cart");
           }  catch (error) {
             alert("Failed to add to cart. Please try again.");
@@ -108,7 +124,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader />  
+        <FileUploader onUploadSuccess={handleUploadSuccess} />  
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between px-4 md:px-7 py-[25px] rounded shadow">
         {productDetails &&<DropDown

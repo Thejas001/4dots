@@ -25,7 +25,7 @@ const FileUploader = ({
   }, [quantity, setUploadedImages]);
 
   const props: UploadProps = {
-    name: "file",
+    name: "document",
     multiple: true,
     accept: "image/png, image/jpeg, image/jpg",
     showUploadList: false,
@@ -46,6 +46,7 @@ const FileUploader = ({
         name: file.name,
         url: previewUrl,
         status: "done" as UploadFile["status"],
+        originFileObj: file,
       };
 
       setUploadedImages((prev) => [...prev, newFile]);

@@ -141,6 +141,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
           {/**Cart Buttons */}
           <CartButton
+            uploadedImages={fileList}
             dataId={dataId}
             selectedQuantity={selectedQuantity}
             calculatedPrice={calculatedPrice}

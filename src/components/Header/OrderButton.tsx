@@ -4,13 +4,7 @@ import { useRouter } from "next/navigation";
 
 const OrderButton = () => { 
     const router = useRouter(); 
-    const [isClient, setIsClient] = useState(false);
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
     const handleClick = () => {
-        if (!isClient) return;
-    
         const token = localStorage.getItem("jwtToken");
     
         if (token) {

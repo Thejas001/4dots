@@ -190,10 +190,12 @@ const OrderComponent = () => {
               <div className="ml-4 flex flex-1 flex-col mt-2">
                 <div className=" flex items-center justify-between">
                     <div className="">
-                    {order.Items.length > 5 ? (
+                    {order.Items.length > 3 ? (
+                       <Link href={`/Order/${order.OrderId}`}>
                         <span className="flex-grow text-md  font-semibold text-[#000] xl:text-xl">
-                        {order.Items.slice(0, 5).map(item => item.ProductName).join(", ")} and more...
+                        {order.Items.slice(0, 2).map(item => item.ProductName).join(", ")} and more...
                         </span>
+                        </Link>
                     ) : (
                       <span className="flex-grow text-md  font-semibold text-[#000] xl:text-xl">
                       {order.Items.map(item => item.ProductName).join(", ")}

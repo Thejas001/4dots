@@ -1,5 +1,5 @@
 import { PhotoFramePricingRule } from "./products";
-//for add product
+import type { UploadFile } from "antd/es/upload";
 
 export interface Addon {
   AddonID: string | number; // Matches the cart entry structure
@@ -19,6 +19,7 @@ export interface CartItems {
     AttributeName: string;
     AttributeValue: string;
   }[];
+  CartItemDocumentIds?: number[];
 }
 
 
@@ -39,12 +40,21 @@ export interface FetchCartItem {
     AttributeName: string;
     AttributeValue: string;
   }[];
+  CartItemDocumentIds: number[];
   Addons: any[]; // Define Addon structure if needed
   PageCount: number | null;
   ResourceUrl: string | null;
   AddedAt: string;
   DeletedAt: string | null;
   IsDeleted: boolean;
+  Documents?: DocumentItem[];
+}
+
+export interface DocumentItem {
+  DocumentId: number;
+  DocumentUrl: string;
+  ContentType: string;
+  // Add any other fields your backend sends
 }
 
 export interface CartData {
@@ -63,6 +73,7 @@ export interface CartButtonProps {
   selectedQuantity: number | null;
   calculatedPrice: number;
   selectedPricingRule: PhotoFramePricingRule | null;
+  uploadedImages: UploadFile[];
 }
 
 

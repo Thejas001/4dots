@@ -17,6 +17,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -35,6 +36,11 @@ const ProductUpload = ({ product }: { product: any }) => {
   ) => {
     setPrice(price);
     setError(error);
+  };
+
+  const handleUploadSuccess = (documentId: number) => {
+    console.log("Received Document ID from child:", documentId);
+    setUploadedDocumentId(documentId);
   };
 
   useEffect(() => {
@@ -71,6 +77,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       dataId: pendingDataId,
       selectedPricingRule: pendingPricingRule,
       selectedQuantity: pendingQuantity,
+      uploadedDocumentId: pendingDocumentId,
     } = JSON.parse(pendingCartItem);
 
     try {
@@ -78,6 +85,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         pendingDataId,
         pendingPricingRule,
         pendingQuantity as number,
+        pendingDocumentId,
       );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
@@ -98,6 +106,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         dataId,
         selectedPricingRule,
         selectedQuantity,
+        uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
@@ -109,6 +118,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         dataId,
         selectedPricingRule,
         Number(selectedQuantity),
+        uploadedDocumentId ?? undefined 
       );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
@@ -129,7 +139,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader />
+        <FileUploader onUploadSuccess={handleUploadSuccess} />
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
           {productDetails && (
