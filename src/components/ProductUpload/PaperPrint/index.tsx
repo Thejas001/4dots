@@ -172,6 +172,53 @@ const ProductUpload = ({ product }: { product: any }) => {
           copySelection === "all" ? noOfCopies : customCopies || 0, // ✅ Store copies count
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      return;
+    }
+
+    const addonBookCount =
+      copySelection === "all" ? noOfCopies : customCopies || 0; // Define it here
+    const addonDetails = {
+      addons: productDetails?.Addons || [], // Safely accessing the Addons array
+      selectedBindingType,
+      selectedSize,
+      selectedColor: selectedOption,
+      pageCount,
+      addonBookCount,
+    };
+
+    try {
+      await addToCartPaperPrint(
+        dataId,
+        selectedPricingRule,
+        pageCount,
+        selectedBindingType,
+        selectedAddonRule,
+        addonBookCount,
+      );
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
+  };
+
+  const handleProceedToCart = async () => {
+    if (!productDetails || !selectedPricingRule) {
+      setErrorMessage("Please select all options before adding to the cart.");
+      return;
+    }
+
+    if (!isLoggedIn()) {
+      const pendingItem = {
+        productType: "paperprinting",
+        selectedPricingRule,
+        pageCount, // ✅ Store page count
+        selectedBindingType, // ✅ Store binding type
+        selectedAddonRule, // ✅ Store addon rule
+        addonBookCount:
+          copySelection === "all" ? noOfCopies : customCopies || 0, // ✅ Store copies count
+      };
+      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
       return;
     }
@@ -312,14 +359,14 @@ const ProductUpload = ({ product }: { product: any }) => {
                     />
                   </svg>
                 </span>
-                <Link href="/Cart">
+                <div onClick={handleAddToCart}>
                   <span className="text-lg font-medium">Add to Cart</span>
-                </Link>
+                </div>
               </div>
 
               {/* Second Button */}
               <div
-                onClick={handleAddToCart}
+                onClick={handleProceedToCart}
                 className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
               >
                 <span className="pr-1">

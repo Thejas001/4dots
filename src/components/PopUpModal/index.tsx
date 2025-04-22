@@ -1,26 +1,35 @@
 import { useEffect, useState } from "react";
+import { updateUserName } from "@/utils/api";
 
 const PopupModal = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [firstName, setFirstName] = useState("");
 
-  useEffect(() => {
-    // Open the modal when the page loads
-    setIsOpen(true);
-  }, []);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const fullName = `${firstName}`.trim();
+
+    if (!firstName) {
+      alert("Please enter your first name.");
+      return;
+    }
+
+    try {
+      await updateUserName(fullName);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  if (!isOpen) return null;
+
 
   return (
     <>
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-7.5 rounded-lg shadow-lg w-[452px]">
-            <div className="flex justify-end">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✖
-              </button>
-            </div>
             <div className="flex flex-col items-center">
               <span className="text-2xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -39,6 +48,8 @@ const PopupModal = () => {
                 </label>
                 <input
                   type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Name"
                   className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 />
@@ -55,6 +66,7 @@ const PopupModal = () => {
               </div>
               <button
                 type="submit"
+                onClick={handleSubmit}
                 className="w-full bg-[#242424] text-white py-2 rounded-[38px] text-center"
               >
                 Submit

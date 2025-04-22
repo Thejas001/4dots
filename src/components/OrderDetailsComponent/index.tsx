@@ -236,12 +236,12 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
                           {item.Attributes.map((attr) => (
                             <div
                               key={attr.OrderItemAttributeId}
-                              className="text-[#242424]"
+                              className="text-sm font-semibold text-[#000"
                             >
-                              <span className="text-base font-medium">
+                              <span className="text-sm font-semibold text-[#000">
                                 {attr.AttributeName}:
                               </span>{" "}
-                              <span className="text-base">
+                              <span className="text-sm font-semibold text-[#000e">
                                 {attr.AttributeValue}
                               </span>
                             </div>

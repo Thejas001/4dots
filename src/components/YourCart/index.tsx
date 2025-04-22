@@ -6,6 +6,8 @@ import DeliveryOption from "./DeliveryOption";
 import AddressOption from "./AddressOption";
 import PaymentCal from "./PaymentCal";
 import { fetchCartItems , deleteCartItem } from "@/utils/cart"; //api
+import { getUserDetails } from "@/utils/api"; //api
+
 import { CartData } from "@/app/models/CartItems"; //model
 import { processPendingCartItem } from "@/utils/processPendingCartItem";
 import PopupModal from "../PopUpModal";
@@ -16,6 +18,26 @@ const Cart = () => {
   const [cartData, setCartData] = useState<CartData>({ Items: [], TotalPrice: 0 });
   const userId = 3; // Replace with actual user ID
   const router = useRouter(); // ✅ Define router here
+  const [user, setUser] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userDetails = await getUserDetails();
+        setUser(userDetails);
+
+        if (!userDetails.Name || userDetails.Name.trim() === "") {
+          setShowModal(true);
+        }
+      } catch (error) {
+        console.error("Could not fetch user details", error);
+        setShowModal(true); // optionally show modal on error
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
@@ -59,7 +81,7 @@ const Cart = () => {
 
   return (
   <div className="h-auto grid grid-rows-[auto,1fr]  bg-[#fff]">
-     <PopupModal/>
+    {showModal && <PopupModal />}
     {/* Top Section */} 
     <div className="flex items-center mt-4 gap-[33.5px] px-20">
       {/* Back Button */}

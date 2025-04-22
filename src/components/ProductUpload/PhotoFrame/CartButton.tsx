@@ -112,6 +112,76 @@ const CartButton: React.FC<CartButtonProps> = ({
           documentIds,
         };
         sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+        router.push(`/auth/signin?redirect=/`);
+        return;
+      }
+  
+      // ✅ User is logged in – proceed to add to cart
+      await addToCartPhotoFrame(
+        dataId,
+        selectedPricingRule,
+        Number(selectedQuantity),
+        documentIds
+      );
+  
+      sessionStorage.removeItem("pendingCartItem");
+      router.push("/");
+  
+    } catch (error) {
+      console.error("Cart error:", error);
+      setErrorMessage("Failed to add to cart. Please try again.");
+    }
+  };
+  
+
+  const handleProceedToCart = async () => {
+    if (!selectedPricingRule || !selectedQuantity) {
+      setErrorMessage("Please select all options before adding to the cart.");
+      return;
+    }
+  
+    let documentIds: number[] = [];
+  
+    try {
+      // ✅ Upload each image and collect document IDs
+      for (const image of uploadedImages) {
+        if (!image.originFileObj) continue;
+  
+        console.log("Uploading image:", image.originFileObj);
+  
+        const formData = new FormData();
+        formData.append("document", image.originFileObj);
+  
+        const response = await fetch("https://fourdotsapi.azurewebsites.net/api/document/upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (!response.ok) {
+          throw new Error("Image upload failed");
+        }
+  
+        const result = await response.json();
+        console.log("Upload result:", result);
+  
+        if (result?.Data?.Id) {
+          documentIds.push(result.Data.Id);
+          console.log("Received documentId:", result.Data.Id);
+        } else {
+          console.error("❌ No document ID found in API response:", result);
+        }
+      }
+  
+      // ✅ Save to session if user is not logged in
+      if (!isLoggedIn()) {
+        const pendingItem = {
+          productType: "photoFrame",
+          dataId,
+          selectedPricingRule,
+          selectedQuantity,
+          documentIds,
+        };
+        sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
         router.push(`/auth/signin?redirect=/Cart`);
         return;
       }
@@ -133,6 +203,8 @@ const CartButton: React.FC<CartButtonProps> = ({
     }
   };
   
+
+
   // Process pending cart item when user logs in
   useEffect(() => {
     if (isLoggedIn()) {
@@ -151,7 +223,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       </button>
 
       <button
-        onClick={handleAddToCart}
+        onClick={handleProceedToCart}
         disabled={!selectedQuantity}
         className={`flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] text-lg md:w-[378px] 
           ${selectedQuantity ? "border-2 border-[#242424] bg-[#fff] text-[#242424]" : "cursor-not-allowed bg-gray-300 text-gray-500"}`}

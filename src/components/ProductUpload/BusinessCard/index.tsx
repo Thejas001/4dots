@@ -81,7 +81,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   };
 
-  const handleAddToCart = async () => {
+  const handleProceedToCart = async () => {
     if (!productDetails || !selectedPricingRule) {
       setErrorMessage("Please select all options before adding to the cart.");
       return;
@@ -106,6 +106,34 @@ const ProductUpload = ({ product }: { product: any }) => {
       alert("Failed to add to cart. Please try again.");
     }
   };
+
+  
+  const handleAddToCart = async () => {
+    if (!productDetails || !selectedPricingRule) {
+      setErrorMessage("Please select all options before adding to the cart.");
+      return;
+    }
+
+    if (!isLoggedIn()) {
+      const pendingItem = {
+        productType: "bussinesscard",
+        dataId,
+        selectedPricingRule,
+        uploadedDocumentId,
+      };
+      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      return;
+    }
+
+    try {
+      await addToCartBusinessCard(dataId, selectedPricingRule,  uploadedDocumentId ?? undefined);
+      router.push("/");
+    } catch (error) {
+      alert("Failed to add to cart. Please try again.");
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn()) {
       processPendingCartItem();
@@ -155,7 +183,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
             {/* Second Button */}
             <div
-              onClick={handleAddToCart}
+              onClick={handleProceedToCart}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
             >
               <span className="pr-1">

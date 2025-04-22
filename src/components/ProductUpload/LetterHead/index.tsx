@@ -120,6 +120,30 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      return;
+    }
+    try {
+      await addToCart(dataId, selectedPricingRule, uploadedDocumentId ?? undefined );
+      router.push("/");
+    } catch (error) {
+      alert("Failed to add to cart. Please try again.");
+    }
+  };
+
+  const handleProceedToCart = async () => {
+    if (!productDetails || !selectedPricingRule) {
+      setErrorMessage("Please select all options before adding to the cart.");
+      return;
+    }
+    if (!isLoggedIn()) {
+      const pendingItem = {
+        productType: "letterhead",
+        dataId,
+        selectedPricingRule,
+        uploadedDocumentId,
+      };
+      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
       return;
     }
@@ -221,7 +245,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
             {/* Second Button */}
             <div
-              onClick={handleAddToCart}
+              onClick={handleProceedToCart}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
             >
               <span className="pr-1">

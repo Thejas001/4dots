@@ -42,6 +42,15 @@ export const getUserDetails = async () => {
   }
 };
 
+export const updateUserName = async (userName: string) => {
+  try {
+    const response = await API.put("/account/update-name", { name: userName });
+    return response.data; // Assuming the API returns updated user details directly
+  } catch (error: any) {
+    console.error("Error updating user name:", error);
+    throw error.response?.data?.message || "Failed to update user name";
+  }
+}
 export const getUserAddress = async () => {
   try {
     const response = await API.get("/address");

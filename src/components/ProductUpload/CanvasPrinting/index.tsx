@@ -63,6 +63,28 @@ const ProductUpload = ({ product }: { product: any }) => {
         if (!isLoggedIn()) {
           const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
           sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+          router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+          return;
+        }
+
+    
+        try {
+          await addToCartCanvasPrinting(dataId, selectedPricingRule, Number(sqftRange), uploadedDocumentId ?? undefined);
+          router.push("/"); // ✅ Redirect to Cart page after adding
+        } catch (error) {
+          alert("Failed to add to cart. Please try again.");
+        }
+      };
+
+      const handleProceedToCart = async () => {
+        if (!productDetails || !selectedPricingRule) {
+          setErrorMessage("Please select all options before adding to the cart.");
+          return;
+        }
+
+        if (!isLoggedIn()) {
+          const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
+          sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
           router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
           return;
         }
@@ -112,7 +134,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
             {/* Second Button */}
             <div
-              onClick={handleAddToCart}
+              onClick={handleProceedToCart}
               className={`flex justify-center w-full md:w-[378px] h-[44px] rounded-[48px] text-lg items-center cursor-pointer 
               ${selectedPrice ? "bg-[#fff] text-[#242424] border-2 border-[#242424]" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
             >

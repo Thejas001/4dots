@@ -98,6 +98,35 @@ const ProductUpload = ({ product }: { product: any }) => {
               uploadedDocumentId,
             };
             sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+            router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+            return;
+          }
+          try{
+            await addToCartOffSetPrinting(
+              dataId, 
+              selectedPricingRule,
+              2,
+              uploadedDocumentId ?? undefined
+            ); //2= buddle quantity change that
+            router.push("/");
+          }  catch (error) {
+            alert("Failed to add to cart. Please try again.");
+          }
+        };
+
+        const handleProceedToCart = async () => {
+          if (!productDetails || !selectedPricingRule) {
+            setErrorMessage("Please select all options before adding to the cart.");
+            return;
+          }
+          if (!isLoggedIn()) {
+            const pendingItem = {
+              productType: "offsetPrinting",
+              dataId,
+              selectedPricingRule,
+              uploadedDocumentId,
+            };
+            sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
             router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
             return;
           }
@@ -113,6 +142,8 @@ const ProductUpload = ({ product }: { product: any }) => {
             alert("Failed to add to cart. Please try again.");
           }
         };
+
+
     useEffect(() => {
       if (isLoggedIn()) {
         processPendingCartItem();
@@ -148,7 +179,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
             {/* Second Button */}
             <div
-            onClick={handleAddToCart}
+            onClick={handleProceedToCart}
             className="flex justify-center bg-[#fff] text-[#242424] w-full md:w-[378px] h-[44px] border-2 border-[#242424] rounded-[48px] text-lg items-center relative cursor-pointer">
               <span className="pr-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="#242424">

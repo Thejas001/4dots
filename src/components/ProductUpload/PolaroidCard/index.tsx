@@ -109,6 +109,38 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      return;
+    }
+
+    try {
+      await addToCartPolaroidCard(
+        dataId,
+        selectedPricingRule,
+        Number(selectedQuantity),
+        uploadedDocumentId ?? undefined 
+      );
+      sessionStorage.removeItem("pendingCartItem");
+      router.push("/");
+    } catch (error) {
+      alert("Failed to add to cart. Please try again.");
+    }
+  };
+
+  const handleProceedToCart = async () => {
+    if (!productDetails || !selectedPricingRule) {
+      setErrorMessage("Please select all options before adding to the cart.");
+      return;
+    }
+    if (!isLoggedIn()) {
+      const pendingItem = {
+        productType: "polaroidCard",
+        dataId,
+        selectedPricingRule,
+        selectedQuantity,
+        uploadedDocumentId,
+      };
+      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
       return;
     }

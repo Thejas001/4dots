@@ -109,6 +109,38 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      return;
+    }
+
+    try {
+      await addToCartNameSlip(
+        dataId,
+        selectedPricingRule,
+        Number(selectedQuantity),
+        uploadedDocumentId ?? undefined 
+      );
+      router.push("/"); // ✅ Redirect to Cart page after adding
+    } catch (error) {
+      alert("Failed to add to cart. Please try again.");
+    }
+  };
+
+  const handleProceddToCart = async () => {
+    if (!productDetails || !selectedPricingRule) {
+      setErrorMessage("Please select all options before adding to the cart.");
+      return;
+    }
+
+    if (!isLoggedIn()) {
+      const pendingItem = {
+        productType: "nameslip",
+        dataId,
+        selectedPricingRule,
+        selectedQuantity,
+        uploadedDocumentId,
+      };
+      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
       return;
     }
@@ -183,7 +215,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
             {/* Second Button */}
             <div
-              onClick={handleAddToCart}
+              onClick={handleProceddToCart}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
             >
               <span className="pr-1">
