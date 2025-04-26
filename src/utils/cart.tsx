@@ -371,7 +371,7 @@ export const addToCartPaperPrint = async (
     Addons: addonRule && selectedBindingType
     ? [
         {
-          AddonID: addonRule.AddonName, // Use AddonID from the rule
+          AddonID: selectedBindingType, // Use AddonID from the rule
           IsDeleted: false,
           NumberOfBooks: addonBookCount || 1, // Use user-specified or default to 1
         },
@@ -384,11 +384,16 @@ export const addToCartPaperPrint = async (
         AttributeValue: pageCount.toString(),
       },
     ],
+    
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
 
   };
 
   console.log("🛒 Cart Item:", JSON.stringify(cartItem, null, 2));
+  
+  console.log("Selected Binding Type:", selectedBindingType);
+console.log("Addon Rule:", addonRule);
+
 
   try {
     const response = await addToCartApi(cartItem);

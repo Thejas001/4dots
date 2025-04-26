@@ -21,8 +21,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [price, setPrice] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const [selectedPricingRule, setSelectedPricingRule] =
-    useState<PolaroidCardPricingRule | null>(null);
+  const [selectedPricingRule, setSelectedPricingRule] = useState<PolaroidCardPricingRule | null>(null);
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
 
   // Check if user is logged in
   const isLoggedIn = () => {
@@ -191,8 +191,9 @@ const ProductUpload = ({ product }: { product: any }) => {
           {/**Cart & Payment Button*/}
           <div className="mt-[316px] flex flex-1 flex-row justify-center gap-19">
             {/* First Button */}
-            <div
+            <button
               onClick={handleAddToCart}
+              disabled={isAddToCartDisabled}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center gap-4 rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]"
             >
               <span className="pr-1">
@@ -213,11 +214,12 @@ const ProductUpload = ({ product }: { product: any }) => {
                 </svg>
               </span>
               <span className="text-lg font-medium">Add to Cart</span>
-            </div>
+            </button>
 
             {/* Second Button */}
-            <div
-              onClick={handleAddToCart}
+            <button
+              onClick={handleProceedToCart}
+              disabled={isAddToCartDisabled}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
             >
               <span className="pr-1">
@@ -236,7 +238,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               </span>
               <span className="font-bold">{price !== null ? price : "0"}</span>
               <span className="pl-4 font-medium">Proceed To Cart</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>

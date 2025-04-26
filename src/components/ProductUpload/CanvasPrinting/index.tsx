@@ -16,6 +16,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     const [selectedPricingRule, setSelectedPricingRule] = useState<CanvasPricingRule | null>(null);
     const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
     const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
+    const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
     const router = useRouter();
 
     
@@ -123,18 +124,22 @@ const ProductUpload = ({ product }: { product: any }) => {
            {/**Cart & Payment Button*/}
           <div className="flex-1 flex flex-row justify-center gap-19 mt-[252px]">
             {/* First Button */}
-            <div onClick={handleAddToCart} className="flex justify-center bg-[#242424] text-[#fff] w-full md:w-[378px] h-[44px] rounded-[48px] text-lg items-center relative gap-4 cursor-pointer">
+            <button
+              onClick={handleAddToCart} 
+              disabled={isAddToCartDisabled}
+              className="flex justify-center bg-[#242424] text-[#fff] w-full md:w-[378px] h-[44px] rounded-[48px] text-lg items-center relative gap-4 cursor-pointer">
               <span className="pr-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
                   <path d="M14.5003 5C14.5003 4.46957 14.2896 3.96086 13.9145 3.58579C13.5395 3.21071 13.0308 3 12.5003 3C11.9699 3 11.4612 3.21071 11.0861 3.58579C10.711 3.96086 10.5003 4.46957 10.5003 5M9.49232 15H12.4923M12.4923 15H15.4923M12.4923 15V12M12.4923 15V18M19.7603 9.696L21.1453 18.696C21.1891 18.9808 21.1709 19.2718 21.0917 19.5489C21.0126 19.8261 20.8746 20.0828 20.687 20.3016C20.4995 20.5204 20.2668 20.6961 20.005 20.8167C19.7433 20.9372 19.4585 20.9997 19.1703 21H5.83032C5.54195 21 5.25699 20.9377 4.99496 20.8173C4.73294 20.6969 4.50005 20.5212 4.31226 20.3024C4.12448 20.0836 3.98624 19.8267 3.90702 19.5494C3.82781 19.2721 3.80949 18.981 3.85332 18.696L5.23832 9.696C5.31097 9.22359 5.5504 8.79282 5.91324 8.4817C6.27609 8.17059 6.73835 7.9997 7.21632 8H17.7843C18.2621 7.99994 18.7241 8.17094 19.0868 8.48203C19.4494 8.79312 19.6877 9.22376 19.7603 9.696Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
                 <span className="font-medium text-lg">Add to Cart</span>
-            </div>
+            </button>
 
             {/* Second Button */}
-            <div
+            <button
               onClick={handleProceedToCart}
+              disabled={isAddToCartDisabled}
               className={`flex justify-center w-full md:w-[378px] h-[44px] rounded-[48px] text-lg items-center cursor-pointer 
               ${selectedPrice ? "bg-[#fff] text-[#242424] border-2 border-[#242424]" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
             >
@@ -145,7 +150,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               </span>
                 <span className="font-bold">{selectedPrice || 0}</span>
                 <span className="font-medium pl-4">Proceed To Cart</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>

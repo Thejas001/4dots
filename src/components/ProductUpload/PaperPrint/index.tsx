@@ -30,8 +30,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [selectedBinderColor, setSelectedBinderColor] = useState("");
   const [copySelection, setCopySelection] = useState<string>("");
   const [customCopies, setCustomCopies] = useState<number>(0);
-  const [selectedPricingRule, setSelectedPricingRule] =
-    useState<PaperPrintingPricingRule | null>(null);
+  const [selectedPricingRule, setSelectedPricingRule] = useState<PaperPrintingPricingRule | null>(null);
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
   const [selectedAddonRule, setSelectedAddonRule] = useState<Addon | null>(
     null,
   );
@@ -66,6 +66,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const handleUploadSuccess = (documentId: number) => {
     console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
+
   };
 
   // Validate Printing Rules
@@ -121,7 +122,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     setSelectedAddonRule(addonRule);
     console.log("Addon Rule:", addonRule);
-  }, [selectedSize, selectedOption, productDetails, pageCount, errorMessage]);
+  }, [selectedSize, selectedOption, productDetails, pageCount, errorMessage, selectedBindingType]);
 
   // Process stored cart item after login
   const processPendingCartItem = async () => {
@@ -225,7 +226,8 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     const addonBookCount =
       copySelection === "all" ? noOfCopies : customCopies || 0; // Define it here
-    const addonDetails = {
+   
+      const addonDetails = {
       addons: productDetails?.Addons || [], // Safely accessing the Addons array
       selectedBindingType,
       selectedSize,
@@ -341,7 +343,10 @@ const ProductUpload = ({ product }: { product: any }) => {
             {/* Buttons */}
             <div className="mt-19 flex flex-1 flex-row justify-center gap-19">
               {/* First Button */}
-              <div className="relative flex h-[44px] w-full cursor-pointer items-center justify-center gap-4 rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]">
+              <button 
+              onClick={handleAddToCart}
+              disabled={isAddToCartDisabled}
+              className="relative flex h-[44px] w-full cursor-pointer items-center justify-center gap-4 rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]">
                 <span className="pr-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -359,13 +364,14 @@ const ProductUpload = ({ product }: { product: any }) => {
                     />
                   </svg>
                 </span>
-                <div onClick={handleAddToCart}>
+                <div >
                   <span className="text-lg font-medium">Add to Cart</span>
                 </div>
-              </div>
+              </button>
 
               {/* Second Button */}
-              <div
+              <button
+                disabled={isAddToCartDisabled}
                 onClick={handleProceedToCart}
                 className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
               >
@@ -387,7 +393,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                   {calculatedPrice !== null ? `${calculatedPrice}` : "0"}
                 </span>
                 <span className="pl-4 font-medium">Proceed To Cart</span>
-              </div>
+              </button>
             </div>
           </div>
         )}

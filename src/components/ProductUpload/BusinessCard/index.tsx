@@ -17,8 +17,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
-  const [selectedPricingRule, setSelectedPricingRule] =
-    useState<BusinessCardPricingRule | null>(null);
+  const [selectedPricingRule, setSelectedPricingRule] = useState<BusinessCardPricingRule | null>(null);
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
   const router = useRouter();
 
   // Check if user is logged in
@@ -157,8 +157,9 @@ const ProductUpload = ({ product }: { product: any }) => {
 
           <div className="mt-[400px] flex flex-1 flex-row justify-center gap-19">
             {/* First Button */}
-            <div
+            <button
               onClick={handleAddToCart}
+              disabled={isAddToCartDisabled}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center gap-4 rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]"
             >
               <span className="pr-1">
@@ -179,11 +180,12 @@ const ProductUpload = ({ product }: { product: any }) => {
                 </svg>
               </span>
               <span className="text-lg font-medium">Add to Cart</span>
-            </div>
+            </button>
 
             {/* Second Button */}
-            <div
+            <button
               onClick={handleProceedToCart}
+              disabled={isAddToCartDisabled}
               className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
             >
               <span className="pr-1">
@@ -202,7 +204,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               </span>
               <span className="font-bold">{price !== null ? price : "0"}</span>
               <span className="pl-4 font-medium">Proceed To Cart</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
