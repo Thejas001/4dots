@@ -15,7 +15,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [fileType, setFileType] = useState<"pdf" | null>(null);
   const props: UploadProps = {
     name: "document",  // Important: match backend's expected form field name
-    action: "https://fourdotsapi.azurewebsites.net/api/document/upload",
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
     accept: ".pdf",
     headers: {
@@ -57,7 +57,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       if (docId) {
         try {
           // Call your delete document API here
-          await fetch(`https://fourdotsapi.azurewebsites.net/api/document/delete/${docId}`, {
+          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
             method: "DELETE",
           });
   

@@ -15,7 +15,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
 
   const props: UploadProps = {
     name: "document",
-    action: "https://fourdotsapi.azurewebsites.net/api/document/upload",
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
     accept: ".pdf",  // Only allow PDF files in the file explorer
     headers: {
@@ -59,7 +59,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         if (docId) {
           try {
             // Call your delete document API here
-            await fetch(`https://fourdotsapi.azurewebsites.net/api/document/delete/${docId}`, {
+            await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
               method: "DELETE",
             });
     
