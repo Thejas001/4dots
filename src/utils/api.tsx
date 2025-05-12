@@ -16,7 +16,7 @@ const agent = new https.Agent({
 }); 
 
 export const API = axios.create({
-  baseURL: "https://fourdotsapi.azurewebsites.net/api",
+  baseURL: "https://fourdotsapp.azurewebsites.net/api",
   headers: { "Content-Type": "application/json" },
   httpsAgent: agent, // ✅ Use the custom HTTPS agent
 });

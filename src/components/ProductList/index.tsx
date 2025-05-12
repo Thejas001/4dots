@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Product } from "@/app/models/products";
 import { fetchProducts } from "@/utils/api";
 import { Metadata } from "next";
-
+import NetworkErrorPage from "../NetworkErrorPage";
  const metadata: Metadata = {
   title: "4 Dots",
   description:
@@ -19,6 +19,8 @@ interface ProductListProps {
 
 
 const ProductList: React.FC<ProductListProps> = ({ products }) => {
+  const [hasError, setHasError] = useState(false);
+
   const formatName = (name: string) => {
     if (!name) return "";
     return name

@@ -10,6 +10,7 @@ import CanvasPrinting from "@/components/ProductUpload/CanvasPrinting";
 import PolaroidCard from "@/components/ProductUpload/PolaroidCard";
 import CustomNameSlip from "@/components/ProductUpload/CustomNameSlip";
 import { Metadata } from "next";
+import NetworkErrorPage from "@/components/NetworkErrorPage";
 
 export const metadata: Metadata = {
   title: "4 Dots",
@@ -43,13 +44,13 @@ export default async function PageDetails({
   const product = await fetchProductDetails(dataId);
 
   if (!product) {
-    return <p>Product not found</p>;
+    return <p><NetworkErrorPage /></p>;
   }
 
   const SpecificProductComponent = ProductComponents[id.toLowerCase()];
 
   if (!SpecificProductComponent) {
-    return <p>Product not found</p>;
+    return <p><NetworkErrorPage /></p>;
   }
 
   return (
