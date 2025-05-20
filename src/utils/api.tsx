@@ -16,7 +16,7 @@ const agent = new https.Agent({
 }); 
 
 export const API = axios.create({
-  baseURL: "https://fourdotsapp.azurewebsites.net/api",
+  baseURL: "https://localhost:7049/api",
   headers: { "Content-Type": "application/json" },
   httpsAgent: agent, // ✅ Use the custom HTTPS agent
 });
@@ -245,12 +245,10 @@ export const addToCartApi = async (cartItem: CartItems) => {
 
 export const placeOrder = async (
   cartItemIds: number[], 
-  userId: number, 
   paymentMethod: string
 ) => {    
   try {
     const response = await API.post("/order/create", {
-      userId, 
       cartItemIds,
       paymentMethod
     });
@@ -277,5 +275,19 @@ export const fetchUserOrder = async () => {
     throw new Error(error.response?.data?.message || "Failed to fetch orders");
   }
 };
+
+export const fetchPaymentRetry = async (orderId: number) => {
+  try {
+    const response = await API.get(`/order/retry-payment/${orderId}`);
+    console.log("API Response Data:", response.data); // Keep this for debugging
+
+    // Return the actual response data directly
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching orders:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "Failed to fetch orders");
+  }
+};
+
 
 export default API;

@@ -3,20 +3,67 @@ import React from "react";
 import Link from "next/link";
 import { PaymentCalProps } from "@/app/models/CartItems";
 import { placeOrder } from "@/utils/api";
+import { useRouter } from "next/navigation";
 
   
 const PaymentCal: React.FC<PaymentCalProps> = ({ userId, cartItemIds, totalPrice }) => {
-    const handlePlaceOrder = async () => {
-      const paymentMethod = "UPI"; // Example payment method
-  
-      try {
-        const response = await placeOrder(cartItemIds, userId, paymentMethod);
-        console.log("Order placed successfully:", response);
-      } catch (error) {
-        console.error("Order placement failed:", error);
-      }
+    const router = useRouter(); // if you're using Next.js router
+
+const handlePlaceOrder = async () => {
+
+  const paymentMethod = "razorpay";
+
+  try {
+    const response = await placeOrder(cartItemIds, paymentMethod);
+
+    console.log("Order response:", response);
+
+    if (!response || !response.RazorpayOrderId) {
+      console.error("Invalid response from backend");
+      return;
+    }
+
+    const options = {
+      key: response.RazorpayKey,
+      amount: response.Amount,
+      currency: response.Currency,
+      name: "PrintDot",
+      description: "Order Payment",
+      order_id: response.RazorpayOrderId,
+      handler: async function (razorpayResponse: any) {
+        console.log("✅ Payment successful:", razorpayResponse);
+
+        // ✅ Optional: send to backend to verify signature
+        // await fetch("/api/payment/verify", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify(razorpayResponse),
+        // });
+
+        // ✅ Redirect after success
+        router.push("/"); // or use window.location.href = "/thank-you";
+        console.log("✅ Payment successful:", razorpayResponse);
+
+      },
+      prefill: {
+        name: "Thejas V Panicker",
+        email: "your@email.com",
+        contact: "9744003284",
+      },
+      theme: {
+        color: "black",
+      },
     };
-      
+
+    const razorpay = new (window as any).Razorpay(options);
+    razorpay.open();
+  } catch (error) {
+    console.error("Order placement or Razorpay failed:", error);
+  }
+};
+
     return(
         <div>
             <div className="flex flex-col rounded-[20px] border border-[#ECECEC] xl:max-w-[468px] pt-5">
@@ -63,11 +110,9 @@ const PaymentCal: React.FC<PaymentCalProps> = ({ userId, cartItemIds, totalPrice
                 </div>
         </div>
         <div onClick={handlePlaceOrder} className="flex-1 flex-col mb-26 mt-5.5 xl:w-[468px] ">
-            <Link href="/">
                 <div className="flex justify-center p-2.5 bg-[#242424] text-[#fff] rounded-[43px]  items-center cursor-pointer">
                     <span className="text-lg font-semibold ">Place Order</span>
                 </div>
-            </Link>
           </div>
     </div>
         

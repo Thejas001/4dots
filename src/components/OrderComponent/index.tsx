@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { fetchUserOrder } from "@/utils/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getUserAddress } from "@/utils/api";
+import { getUserAddress,  fetchPaymentRetry} from "@/utils/api";
 import { motion } from "framer-motion";
+import paymentRetry from  "./paymentRetry";
 
 interface Attribute {
   OrderItemAttributeId: number;
@@ -55,6 +56,8 @@ const OrderComponent = () => {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {},
   );
+
+
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -107,6 +110,16 @@ const OrderComponent = () => {
     }));
   };
 
+  const handleRetryPayment = async (orderId: number) => {
+  try {
+    const paymentData = await fetchPaymentRetry(orderId);
+    paymentRetry(paymentData); // This opens Razorpay payment window
+  } catch (error) {
+    console.error("Retry failed:", error);
+    // Show toast or error UI if needed
+  }
+};
+
   return (
     <div className="w-2xl grid h-auto  grid-rows-[auto,1fr] bg-[#fff]">
       {/* Top Section */}
@@ -126,13 +139,32 @@ const OrderComponent = () => {
       <div className="mb-10 mt-9 grid  h-auto grid-cols-12 pl-36 pr-39 xl:grid-cols-1">
         {orders.length > 0 ? (
           <div className="flex flex-col ">
-            {orders.map((order) => (
+            {orders.map((order) => ( (
               //  <div key={order.OrderId}>
               //  {order.Items.map(item => (
               <div
                 key={order.OrderId}
                 className="bg-lightgray col-span-12 mb-4 flex flex-col rounded-[10px] border border-[#E9E9E9] bg-white p-5 shadow-[0px_4px_16px_0px_rgba(91,91,91,0.20)] xl:w-[1243px]"
               >
+
+                                {/* Payment Failed Banner */}
+            {order.Payment?.PaymentStatus === "Failed" && (
+                  <div className="mb-3 rounded-md bg-red-100 p-3 text-sm text-red-700">
+                    ⚠ Payment for this order failed. Please try again or contact
+                    support.
+                    <div className="mt-2">
+                      <button
+                        onClick={() =>
+                          handleRetryPayment(order.OrderId)
+                        }
+                        className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                      >
+                        Retry Payment
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Centered Heading */}
                 <div className="w-full ">
                   {/* Progress Bar */}
@@ -416,7 +448,7 @@ const OrderComponent = () => {
                           </motion.div>
                   </div>
                 </div>
-              </div>
+              </div>)
             ))}
           </div>
         ) : (
