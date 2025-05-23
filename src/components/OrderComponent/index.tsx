@@ -165,6 +165,20 @@ const OrderComponent = () => {
                   </div>
                 )}
 
+                {order.Payment?.PaymentStatus === "Pending" && (
+                    <div className="mb-3 rounded-md bg-yellow-100 p-3 text-sm text-yellow-800">
+                      ⏳ Payment for this order is pending. Please complete the payment to proceed.
+                      <div className="mt-2">
+                        <button
+                          onClick={() => handleRetryPayment(order.OrderId)}
+                          className="rounded-md bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
+                        >
+                          Complete Payment
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                 {/* Centered Heading */}
                 <div className="w-full ">
                   {/* Progress Bar */}
