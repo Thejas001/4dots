@@ -245,20 +245,23 @@ export const addToCartApi = async (cartItem: CartItems) => {
 
 export const placeOrder = async (
   cartItemIds: number[], 
-  paymentMethod: string
+  deliveryOption: string,
+  paymentOption: string
 ) => {    
   try {
     const response = await API.post("/order/create", {
-      cartItemIds,
-      paymentMethod
+      CartItemIds: cartItemIds,
+      PaymentMethod: paymentOption,
+      DeliveryType: deliveryOption,
     });
 
-    return response.data; // Axios automatically handles JSON parsing
+    return response.data;
   } catch (error: any) {
     console.error("Error placing order:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Failed to place order");
   }
 };
+
 
 
 export const fetchUserOrder = async () => {

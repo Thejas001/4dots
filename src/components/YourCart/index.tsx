@@ -5,6 +5,7 @@ import Link from "next/link";
 import DeliveryOption from "./DeliveryOption";
 import AddressOption from "./AddressOption";
 import PaymentCal from "./PaymentCal";
+import PaymentMethod from "./PaymentMethod";
 import { fetchCartItems , deleteCartItem } from "@/utils/cart"; //api
 import { getUserDetails } from "@/utils/api"; //api
 
@@ -14,7 +15,8 @@ import PopupModal from "../PopUpModal";
 
 
 const Cart = () => {
-  const [selectedOption, setSelectedOption] = useState(""); // State lifted to parent
+  const [deliveryOption, setDeliveryOption] = useState("");
+  const [paymentOption, setPaymentOption] = useState("");
   const [cartData, setCartData] = useState<CartData>({ Items: [], TotalPrice: 0 });
   const userId = 3; // Replace with actual user ID
   const router = useRouter(); // ✅ Define router here
@@ -206,9 +208,10 @@ const Cart = () => {
 })}
   </div>
         <div className="col-span-12 xl:col-span-1 ml-6 mr-20">
-        <DeliveryOption selectedOption={selectedOption} setSelectedOption={setSelectedOption} />
-        {selectedOption === "delivery" && <AddressOption />}
-        <PaymentCal totalPrice={cartData.TotalPrice}  userId={userId} cartItemIds={cartItemIds} />
+        <DeliveryOption selectedOption={deliveryOption} setSelectedOption={setDeliveryOption} />
+        {deliveryOption === "Delivery" && <AddressOption />}
+        <PaymentMethod selectedPaymentOption={paymentOption} setSelectedPaymentOption={setPaymentOption} />
+        <PaymentCal totalPrice={cartData.TotalPrice}  userId={userId} cartItemIds={cartItemIds} deliveryOption={deliveryOption}  paymentOption={paymentOption}/>
         </div>
         </>
       ) : (

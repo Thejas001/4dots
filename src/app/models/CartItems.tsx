@@ -66,6 +66,8 @@ export interface PaymentCalProps {
   userId: number;
   cartItemIds: number[];
   totalPrice: number;
+  deliveryOption: string; 
+  paymentOption: string; // "Online" or "CashOnDelivery"
 }
 
 export interface CartButtonProps {

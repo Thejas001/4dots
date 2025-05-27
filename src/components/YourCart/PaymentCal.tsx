@@ -6,17 +6,25 @@ import { placeOrder } from "@/utils/api";
 import { useRouter } from "next/navigation";
 
   
-const PaymentCal: React.FC<PaymentCalProps> = ({ userId, cartItemIds, totalPrice }) => {
+const PaymentCal: React.FC<PaymentCalProps> = ({cartItemIds, totalPrice, deliveryOption ,paymentOption}) => {
     const router = useRouter(); // if you're using Next.js router
 
 const handlePlaceOrder = async () => {
 
-  const paymentMethod = "razorpay";
+  const paymentMethod = paymentOption === "CashOnDelivery" ? "cash" : "razorpay";
 
   try {
-    const response = await placeOrder(cartItemIds, paymentMethod);
+    const response = await placeOrder(cartItemIds ,deliveryOption, paymentOption);
 
     console.log("Order response:", response);
+
+    
+    if (paymentMethod === "cash") {
+      // ✅ Skip Razorpay, redirect or show success
+      console.log("✅ Cash on Delivery selected. Skipping Razorpay.");
+      router.push("/"); // or your desired confirmation page
+      return;
+    }
 
     if (!response || !response.RazorpayOrderId) {
       console.error("Invalid response from backend");
@@ -91,12 +99,14 @@ const handlePlaceOrder = async () => {
                     <span>0</span></div>
             </div>
             {/* Shipping Charges */}
+            {paymentOption !== "CashOnDelivery" && (
             <div className="flex justify-between pl-9 pr-[33px] mt-7.5 text-base font-medium text-[#000]">
                 <div><span>Shipping Fee :</span></div>
                     <div className="flex" >
                         <span>Free</span>
                     </div>
                 </div>
+            )}
 
             {/* Total Amount */}
             <div className="flex justify-between py-4 pl-9 pr-[33px] mt-4.5 text-lg font-semibold text-[#000] rounded-b-[20px] border border-[#ECECEC] bg-white">

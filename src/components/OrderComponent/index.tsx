@@ -402,7 +402,7 @@ const OrderComponent = () => {
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center space-x-1">
                         <span className="text-sm font-semibold text-[#000]">
-                          Paid Amount :
+                           Amount :
                         </span>
                         <span className="flex items-center">
                           <svg
