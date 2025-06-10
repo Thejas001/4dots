@@ -346,7 +346,12 @@ const ProductUpload = ({ product }: { product: any }) => {
               <button 
               onClick={handleAddToCart}
               disabled={isAddToCartDisabled}
-              className="relative flex h-[44px] w-full cursor-pointer items-center justify-center gap-4 rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]">
+              className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+                ${isAddToCartDisabled
+                  ? "cursor-not-allowed bg-gray-300 text-gray-500"
+                  : "cursor-pointer bg-[#242424] text-white"
+                }`}               
+                >               
                 <span className="pr-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -373,8 +378,12 @@ const ProductUpload = ({ product }: { product: any }) => {
               <button
                 disabled={isAddToCartDisabled}
                 onClick={handleProceedToCart}
-                className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
-              >
+                className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] border-2 text-lg md:w-[378px]
+                  ${isAddToCartDisabled
+                    ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
+                    : "cursor-pointer border-[#242424] bg-white text-[#242424]"
+                  }`}                
+                  >
                 <span className="pr-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

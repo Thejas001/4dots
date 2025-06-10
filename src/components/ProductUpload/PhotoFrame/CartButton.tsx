@@ -27,6 +27,8 @@ const CartButton: React.FC<CartButtonProps> = ({
     return !!token;
   };
 
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedImages || uploadedImages.length === 0;
+
   // ✅ Process pending cart item after login
   const processPendingCartItem = async () => {
     const pendingCartItem = sessionStorage.getItem("pendingCartItem");
@@ -216,18 +218,26 @@ const CartButton: React.FC<CartButtonProps> = ({
     <div className="mt-4 flex flex-1 flex-row justify-center gap-4">
       <button
         onClick={handleAddToCart}
-        className="flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]"
-      >
+        disabled={isAddToCartDisabled}
+        className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+          ${isAddToCartDisabled
+            ? "cursor-not-allowed bg-gray-300 text-gray-500"
+            : "cursor-pointer bg-[#242424] text-white"
+          }`}               
+          >
         <span className="pr-1">🛒</span>
         <span className="text-lg font-medium">Add to Cart</span>
       </button>
 
       <button
         onClick={handleProceedToCart}
-        disabled={!selectedQuantity}
-        className={`flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] text-lg md:w-[378px] 
-          ${selectedQuantity ? "border-2 border-[#242424] bg-[#fff] text-[#242424]" : "cursor-not-allowed bg-gray-300 text-gray-500"}`}
-      >
+        disabled={isAddToCartDisabled}
+        className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] border-2 text-lg md:w-[378px]
+          ${isAddToCartDisabled
+            ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
+            : "cursor-pointer border-[#242424] bg-white text-[#242424]"
+          }`}                
+          >
         <span className="pr-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"

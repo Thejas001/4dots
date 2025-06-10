@@ -22,7 +22,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [selectedPricingRule, setSelectedPricingRule] = useState<PolaroidCardPricingRule | null>(null);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
 
   // Check if user is logged in
   const isLoggedIn = () => {
@@ -94,6 +93,8 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   };
 
+  const isProceedToCartDisabled = !productDetails || !selectedPricingRule || !selectedSize || !selectedQuantity || !uploadedDocumentId;
+
   //add to cart function
   const handleAddToCart = async () => {
     if (!productDetails || !selectedPricingRule) {
@@ -127,37 +128,40 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   };
 
-  const handleProceedToCart = async () => {
-    if (!productDetails || !selectedPricingRule) {
-      setErrorMessage("Please select all options before adding to the cart.");
-      return;
-    }
-    if (!isLoggedIn()) {
-      const pendingItem = {
-        productType: "polaroidCard",
-        dataId,
-        selectedPricingRule,
-        selectedQuantity,
-        uploadedDocumentId,
-      };
-      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
-      return;
-    }
+// Utility to check if all required options are selected
 
-    try {
-      await addToCartPolaroidCard(
-        dataId,
-        selectedPricingRule,
-        Number(selectedQuantity),
-        uploadedDocumentId ?? undefined 
-      );
-      sessionStorage.removeItem("pendingCartItem");
-      router.push("/Cart");
-    } catch (error) {
-      alert("Failed to add to cart. Please try again.");
-    }
-  };
+const handleProceedToCart = async () => {
+  if (isProceedToCartDisabled) {
+    setErrorMessage("Please select all options (size, quantity, and upload a document) before proceeding to cart.");
+    return;
+  }
+
+  if (!isLoggedIn()) {
+    const pendingItem = {
+      productType: "polaroidCard",
+      dataId,
+      selectedPricingRule,
+      selectedQuantity,
+      uploadedDocumentId,
+    };
+    sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+    router.push(`/auth/signin?redirect=/Cart`);
+    return;
+  }
+
+  try {
+    await addToCartPolaroidCard(
+      dataId,
+      selectedPricingRule,
+      Number(selectedQuantity),
+      uploadedDocumentId ?? undefined
+    );
+    sessionStorage.removeItem("pendingCartItem");
+    router.push("/Cart");
+  } catch (error) {
+    setErrorMessage("Failed to add to cart. Please try again.");
+  }
+};
 
   // Process pending cart item when user logs in
   useEffect(() => {
@@ -186,6 +190,7 @@ const ProductUpload = ({ product }: { product: any }) => {
           {/**error message*/}
           <div className="flex w-full flex-col items-center justify-center ">
             {error && <div className="text-red-500">{error}</div>}
+            {errorMessage && <div className="text-red-500">{errorMessage}</div>}
           </div>
 
           {/**Cart & Payment Button*/}
@@ -193,9 +198,12 @@ const ProductUpload = ({ product }: { product: any }) => {
             {/* First Button */}
             <button
               onClick={handleAddToCart}
-              disabled={isAddToCartDisabled}
-              className="relative flex h-[44px] w-full cursor-pointer items-center justify-center gap-4 rounded-[48px] bg-[#242424] text-lg text-[#fff] md:w-[378px]"
-            >
+              disabled={isProceedToCartDisabled}
+              className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+                ${isProceedToCartDisabled
+                  ? "cursor-not-allowed bg-gray-300 text-gray-500"
+                  : "cursor-pointer bg-[#242424] text-white"
+                }`}            >
               <span className="pr-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -219,9 +227,12 @@ const ProductUpload = ({ product }: { product: any }) => {
             {/* Second Button */}
             <button
               onClick={handleProceedToCart}
-              disabled={isAddToCartDisabled}
-              className="relative flex h-[44px] w-full cursor-pointer items-center justify-center rounded-[48px] border-2 border-[#242424] bg-[#fff] text-lg text-[#242424] md:w-[378px]"
-            >
+              disabled={isProceedToCartDisabled}
+              className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] border-2 text-lg md:w-[378px]
+                ${isProceedToCartDisabled
+                  ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
+                  : "cursor-pointer border-[#242424] bg-white text-[#242424]"
+                }`}            >
               <span className="pr-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
