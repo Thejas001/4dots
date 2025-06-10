@@ -63,7 +63,11 @@ const OrderComponent = () => {
     const loadOrders = async () => {
       try {
         const data = await fetchUserOrder();
-        setOrders(data);
+        // Sort orders by CreatedAt in descending order (newest first)
+        const sortedOrders = [...data].sort((a, b) => 
+          new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime()
+        );
+        setOrders(sortedOrders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
