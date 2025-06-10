@@ -1,9 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
 import React from "react";
-import TableOne from "../Tables/TableOne";
-import CardDataStats from "../CardDataStats";
-import ContactUs from "../ContactUs";
 import ProductList from "../ProductList";
 import Footer from "@/components/Footer";
 import { Product } from "@/app/models/products";
@@ -20,7 +17,6 @@ const ECommerce: React.FC<ECommerceProps> = ({ products }) => {
       </div>
       {/** */}
       <div className="md:pt-10 md:pb-[47.7px] pt-15 pb-12.5 bg-[#fff]">
-      <ContactUs />
       </div>
       <Footer/>
         

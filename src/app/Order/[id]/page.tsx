@@ -1,12 +1,13 @@
-import React from "react";
 import OrderDetailsComponent from "@/components/OrderDetailsComponent";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import { Metadata } from "next";
-interface OrderPageProps {
-  params: { id: string };
-}
 
-const OrderDetailsPage = ({ params }: OrderPageProps) => {
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export default function OrderDetailsPage({ params }: Props) {
   const orderId = params.id;
 
   return (
@@ -14,6 +15,4 @@ const OrderDetailsPage = ({ params }: OrderPageProps) => {
       <OrderDetailsComponent orderId={orderId} />
     </DefaultLayout>
   );
-};
-
-export default OrderDetailsPage;
+}

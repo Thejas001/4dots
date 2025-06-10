@@ -1,17 +1,20 @@
 "use client";
 import React, { useState } from "react";
 import { Product } from "@/app/models/products";
+import {letterHeadRules} from "@/utils/bindingdisable"
 
 const DropDown = ({
     productDetails,
     onSizeChange,
     onQuantityChange,
-    onQualityChange
+    onQualityChange,
+    selectedOption
 }:{
     productDetails: Product,
     onSizeChange: (size: string) => void;
     onQuantityChange: (quantity: number) => void;
     onQualityChange: (quality: string) => void; 
+    selectedOption: string;
 }) => {
 
       const [isOpenSize, setIsOpenSize] = useState(false);
@@ -26,7 +29,36 @@ const DropDown = ({
       const sizeOptions = productDetails.sizes || [];
       const quantityOptions = productDetails.quantity || [];
       const qualityOptions = productDetails.Quality || [];
+
+
       
+// Get Available Quantity
+const getAvailableQuantities = () => {
+  if (productDetails.name !== "Letter Head") return quantityOptions;
+
+  if (selectedOption === "Colour" && selectedQuality === "100GSM") {
+    console.log("Letter Head Colour 100GSM selected");
+    return letterHeadRules.Colour.Quantity["100GSM"];
+  }
+
+  return quantityOptions;
+};
+
+        // Get Available Sizes
+        const getAvailableSizes = () => {
+        if (productDetails.name !== "Letter Head") return sizeOptions;
+
+        if (selectedOption === "Colour") {
+            return letterHeadRules.Colour.Size;
+        }
+
+        return sizeOptions;
+        };
+
+        // Apply filters
+        const filteredQuantities = getAvailableQuantities();
+        const filteredSizes = getAvailableSizes();
+            
     return (
         <div className="flex flex-col md:flex-row gap-6 md:gap-[45px] w-full">
         {/* Left DropDown Section */}
@@ -79,7 +111,7 @@ const DropDown = ({
                 </div>
                 {isOpenSize && (
                     <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
-                    {sizeOptions.map((option, index) => (
+                    {filteredSizes.map((option, index) => (
                         <li
                         key={index}
                         className={`px-5 py-3 text-sm cursor-pointer ${
@@ -115,16 +147,17 @@ const DropDown = ({
             </div>
             {isOpenQunatity && (
                 <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
-                {quantityOptions.map((option, index) => (
+                {getAvailableQuantities().map((option, index) => (
                     <li
                     key={index}
                     className={`px-5 py-3 text-sm cursor-pointer ${
                         selectedQuantity === option ? "bg-[#242424] text-white" : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
                     }`}
                     onClick={() => { 
-                        setSelectedQuantity(option); 
-                        onQuantityChange(option);
-                        setIsOpenQuantity(false); }}
+                    const quantity = Number(option);
+                    setSelectedQuantity(quantity); 
+                    onQuantityChange(quantity);
+                    setIsOpenQuantity(false);  }}
                     >
                     {option}
                     </li>

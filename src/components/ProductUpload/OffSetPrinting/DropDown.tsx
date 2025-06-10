@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo  } from "react";
 import { Product } from "@/app/models/products";
+import {noticeTypeQualityRules} from "@/utils/bindingdisable"; // Adjust the import path as necessary
 
 const DropDown = ({
     productDetails,
@@ -17,7 +18,6 @@ const DropDown = ({
       const [isOpenSize, setIsOpenSize] = useState(false);
       const [selectedSize, setSelectedSize] = useState("");
     
-      const [isOpenQunatity, setIsOpenQuantity] = useState(false);
       const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
 
       const [isOpenQuality, setIsOpenQuality] = useState(false);
@@ -26,6 +26,24 @@ const DropDown = ({
       const sizeOptions = productDetails.NoticeType || [];
       const sizeQuantity = productDetails.quantity || []; // Change this to quantity
       const qualityOptions = productDetails.Quality || [];
+
+const getFilteredQualities = () => {
+  const isOffsetPrinting = productDetails.name === "Offset Printing";
+
+  if (!isOffsetPrinting) return qualityOptions;
+
+  const allowedQualities = noticeTypeQualityRules[selectedSize];
+  if (allowedQualities) {
+    return qualityOptions.filter((q) =>
+      allowedQualities.includes(q.toUpperCase())
+    );
+  }
+
+  // If no rule defined, return all
+  return qualityOptions;
+};
+
+
       
     return (
         <div className="flex flex-col md:flex-row gap-6 md:gap-[45px] w-full">
@@ -68,33 +86,19 @@ const DropDown = ({
                 <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
                      Quantity
                 </label>
-                <div
-                    className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
-                    onClick={() => setIsOpenQuantity(!isOpenQunatity)}
-                >
-                    <div className="text-sm font-normal text-gray-700">{selectedQuantity || "Select Quantity"}</div>
-                    <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    ▼
-                    </span>
-                </div>
-                {isOpenQunatity && (
-                    <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
-                    {sizeQuantity.map((option, index) => (
-                        <li
-                        key={index}
-                        className={`px-5 py-3 text-sm cursor-pointer ${
-                            selectedQuantity === option ? "bg-[#242424] text-white" : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
-                        }`}
-                        onClick={() => { 
-                            setSelectedQuantity(option);
-                            onQuantityChange(option);
-                            setIsOpenQuantity(false); }}
-                        >
-                        {option}
-                        </li>
-                    ))}
-                    </ul>
-                )}
+                 <input
+                    type="number"
+                    min="1"
+                    className="border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white text-gray-700 w-full"
+                    placeholder="Enter Quantity"
+                    value={selectedQuantity || ""}
+                    onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        const adjustedValue = value ? value * 1000 : 0;
+                        setSelectedQuantity(value);
+                        onQuantityChange(adjustedValue);
+                    }}
+                    />
                 </div>
             </div>
 
@@ -115,7 +119,7 @@ const DropDown = ({
             </div>
             {isOpenQuality && (
                 <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
-                {qualityOptions.map((option, index) => (
+                {getFilteredQualities().map((option, index) => (
                     <li
                     key={index}
                     className={`px-5 py-3 text-sm cursor-pointer ${

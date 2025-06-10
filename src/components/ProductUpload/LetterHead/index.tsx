@@ -212,6 +212,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               onSizeChange={setSelectedSize}
               onQuantityChange={setSelectedQuantity}
               onQualityChange={setSelectedQuality}
+              selectedOption={selectedOption} 
             />
           )}
           <div className="flex w-full flex-col items-center justify-center ">
