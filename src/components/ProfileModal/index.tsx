@@ -62,7 +62,7 @@ const ProfileModal = ({ isOpen, onClose, onProfileUpdated  }: { isOpen: boolean;
             />
           </div>
 
-          {/* Phone Number Field */}
+          {/* Phone Number Field 
           <div>
               <label className="text-base font-normal text-[#242424] space-x-2.5">Phone Number</label>
               <div className="flex items-center overflow-hidden mt-2.5  rounded-md border border-gray-300 bg-white">
@@ -81,8 +81,8 @@ const ProfileModal = ({ isOpen, onClose, onProfileUpdated  }: { isOpen: boolean;
                   placeholder="Enter phone number"
                 />
               </div>
-            </div>
-
+          </div>
+*/}
           {/* Update Button */}
             <div className="flex justify-end mt-6">
                 <button disabled={loading} type="submit" className="md:w-[179px] bg-black text-white py-3 rounded-lg hover:bg-gray-900 transition">

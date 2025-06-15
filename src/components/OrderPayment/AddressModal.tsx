@@ -147,7 +147,7 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
               )}
             </div>
 
-            {/* Phone Number */}
+            {/* Phone Number 
             <div className="sm:col-span-2">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number <span className="text-red-500">*</span>
@@ -177,7 +177,7 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
                 <p className="mt-1 text-sm text-red-500">{errors.PhoneNumber}</p>
               )}
             </div>
-
+*/}
             {/* Country */}
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
