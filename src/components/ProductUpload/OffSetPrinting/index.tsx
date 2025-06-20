@@ -8,6 +8,7 @@ import { addToCartOffSetPrinting } from "@/utils/cart";
 import { findOffsetPrintingPricingRule } from "@/utils/priceFinder";
 import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
+import { findOffsetPrintingPricingRule1, calculateOffsetPrintingPrice} from "./PriceCalculator";
 
 
 
@@ -19,6 +20,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [selectedQuality, setSelectedQuality] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
+
   const [selectedPricingRule, setSelectedPricingRule] = useState<OffsetPrintingPricingRule | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
@@ -37,29 +40,51 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   // Fetch product details when component mounts
 
-  //pricing rule
-  useEffect(() => {
-    if (!productDetails || !selectedSize || !selectedQuantity || !selectedQuality) return;
-    
-    if (errorMessage) {
-      console.warn("Pricing rule not fetched due to validation error.");
-      return;
-    }
-  
-    console.log("Extracted OffsetPrintingPricingRules:", productDetails?.OffsetPrintingPricingRules); 
-  
-    const pricingrule = findOffsetPrintingPricingRule(
-      productDetails.OffsetPrintingPricingRules,
-      selectedSize,
-      selectedQuantity,
-      selectedQuality
-    );
-    setSelectedPricingRule(pricingrule);
-  
-    console.log("Matched Pricing Rule:", pricingrule);
-    setSelectedPrice(pricingrule ? pricingrule.Price : null); // ✅ Store selected price
-  
-  }, [selectedSize, selectedQuantity, selectedQuality, productDetails, errorMessage]);
+useEffect(() => {
+  if (!productDetails || !selectedSize || !selectedQuantity || !selectedQuality) {
+    console.warn("Missing required fields. Resetting price and pricing rule.");
+    setCalculatedPrice(null); // Reset price
+    setSelectedPricingRule(null); // Reset pricing rule
+    return;
+  }
+
+  // Handle invalid quantity
+  if (selectedQuantity === null || selectedQuantity <= 0) {
+    console.warn("Quantity is zero or invalid. Resetting price and pricing rule.");
+    setCalculatedPrice(null); // Reset price
+    setSelectedPricingRule(null); // Reset pricing rule
+    return;
+  }
+
+  if (errorMessage) {
+    console.warn("Pricing rule not fetched due to validation error.");
+    setCalculatedPrice(null); // Reset price
+    setSelectedPricingRule(null); // Reset pricing rule
+    return;
+  }
+
+  console.log("Extracted OffsetPrintingPricingRules:", productDetails?.OffsetPrintingPricingRules);
+
+  const pricingrule = findOffsetPrintingPricingRule(
+    productDetails.OffsetPrintingPricingRules,
+    selectedSize,
+    selectedQuantity,
+    selectedQuality
+  );
+  setSelectedPricingRule(pricingrule);
+
+  // Calculate price
+  const price = calculateOffsetPrintingPrice(
+    productDetails.OffsetPrintingPricingRules,
+    selectedSize,
+    selectedQuantity,
+    selectedQuality
+  );
+  setCalculatedPrice(price);
+
+  console.log("Matched Pricing Rule:", pricingrule);
+  setSelectedPrice(pricingrule ? pricingrule.Price : null); // Store selected price
+}, [selectedSize, selectedQuantity, selectedQuality, productDetails, errorMessage]);
 
 
   // Process stored cart item after login
@@ -77,7 +102,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         await addToCartOffSetPrinting(
           pendingDataId,
           pendingPricingRule,
-          2,
+          selectedQuantity ?? 1, // Default to 1 if quantity is not set
           pendingDocumentId,
         );
         sessionStorage.removeItem("pendingCartItem");
@@ -135,7 +160,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             await addToCartOffSetPrinting(
               dataId, 
               selectedPricingRule,
-              2,
+              selectedQuantity ?? 1, // Default to 1 if quantity is not set
               uploadedDocumentId ?? undefined
             ); //2= buddle quantity change that
             router.push("/Cart");
@@ -206,7 +231,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                   <path d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z" fill="black"/>
                 </svg>
               </span>
-                <span className="font-bold">{selectedPrice || "0"}</span>
+                <span className="font-bold">{calculatedPrice || "0"}</span>
                 <span className="font-medium pl-4">Proceed To Cart</span>
             </button>
           </div>

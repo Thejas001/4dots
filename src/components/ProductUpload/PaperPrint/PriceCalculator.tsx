@@ -6,14 +6,14 @@ interface PriceCalculatorProps {
   pricingRules: PaperPrintingPricingRule[];
   addons: Addon[];
   selectedSize: string;
-  selectedColor: "B/W" | "Color";
+  selectedColor: "B/W" | "Color" | null
   pageCount: number;
   noOfCopies: number;
   selectedBindingType?: string;
   customCopies?: number;
   copySelection: string;
   onPriceUpdate: (price: number | null) => void;
-}
+} 
 
 // Identify double-sided paper sizes based on naming pattern
 const isDoubleSided = (paperSize: string): boolean => 

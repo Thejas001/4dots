@@ -12,7 +12,7 @@ const DropDown = ({
   onCopiesChange: (copies: number) => void;
 }) => {
   const [selectedSize, setSelectedSize] = useState("");
-  const [selectedCopies, setSelectedCopies] = useState("1");
+  const [selectedCopies, setSelectedCopies] = useState("");
 
   const sizeOptions = productDetails.sizes || [];
   const copiesOptions = ["1", "2", "3", "4", "5"];
@@ -68,7 +68,6 @@ const DropDown = ({
         </label>
         <input
             type="number"
-            min="1"
             className="w-full rounded-md border bg-white px-5 py-3 text-gray-700 focus:ring-2 focus:ring-gray-300"
             value={selectedCopies || ""}
             placeholder="Enter No. of Copies"

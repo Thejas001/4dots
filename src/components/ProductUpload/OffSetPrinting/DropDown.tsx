@@ -94,7 +94,7 @@ const getFilteredQualities = () => {
                     value={selectedQuantity || ""}
                     onChange={(e) => {
                         const value = parseInt(e.target.value, 10);
-                        const adjustedValue = value ? value * 1000 : 0;
+                        const adjustedValue = value;
                         setSelectedQuantity(value);
                         onQuantityChange(adjustedValue);
                     }}

@@ -9,6 +9,7 @@ interface CartButtonProps {
   selectedPricingRule: any;
   dataId: number;
   uploadedImages: any[];
+  selectedFrameColor: string;  
 }
 
 const CartButton: React.FC<CartButtonProps> = ({
@@ -17,6 +18,7 @@ const CartButton: React.FC<CartButtonProps> = ({
   selectedPricingRule,
   dataId,
   uploadedImages,
+  selectedFrameColor, 
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -27,7 +29,7 @@ const CartButton: React.FC<CartButtonProps> = ({
     return !!token;
   };
 
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedImages || uploadedImages.length === 0;
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedImages || uploadedImages.length === 0 || !selectedFrameColor;
 
   // ✅ Process pending cart item after login
   const processPendingCartItem = async () => {
@@ -46,7 +48,8 @@ const CartButton: React.FC<CartButtonProps> = ({
         pendingDataId,
         pendingPricingRule,
         Number(pendingQuantity),
-        pendingDocumentIds
+        pendingDocumentIds,
+        selectedFrameColor, 
       );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
@@ -84,7 +87,7 @@ const CartButton: React.FC<CartButtonProps> = ({
         const formData = new FormData();
         formData.append("document", image.originFileObj);
   
-        const response = await fetch("https://localhost:7049/api/document/upload", {
+        const response = await fetch("https://fourdotsapp.azurewebsites.net/api/document/upload", {
           method: "POST",
           body: formData,
         });
@@ -112,6 +115,7 @@ const CartButton: React.FC<CartButtonProps> = ({
           selectedPricingRule,
           selectedQuantity,
           documentIds,
+          selectedFrameColor, 
         };
         sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
         router.push(`/auth/signin?redirect=/`);
@@ -123,7 +127,8 @@ const CartButton: React.FC<CartButtonProps> = ({
         dataId,
         selectedPricingRule,
         Number(selectedQuantity),
-        documentIds
+        documentIds,
+        selectedFrameColor,
       );
   
       sessionStorage.removeItem("pendingCartItem");
@@ -182,6 +187,7 @@ const CartButton: React.FC<CartButtonProps> = ({
           selectedPricingRule,
           selectedQuantity,
           documentIds,
+          selectedFrameColor,
         };
         sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
         router.push(`/auth/signin?redirect=/Cart`);
@@ -193,7 +199,8 @@ const CartButton: React.FC<CartButtonProps> = ({
         dataId,
         selectedPricingRule,
         Number(selectedQuantity),
-        documentIds
+        documentIds,
+        selectedFrameColor
       );
   
       sessionStorage.removeItem("pendingCartItem");

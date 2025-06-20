@@ -63,6 +63,12 @@ const handlePlaceOrder = async () => {
       theme: {
         color: "black",
       },
+      modal: {
+        ondismiss: function () {
+          console.log("❌ Payment popup closed by user.");
+          router.push("/Order");  // Redirect to orders page
+        }
+      }
     };
 
     const razorpay = new (window as any).Razorpay(options);

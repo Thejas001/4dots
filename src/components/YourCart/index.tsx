@@ -62,6 +62,7 @@ const Cart = () => {
     console.log("Updated Cart Data in State:", cartData);
   }, [cartData]);
   
+  
 
   const handleDelete = async (cartItemId: number) => {
     const success = await deleteCartItem(cartItemId);

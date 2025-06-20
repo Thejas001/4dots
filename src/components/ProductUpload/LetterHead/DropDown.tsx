@@ -71,7 +71,7 @@ const getAvailableQuantities = () => {
                     className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
                     onClick={() => setIsOpenQuality(!isOpenQuality)}
                 >
-                    <div className="text-sm font-normal text-gray-700">{selectedQuality || "Dropdown"}</div>
+                    <div className="text-sm font-normal text-gray-700">{selectedQuality || "Quality"}</div>
                     <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
                     ▼
                     </span>
@@ -104,7 +104,7 @@ const getAvailableQuantities = () => {
                     className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
                     onClick={() => setIsOpenSize(!isOpenSize)}
                 >
-                    <div className="text-sm font-normal text-gray-700">{selectedSize || "Dropdown"}</div>
+                    <div className="text-sm font-normal text-gray-700">{selectedSize || "Size"}</div>
                     <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
                     ▼
                     </span>
@@ -140,7 +140,7 @@ const getAvailableQuantities = () => {
                 className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
                 onClick={() => setIsOpenQuantity(!isOpenQunatity)}
             >
-                <div className="text-sm font-normal text-gray-700">{selectedQuantity || "Dropdown"}</div>
+                <div className="text-sm font-normal text-gray-700">{selectedQuantity || "Quantity"}</div>
                 <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
                 ▼
                 </span>

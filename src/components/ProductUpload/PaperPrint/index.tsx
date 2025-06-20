@@ -18,11 +18,11 @@ import { useRouter } from "next/navigation";
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
-  const [selectedOption, setSelectedOption] = useState<"B/W" | "Color">("B/W");
+const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>(""); // Size selected
-  const [noOfCopies, setNoOfCopies] = useState<number>(1); // Number of copies selected
-  const [pageCount, setPageCount] = useState(1);
+  const [noOfCopies, setNoOfCopies] = useState<number>(0); // Number of copies selected
+  const [pageCount, setPageCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
@@ -331,7 +331,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               pricingRules={productDetails.PaperPrintingPricingRules || []}
               addons={productDetails.Addons || []}
               selectedSize={selectedSize}
-              selectedColor={selectedOption}
+              selectedColor={selectedOption === "" ? "B/W" : selectedOption}
               pageCount={pageCount}
               noOfCopies={noOfCopies}
               copySelection={copySelection}

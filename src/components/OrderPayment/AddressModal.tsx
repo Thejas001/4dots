@@ -16,7 +16,6 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
     Country: "",
     PinCode: "",
     Landmark: "",
-    PhoneNumber: "",
     IsPrimary: true,
   });
 
@@ -37,7 +36,6 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
     if (!formData.City.trim()) newErrors.City = "City is required";
     if (!formData.Country.trim()) newErrors.Country = "Country is required";
     if (!formData.PinCode.trim()) newErrors.PinCode = "Postcode is required";
-    if (!formData.PhoneNumber.trim()) newErrors.PhoneNumber = "Phone number is required";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

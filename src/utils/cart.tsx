@@ -198,7 +198,7 @@ export const addToCartOffSetPrinting = async (
     ],
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
-
+  console .log("selectedQuantity", selectedQuantity);
   console.log("🧾 Document IDs:", cartItem.CartItemDocumentIds);
   console.log("🛒 Offset printing Data:", JSON.stringify(cartItem, null, 2));
 
@@ -295,8 +295,12 @@ export const addToCartPhotoFrame = async (
     Price: number;
   },
   selectedQuantity: number, // Pass the actual quantity chosen by the user
-  documentId?: number[]
+  documentId?: number[],
+  selectedFrameColor?: string
 ) => {
+    if (!selectedFrameColor) {
+    throw new Error("Frame color is required.");
+  }
   // API expects Quantity 8 attributes if selectedQuantity > 8
   const quantityToSend = selectedQuantity > 8 ? 8 : selectedQuantity;
 
@@ -316,7 +320,7 @@ export const addToCartPhotoFrame = async (
     DynamicAttributes: [
         {
           "AttributeName": "Color",
-          "AttributeValue": "Black"
+          "AttributeValue": selectedFrameColor // Use the selected frame color
         },
       {
         AttributeName: "PhotoFrameQuantity",
