@@ -16,7 +16,7 @@ import NetworkErrorPage from "../NetworkErrorPage";
 interface ProductListProps {
   products: Product[];
 }
-
+// test
 
 const ProductList: React.FC<ProductListProps> = ({ products }) => {
   const [hasError, setHasError] = useState(false);
