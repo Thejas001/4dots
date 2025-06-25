@@ -350,15 +350,27 @@ export const addToCartPaperPrint = async (
   pricingRule: {
     PaperSize: { AttributeID: number; ValueID: number };
     ColorType: { AttributeID: number; ValueID: number };
-   // PageRange: { AttributeID: number; ValueID: number };
     PricePerPage: number;
   },
   pageCount: number,
   selectedBindingType?: string,
   addonRule?: any,
   addonBookCount?: number,
-  documentId?: number 
+  documentId?: number
 ) => {
+
+  // ✅ Map binding type to AddonID
+  const bindingTypeToAddonIdMap: Record<string, number> = {
+    "Spiral Binding": 1,
+    "Soft Binding": 2,
+    "Hard Binding": 3
+  };
+
+const resolvedAddonId = selectedBindingType
+  ? bindingTypeToAddonIdMap[selectedBindingType] ?? selectedBindingType
+  : null; // explicitly set to null if undefined
+
+
   const cartItem: CartItems = {
     ProductID: productId,
     Price: pricingRule.PricePerPage,
@@ -372,32 +384,29 @@ export const addToCartPaperPrint = async (
         AttributeValueId: pricingRule.ColorType.ValueID,
       },
     ],
-    Addons: addonRule && selectedBindingType
-    ? [
-        {
-          AddonID: selectedBindingType, // Use AddonID from the rule
-          IsDeleted: false,
-          NumberOfBooks: addonBookCount || 1, // Use user-specified or default to 1
-        },
-      ]
-    : [],
-  
+    Addons:
+      addonRule && selectedBindingType && resolvedAddonId !== null
+        ? [
+            {
+              AddonID: resolvedAddonId,
+              IsDeleted: false,
+              NumberOfBooks: addonBookCount || 1,
+            },
+          ]
+        : [],
+
     DynamicAttributes: [
       {
         AttributeName: "PageCount",
         AttributeValue: pageCount.toString(),
       },
     ],
-    
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
-
   };
 
   console.log("🛒 Cart Item:", JSON.stringify(cartItem, null, 2));
-  
   console.log("Selected Binding Type:", selectedBindingType);
-console.log("Addon Rule:", addonRule);
-
+  console.log("Addon Rule:", addonRule);
 
   try {
     const response = await addToCartApi(cartItem);

@@ -68,6 +68,9 @@ export interface PaymentCalProps {
   totalPrice: number;
   deliveryOption: string; 
   paymentOption: string; // "Online" or "CashOnDelivery"
+  discountAmount?: number; // optional discount value
+  shippingFee?: number | string; // optional shipping value (number or "Free")
+
 }
 
 export interface CartButtonProps {

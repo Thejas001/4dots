@@ -8,6 +8,8 @@ import { findBusinessCardPricingRule } from "@/utils/priceFinder";
 import { addToCartBusinessCard } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 import FileUploader from "./Fileuploader";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
@@ -20,7 +22,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [selectedPricingRule, setSelectedPricingRule] = useState<BusinessCardPricingRule | null>(null);
   const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
   const router = useRouter();
-
+  const incrementCart = useCartStore((state) => state.incrementCart);
+  
   // Check if user is logged in
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
@@ -101,6 +104,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     try {
       await addToCartBusinessCard(dataId, selectedPricingRule,  uploadedDocumentId ?? undefined);
+      toast.success("Product added to cart!");
       router.push("/Cart");
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
@@ -122,12 +126,16 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      incrementCart();
+       toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
       return;
     }
 
     try {
       await addToCartBusinessCard(dataId, selectedPricingRule,  uploadedDocumentId ?? undefined);
+      incrementCart();
+      toast.success("Product added to cart!");
       router.push("/");
     } catch (error) {
       alert("Failed to add to cart. Please try again.");

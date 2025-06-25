@@ -15,6 +15,8 @@ import { validatePrintSelection } from "@/utils/validatePrint";
 import PriceCalculator from "./PriceCalculator";
 import { addToCartPaperPrint } from "@/utils/cart";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
@@ -37,6 +39,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   );
 
   const router = useRouter();
+  const incrementCart = useCartStore((state) => state.incrementCart);
 
   // Check if user is logged in
   const isLoggedIn = () => {
@@ -173,6 +176,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
           copySelection === "all" ? noOfCopies : customCopies || 0, // ✅ Store copies count
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      toast.success("Product added to cart!");
+      incrementCart();
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
       return;
     }
@@ -197,6 +202,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedAddonRule,
         addonBookCount,
       );
+      toast.success("Product added to cart!");
+      incrementCart();
       router.push("/");
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -245,6 +252,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedAddonRule,
         addonBookCount,
       );
+      toast.success("Product added to cart!");
       router.push("/Cart");
     } catch (error) {
       console.error("Failed to add to cart:", error);

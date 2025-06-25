@@ -8,6 +8,8 @@ import { findPolaroidCardPricingRule } from "@/utils/priceFinder";
 import { addToCartPolaroidCard } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
@@ -22,6 +24,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [selectedPricingRule, setSelectedPricingRule] = useState<PolaroidCardPricingRule | null>(null);
+  const incrementCart = useCartStore((state) => state.incrementCart);
 
   // Check if user is logged in
   const isLoggedIn = () => {
@@ -110,6 +113,8 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      toast.success("Product added to cart!");
+      incrementCart();
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
       return;
     }
@@ -122,6 +127,8 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId ?? undefined 
       );
       sessionStorage.removeItem("pendingCartItem");
+      incrementCart();
+      toast.success("Product added to cart!");
       router.push("/");
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
@@ -157,6 +164,7 @@ const handleProceedToCart = async () => {
       uploadedDocumentId ?? undefined
     );
     sessionStorage.removeItem("pendingCartItem");
+    toast.success("Product added to cart!");
     router.push("/Cart");
   } catch (error) {
     setErrorMessage("Failed to add to cart. Please try again.");

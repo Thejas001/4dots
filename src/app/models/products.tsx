@@ -80,6 +80,7 @@ export interface AddonRule {
 }
 
 export interface Addon {
+  Id: number;
   AddonName: string;
   Rules: AddonRule[];
 }

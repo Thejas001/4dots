@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 //import { CartButtonProps } from "@/app/models/CartItems";
 import { addToCartPhotoFrame } from "@/utils/cart";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 interface CartButtonProps {
   selectedQuantity: number | null;  
@@ -23,6 +25,7 @@ const CartButton: React.FC<CartButtonProps> = ({
   const router = useRouter();
   const pathname = usePathname();
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const incrementCart = useCartStore((state) => state.incrementCart);
 
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
@@ -87,7 +90,7 @@ const CartButton: React.FC<CartButtonProps> = ({
         const formData = new FormData();
         formData.append("document", image.originFileObj);
   
-        const response = await fetch("https://fourdotsapp.azurewebsites.net/api/document/upload", {
+        const response = await fetch("https://localhost:7049/api/document/upload", {
           method: "POST",
           body: formData,
         });
@@ -118,6 +121,8 @@ const CartButton: React.FC<CartButtonProps> = ({
           selectedFrameColor, 
         };
         sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+        toast.success("Product added to cart!");
+        incrementCart();
         router.push(`/auth/signin?redirect=/`);
         return;
       }
@@ -132,6 +137,8 @@ const CartButton: React.FC<CartButtonProps> = ({
       );
   
       sessionStorage.removeItem("pendingCartItem");
+      incrementCart();
+      toast.success("Product added to cart!");
       router.push("/");
   
     } catch (error) {
@@ -159,7 +166,7 @@ const CartButton: React.FC<CartButtonProps> = ({
         const formData = new FormData();
         formData.append("document", image.originFileObj);
   
-        const response = await fetch("https://fourdotsapp.azurewebsites.net/api/document/upload", {
+        const response = await fetch("https://localhost:7049/api/document/upload", {
           method: "POST",
           body: formData,
         });
@@ -204,6 +211,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       );
   
       sessionStorage.removeItem("pendingCartItem");
+      toast.success("✅ Product added to cart!");
       router.push("/Cart");
   
     } catch (error) {

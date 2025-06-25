@@ -7,6 +7,8 @@ import { Product, CanvasPricingRule } from "@/app/models/products";
 import { useRouter } from "next/navigation";
 import { addToCartCanvasPrinting } from "@/utils/cart";
 import FileUploader from "./FileUploader";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 const ProductUpload = ({ product }: { product: any }) => {
     const dataId = product.id;
@@ -18,6 +20,8 @@ const ProductUpload = ({ product }: { product: any }) => {
     const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
     const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
     const router = useRouter();
+    const incrementCart = useCartStore((state) => state.incrementCart);
+
 
     
   const handleUploadSuccess = (documentId: number) => {
@@ -64,6 +68,8 @@ const ProductUpload = ({ product }: { product: any }) => {
         if (!isLoggedIn()) {
           const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
           sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+          toast.success("Product added to cart!");
+          incrementCart();
           router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
           return;
         }
@@ -71,6 +77,8 @@ const ProductUpload = ({ product }: { product: any }) => {
     
         try {
           await addToCartCanvasPrinting(dataId, selectedPricingRule, Number(sqftRange), uploadedDocumentId ?? undefined);
+          incrementCart();
+          toast.success("Product added to cart!");
           router.push("/"); // ✅ Redirect to Cart page after adding
         } catch (error) {
           alert("Failed to add to cart. Please try again.");
@@ -93,6 +101,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     
         try {
           await addToCartCanvasPrinting(dataId, selectedPricingRule, Number(sqftRange), uploadedDocumentId ?? undefined);
+          toast.success("Product added to cart!");
           router.push("/Cart"); // ✅ Redirect to Cart page after adding
         } catch (error) {
           alert("Failed to add to cart. Please try again.");

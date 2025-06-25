@@ -9,8 +9,8 @@ import { findOffsetPrintingPricingRule } from "@/utils/priceFinder";
 import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
 import { findOffsetPrintingPricingRule1, calculateOffsetPrintingPrice} from "./PriceCalculator";
-
-
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
@@ -26,7 +26,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
   const router = useRouter();
-
+  const incrementCart = useCartStore((state) => state.incrementCart);
+  
     // Check if user is logged in
     const isLoggedIn = () => {
       const token = localStorage.getItem("jwtToken");
@@ -125,6 +126,8 @@ useEffect(() => {
             };
             sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
             router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+            toast.success("Product added to cart!");
+            incrementCart();           
             return;
           }
           try{
@@ -134,7 +137,9 @@ useEffect(() => {
               selectedQuantity ?? 1, // Default to 1 if quantity is not set
               uploadedDocumentId ?? undefined
             ); //2= buddle quantity change that
-            router.push("/");
+           toast.success("Product added to cart!");
+             incrementCart();  
+           router.push("/");
           }  catch (error) {
             alert("Failed to add to cart. Please try again.");
           }
@@ -163,6 +168,7 @@ useEffect(() => {
               selectedQuantity ?? 1, // Default to 1 if quantity is not set
               uploadedDocumentId ?? undefined
             ); //2= buddle quantity change that
+           toast.success("Product added to cart!");
             router.push("/Cart");
           }  catch (error) {
             alert("Failed to add to cart. Please try again.");

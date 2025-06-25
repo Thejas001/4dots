@@ -16,7 +16,7 @@ const agent = new https.Agent({
 }); 
 
 export const API = axios.create({
-  baseURL: "https://fourdotsapp.azurewebsites.net/api",
+  baseURL: "https://localhost:7049/api",
   // /api",
   headers: { "Content-Type": "application/json" },
   httpsAgent: agent, // ✅ Use the custom HTTPS agent
@@ -81,6 +81,18 @@ export const updateUserDetails = async (userDetails: any) => {
     throw error.response?.data?.message || "Failed to update user details";
   }
 }
+export const updateOrderStatus = async (orderId: number, status: number) => {
+  try {
+    const response = await API.put(`/order/${orderId}/status`, {
+      OrderStatus: status,
+    });
+    return response.data; // Adjust as per your API's response structure
+  } catch (error: any) {
+    console.error(`Error updating order ${orderId} status:`, error);
+    throw error.response?.data?.message || "Failed to update order status";
+  }
+};
+
 
 // Send OTP to user's phone
  export const sendOtp = async (phoneNumber: string) => {

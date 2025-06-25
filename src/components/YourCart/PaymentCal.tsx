@@ -4,10 +4,13 @@ import Link from "next/link";
 import { PaymentCalProps } from "@/app/models/CartItems";
 import { placeOrder } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
   
 const PaymentCal: React.FC<PaymentCalProps> = ({cartItemIds, totalPrice, deliveryOption ,paymentOption}) => {
     const router = useRouter(); // if you're using Next.js router
+  const incrementOrderBadge = useCartStore((state) => state.incrementOrderBadge);
 
 const handlePlaceOrder = async () => {
 
@@ -21,6 +24,8 @@ const handlePlaceOrder = async () => {
     
     if (paymentMethod === "cash") {
       // ✅ Skip Razorpay, redirect or show success
+      incrementOrderBadge(); // Increment order badge count
+      toast.success(" Cash on Delivery selected! Your order will be processed.");
       console.log("✅ Cash on Delivery selected. Skipping Razorpay.");
       router.push("/"); // or your desired confirmation page
       return;
@@ -51,6 +56,8 @@ const handlePlaceOrder = async () => {
         // });
 
         // ✅ Redirect after success
+        toast.success("✅ Payment successful! Thank you for your order.");
+        incrementOrderBadge(); // Increment order badge count
         router.push("/"); // or use window.location.href = "/thank-you";
         console.log("✅ Payment successful:", razorpayResponse);
 
@@ -95,7 +102,7 @@ const handlePlaceOrder = async () => {
                     </svg>
                     <span>{totalPrice}</span></div>
             </div>
-            {/* Discount */}
+            {/* Discount 
             <div className="flex justify-between pl-9 pr-[33px] mt-7.5 text-base font-medium text-[#000]">
                 <div><span>Discounted MRP :</span></div>
                 <div className="flex" >
@@ -103,8 +110,8 @@ const handlePlaceOrder = async () => {
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#242424"/>
                     </svg>
                     <span>0</span></div>
-            </div>
-            {/* Shipping Charges */}
+            </div>*/}
+            {/* Shipping Charges 
             {paymentOption !== "CashOnDelivery" && (
             <div className="flex justify-between pl-9 pr-[33px] mt-7.5 text-base font-medium text-[#000]">
                 <div><span>Shipping Fee :</span></div>
@@ -112,7 +119,7 @@ const handlePlaceOrder = async () => {
                         <span>Free</span>
                     </div>
                 </div>
-            )}
+            )}*/}
 
             {/* Total Amount */}
             <div className="flex justify-between py-4 pl-9 pr-[33px] mt-4.5 text-lg font-semibold text-[#000] rounded-b-[20px] border border-[#ECECEC] bg-white">

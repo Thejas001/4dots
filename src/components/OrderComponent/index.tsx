@@ -3,14 +3,23 @@ import React, { useEffect, useState } from "react";
 import { fetchUserOrder } from "@/utils/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getUserAddress,  fetchPaymentRetry} from "@/utils/api";
+import { getUserAddress,  fetchPaymentRetry, updateOrderStatus} from "@/utils/api";
 import { motion } from "framer-motion";
 import paymentRetry from  "./paymentRetry";
+import toast from "react-hot-toast";
+import { useCartStore } from "@/utils/store/cartStore";
 
 interface Attribute {
   OrderItemAttributeId: number;
   AttributeName: string;
   AttributeValue: string;
+}
+interface OrderComment {
+  Id: number;
+  OrderId: number;
+  CommentedBy: number;
+  CommentText: string;
+  CreatedAt: string;
 }
 
 interface Item {
@@ -35,6 +44,7 @@ interface Order {
     ShippingStatus: string;
   };
   Items: Item[];
+  Comments: OrderComment[];
 }
 
 interface AddressType {
@@ -52,13 +62,17 @@ const OrderComponent = () => {
   const [address, setAddress] = useState<AddressType[]>([]);
   const router = useRouter();
   const userId = 2; // Replace with actual user ID
-
+  const clearOrderBadge = useCartStore((state) => state.clearOrderBadge);
+  
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {},
   );
 
 
-
+  useEffect(() => {
+    // When this component mounts (cart opens), reset the badge
+    clearOrderBadge();
+  }, [clearOrderBadge]);
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -121,6 +135,16 @@ const OrderComponent = () => {
   } catch (error) {
     console.error("Retry failed:", error);
     // Show toast or error UI if needed
+  }
+};
+
+const handleCancelOrder = async (orderId: number) => {
+  try {
+    await updateOrderStatus(orderId, 3); // 3 = Cancelled status
+    toast.success("Order Canceled!");
+    // You can also refresh the list or update UI here
+  } catch (error) {
+    alert(`Failed to cancel order: ${error}`);
   }
 };
 
@@ -372,7 +396,9 @@ const OrderComponent = () => {
                           </span>
                         )}
                       </div>
-                      <div className="text-[18px]  font-normal leading-[24px] tracking-[-0.2px] text-[#E50000]">
+                      <div className="text-[18px]  font-normal leading-[24px] tracking-[-0.2px] text-[#E50000]" 
+                       onClick={() => handleCancelOrder(order.OrderId)}
+                       >
                         Cancel Order
                       </div>
                     </div>
@@ -465,6 +491,12 @@ const OrderComponent = () => {
                               ))}
                             </div>
                           </motion.div>
+                          {/* ✅ Conditionally show comment info */}
+                        {order.Comments && order.Comments.length > 0 && order.Comments[0].CommentText && (
+                          <div className="mt-2 text-sm text-blue-600 font-medium">
+                            Comment: {order.Comments[0].CommentText}
+                          </div>
+                        )}
                   </div>
                 </div>
               </div>)
