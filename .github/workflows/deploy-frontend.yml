@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - feature/azure-deploy-25-june
-
+      
+  workflow_dispatch:
+ 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
