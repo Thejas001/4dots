@@ -3,10 +3,10 @@ name: Deploy Frontend to Azure
 on:
   push:
     branches:
-      - feature/azure-deploy-25-june
-      
+      - main
+
   workflow_dispatch:
- 
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -21,10 +21,15 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build
+      - name: Build Next.js app
         run: npm run build
+
+      - name: Prepare deployment package
+        run: |
+          mkdir output
+          cp -r .next public node_modules package.json output/
 
       - name: Login to Azure
         uses: azure/login@v1
@@ -34,6 +39,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: fourdotsui         # e.g., fourdotsui
+          app-name: fourdotsui
           slot-name: production
-          package: .
+          package: ./output
