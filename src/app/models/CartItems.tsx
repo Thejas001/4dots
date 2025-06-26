@@ -35,6 +35,8 @@ export interface FetchCartItem {
   Attributes: {
     AttributeId: number;
     AttributeValueId: number;
+    AttributeName: string;
+    AttributeValue: string;
   }[];
   DynamicAttributes: {
     AttributeName: string;

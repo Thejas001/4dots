@@ -127,7 +127,7 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
       </div>
       <div className="grid w-full grid-cols-12">
         <div className="sticky top-10 col-span-1 pl-8">
-          <ProgressBar />
+          <ProgressBar orderStatus={selectedOrder.OrderStatus} />
         </div>
         {/* Bottom Section */}
         <div className="mb-10 mt-9 grid  h-auto grid-cols-12 pl-36 pr-39 xl:grid-cols-1">
@@ -156,9 +156,10 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
                             {item.ProductName}
                           </span>
                         </div>
+                        {/*Cancel Button
                         <div className="text-[18px]  font-normal leading-[24px] tracking-[-0.2px] text-[#E50000]">
                           Cancel Order
-                        </div>
+                        </div>*/}
                       </div>
 
                       {/*Address*/}

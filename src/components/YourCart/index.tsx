@@ -195,29 +195,18 @@ const Cart = () => {
             </div>
           </div>
 
-          <div className="flex items-center text-[#242424] mt-8 gap-7.5">
-            {/* Selected Size */}
-            <span className="text-base font-medium leading-6 tracking-[-0.2px]">
-              <span>Selected Size:</span>
-              <span className="pl-[9px]">20 x 30 cm</span>
-            </span>
+<div className="flex flex-row text-[#242424] mt-8 gap-7.5 flex-wrap">
+  {/* Selected Attributes */}
+  {item.DynamicAttributes.map((attr) => (
+    <div key={attr.AttributeName} className="text-base font-medium leading-6 tracking-[-0.2px] flex items-center">
+      <span>{attr.AttributeName}:</span>
+      <span className="pl-[9px]">{attr.AttributeValue}</span>
+    </div>
+  ))}
+</div>
 
-            {/* Color */}
-            <span className="flex items-center text-[#000] pl-2">
-              <span className="text-[#242424]">Color:</span>
-              <div
-                className="w-6.5 h-6.5 rounded-[32px] bg-black inline-block mx-2 border border-gray-300 gap-3"
-                style={{ borderColor: "#ECECEC" }}
-              ></div>
-              Black
-            </span>
-          </div>
 
           <div className="flex items-center text-[#242424] mt-3">
-            <span className="text-base font-medium leading-6 tracking-[-0.2px]">
-              <span>Quantity :</span>
-              <span className="pl-[9px]">1 pcs</span>
-            </span>
             <span onClick={() => handleViewDesign(item)} className="text-[#0075FF] italic underline text-base font-medium ml-7.5 leading-6 tracking-[-0.2px] cursor-pointer">
               Uploaded Design
             </span>

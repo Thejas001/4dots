@@ -63,7 +63,8 @@ const OrderComponent = () => {
   const router = useRouter();
   const userId = 2; // Replace with actual user ID
   const clearOrderBadge = useCartStore((state) => state.clearOrderBadge);
-  
+  const [cancelledOrders, setCancelledOrders] = useState<number[]>([]);
+
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {},
   );
@@ -140,13 +141,14 @@ const OrderComponent = () => {
 
 const handleCancelOrder = async (orderId: number) => {
   try {
-    await updateOrderStatus(orderId, 3); // 3 = Cancelled status
+    await updateOrderStatus(orderId, 3); // 3 = Cancelled
     toast.success("Order Canceled!");
-    // You can also refresh the list or update UI here
+    setCancelledOrders((prev) => [...prev, orderId]);
   } catch (error) {
     alert(`Failed to cancel order: ${error}`);
   }
 };
+;
 
   return (
     <div className="w-2xl grid h-auto  grid-rows-[auto,1fr] bg-[#fff]">
@@ -396,11 +398,24 @@ const handleCancelOrder = async (orderId: number) => {
                           </span>
                         )}
                       </div>
-                      <div className="text-[18px]  font-normal leading-[24px] tracking-[-0.2px] text-[#E50000]" 
-                       onClick={() => handleCancelOrder(order.OrderId)}
-                       >
-                        Cancel Order
-                      </div>
+                        <div className="text-[18px] font-normal leading-[24px] tracking-[-0.2px] text-[#E50000] cursor-pointer">
+                          <button
+                            onClick={() => handleCancelOrder(order.OrderId)}
+                            disabled={
+                              cancelledOrders.includes(order.OrderId) ||
+                              order.OrderStatus === "CancelledByUser"
+                            }
+                            className={`bg-transparent border-none p-0 m-0 text-inherit ${
+                              cancelledOrders.includes(order.OrderId) || order.OrderStatus === "CancelledByUser"
+                                ? "cursor-not-allowed text-gray-400"
+                                : "cursor-pointer text-[#E50000]"
+                            }`}
+                          >
+                            {cancelledOrders.includes(order.OrderId) || order.OrderStatus === "CancelledByUser"
+                              ? "Order Canceled"
+                              : "Cancel Order"}
+                          </button>
+                        </div>
                     </div>
 
                     {/*Address*/}

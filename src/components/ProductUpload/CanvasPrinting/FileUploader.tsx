@@ -15,7 +15,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
 
   const props: UploadProps = {
     name: "document",
-    action: "https://localhost:7049/api/document/upload",
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
     accept: ".pdf",  // Only allow PDF files in the file explorer
     headers: {
