@@ -17,7 +17,7 @@ jobs:
       - name: 🔧 Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # or match what you use locally
+          node-version: '22' # or match what you use locally
 
       - name: 🧩 Install dependencies
         run: npm ci
