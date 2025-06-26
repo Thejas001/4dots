@@ -4,9 +4,12 @@ import React, { useState, useEffect , useRef } from "react";
 import CartButton from "./CartButton";
 import OrderButton from "./OrderButton";
 import LoginButton from "./LoginButton";
-
+import { useCartStore } from "@/utils/store/cartStore";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const cartCount = useCartStore((state) => state.cartCount);
+  const orderBadgeCount = useCartStore((state) => state.orderBadgeCount);
+
 
   // Toggle function to open/close the dropdown
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -58,6 +61,11 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-full bg-[#242424] opacity-0 transition-all duration-100 group-hover:opacity-100 group-hover:h-1" style={{ height: "1px" }}></span>
               <div className="transition-transform duration-100 group-hover:-translate-y-1">
                 <CartButton />
+                {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+      )}
               </div>
             </button>
 
@@ -65,6 +73,11 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-full bg-[#242424] opacity-0 transition-all duration-100 group-hover:opacity-100 group-hover:h-1" style={{ height: "1px" }}></span>
               <div className="transition-transform duration-100 group-hover:-translate-y-1">
                 <OrderButton />
+                {orderBadgeCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                      {orderBadgeCount}
+                    </span>
+                  )}
               </div>
             </button>
 
@@ -96,20 +109,25 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Dropdown Menu for Small Screens */}
+
       {isOpen && (
         <div id="mobile-menu" className="sm:hidden absolute top-[60px] right-0 w-full shadow-lg py-4 z-50 bg-white">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
             Your Cart
           </button>
+          
+          <Link href="/Order">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
-            <Link href="/Order">Your Order</Link>
+            Your Order
           </button>
+          </Link>
+          
+          <Link href="/auth/signin">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
-            <Link href="/auth/signin">
               <span>Login</span>
-            </Link>
           </button>
+          </Link>
+
         </div>
   )}
 </header>

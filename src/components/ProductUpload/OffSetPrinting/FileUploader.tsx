@@ -1,42 +1,80 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
-const FileUploader = () => {
+interface FileUploaderProps {
+  onUploadSuccess: (documentId: number) => void;
+}
+
+const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<"pdf" | null>(null);
-
   const props: UploadProps = {
-    name: "file",
-    action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
-    accept: ".pdf",  // Only allow PDF files in the file explorer
+    name: "document",  // Important: match backend's expected form field name
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
+    method: "POST",
+    accept: ".pdf",
     headers: {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
-      // Always generate preview URL first
       const fileURL = URL.createObjectURL(file);
       setSelectedFile(fileURL);
-      
+  
       if (file.type === "application/pdf") {
         setFileType("pdf");
-        return true; // Allow upload for PDFs
+        return true;
       } else {
         message.error("Unsupported file type. Please upload a PDF.");
-        return false; // Prevent upload but still show preview
+        return false;
       }
     },
     onChange(info) {
       if (info.file.status === "done") {
-        message.success(`${info.file.name} uploaded successfully`);
+        const response = info.file.response;
+  
+        if (response?.Success) {
+          const documentId = response.Data?.Id;  
+          sessionStorage.setItem("uploadedDocumentId", documentId);
+          onUploadSuccess(documentId); 
+          message.success(`${info.file.name} uploaded successfully`);
+          console.log("📄 Document ID:", documentId);
+        } else {
+          message.error("Upload failed. Server did not return success.");        }
       } else if (info.file.status === "error") {
         message.error(`${info.file.name} upload failed.`);
       }
     },
   };
+  useEffect(() => {
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
+      const docId = sessionStorage.getItem("uploadedDocumentId");
+  
+      if (docId) {
+        try {
+          // Call your delete document API here
+          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
+            method: "DELETE",
+          });
+  
+          sessionStorage.removeItem("uploadedDocumentId");
+          console.log("🧹 Document removed on unload.");
+        } catch (err) {
+          console.error("❌ Failed to delete document on unload:", err);
+        }
+      }
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
 
   return (
     <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">

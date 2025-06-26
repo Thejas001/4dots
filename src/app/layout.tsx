@@ -5,7 +5,7 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
-
+import { Toaster } from "react-hot-toast";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,7 +26,20 @@ export default function RootLayout({
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {loading ? <Loader /> : children}
         </div>
-      </body>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: '#000', // black background
+                color: '#fff',      // white text
+                borderRadius: '8px',
+                padding: '12px 16px',
+              },
+            }}
+          />
+
+    
+    </body>
     </html>
   );
 }

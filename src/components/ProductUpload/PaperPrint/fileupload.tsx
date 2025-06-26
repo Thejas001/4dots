@@ -1,42 +1,93 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
-const FileUploader = ({ pageCount, setPageCount }: { pageCount: number; setPageCount: (count: number) => void }) => {
+interface FileUploaderProps {
+  onUploadSuccess: (documentId: number) => void;
+  pageCount: number;
+  setPageCount: (count: number) => void;
+}
+
+const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<"pdf" | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const props: UploadProps = {
-    name: "file",
-    action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
-    accept: ".pdf",  // Only allow PDF files in the file explorer
+    name: "document",
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload?returnPageCount=true",
+    method: "POST",
+    accept: ".pdf",
     headers: {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
-      // Always generate preview URL first
       const fileURL = URL.createObjectURL(file);
       setSelectedFile(fileURL);
-      
+
       if (file.type === "application/pdf") {
         setFileType("pdf");
-        return true; // Allow upload for PDFs
+        return true;
       } else {
         message.error("Unsupported file type. Please upload a PDF.");
-        return false; // Prevent upload but still show preview
+        return false;
       }
     },
     onChange(info) {
       if (info.file.status === "done") {
-        message.success(`${info.file.name} uploaded successfully`);
+        const response = info.file.response;
+
+        if (response?.Success) {
+          const documentId = response.Data?.Id;
+          const pages = response.Data?.PageCount;
+
+          sessionStorage.setItem("uploadedDocumentId", documentId);
+          onUploadSuccess(documentId);
+
+          if (pages !== undefined) {
+            setPageCount(pages);
+            console.log("📄 Page Count:", pages);
+          }
+
+          message.success(`${info.file.name} uploaded successfully`);
+          console.log("📄 Document ID:", documentId);
+        } else {
+          message.error("Upload failed. Server did not return success.");
+        }
       } else if (info.file.status === "error") {
         message.error(`${info.file.name} upload failed.`);
       }
     },
   };
+
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      const docId = sessionStorage.getItem("uploadedDocumentId");
+
+      if (docId) {
+        try {
+          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
+            method: "DELETE",
+          });
+
+          sessionStorage.removeItem("uploadedDocumentId");
+          console.log("🧹 Document removed on unload.");
+        } catch (err) {
+          console.error("❌ Failed to delete document on unload:", err);
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+  
 
   return (
     <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
@@ -54,13 +105,14 @@ const FileUploader = ({ pageCount, setPageCount }: { pageCount: number; setPageC
       <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
         {selectedFile ? (
           fileType === "pdf" ? (
-            <iframe
-              src={`${selectedFile}#toolbar=0`}
-              width="100%"
-              height="100%"
-              className="rounded-md border"
-              title="PDF Preview"
-            />
+          <iframe
+            key={currentPage} // 🔁 This forces it to reload when page changes
+            src={`${selectedFile}#toolbar=0&page=${currentPage}`}
+            width="100%"
+            height="100%"
+            className="rounded-md border"
+            title="PDF Preview"
+          />
           ) : (
             <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
           )
@@ -71,17 +123,11 @@ const FileUploader = ({ pageCount, setPageCount }: { pageCount: number; setPageC
 
       {/* Pagination */}
       <div
-        className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-[11px] px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px]"
-        style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
-      > 
-        <input
-          type="number"
-          value={pageCount}
-          min="1"
-          className="w-full bg-transparent text-center outline-none"
-          onChange={(e) => setPageCount(Number(e.target.value))}
-        />
-      </div>
+  className="mt-[11px] h-10 w-[60px] rounded-[30px] bg-white px-3 py-2 text-sm font-medium leading-6 tracking-[-0.2px] text-[#242424] flex items-center justify-center shadow-[0px_4px_16px_0px_rgba(91,91,91,0.10)]"
+>
+  {pageCount}
+</div>
+
     </div>
   );
 };

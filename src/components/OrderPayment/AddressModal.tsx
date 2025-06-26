@@ -16,7 +16,6 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
     Country: "",
     PinCode: "",
     Landmark: "",
-    PhoneNumber: "",
     IsPrimary: true,
   });
 
@@ -37,7 +36,6 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
     if (!formData.City.trim()) newErrors.City = "City is required";
     if (!formData.Country.trim()) newErrors.Country = "Country is required";
     if (!formData.PinCode.trim()) newErrors.PinCode = "Postcode is required";
-    if (!formData.PhoneNumber.trim()) newErrors.PhoneNumber = "Phone number is required";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -147,7 +145,7 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
               )}
             </div>
 
-            {/* Phone Number */}
+            {/* Phone Number 
             <div className="sm:col-span-2">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number <span className="text-red-500">*</span>
@@ -177,7 +175,7 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
                 <p className="mt-1 text-sm text-red-500">{errors.PhoneNumber}</p>
               )}
             </div>
-
+*/}
             {/* Country */}
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">

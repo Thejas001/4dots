@@ -16,7 +16,8 @@ const agent = new https.Agent({
 }); 
 
 export const API = axios.create({
-  baseURL: "https://fourdotsapi.azurewebsites.net/api",
+  baseURL: "https://fourdotsapp.azurewebsites.net/api",
+  // /api",
   headers: { "Content-Type": "application/json" },
   httpsAgent: agent, // ✅ Use the custom HTTPS agent
 });
@@ -42,6 +43,15 @@ export const getUserDetails = async () => {
   }
 };
 
+export const updateUserName = async (userName: string) => {
+  try {
+    const response = await API.put("/account/update-name", { name: userName });
+    return response.data; // Assuming the API returns updated user details directly
+  } catch (error: any) {
+    console.error("Error updating user name:", error);
+    throw error.response?.data?.message || "Failed to update user name";
+  }
+}
 export const getUserAddress = async () => {
   try {
     const response = await API.get("/address");
@@ -71,6 +81,18 @@ export const updateUserDetails = async (userDetails: any) => {
     throw error.response?.data?.message || "Failed to update user details";
   }
 }
+export const updateOrderStatus = async (orderId: number, status: number) => {
+  try {
+    const response = await API.put(`/order/${orderId}/status`, {
+      OrderStatus: status,
+    });
+    return response.data; // Adjust as per your API's response structure
+  } catch (error: any) {
+    console.error(`Error updating order ${orderId} status:`, error);
+    throw error.response?.data?.message || "Failed to update order status";
+  }
+};
+
 
 // Send OTP to user's phone
  export const sendOtp = async (phoneNumber: string) => {
@@ -236,22 +258,23 @@ export const addToCartApi = async (cartItem: CartItems) => {
 
 export const placeOrder = async (
   cartItemIds: number[], 
-  userId: number, 
-  paymentMethod: string
+  deliveryOption: string,
+  paymentOption: string
 ) => {    
   try {
     const response = await API.post("/order/create", {
-      userId, 
-      cartItemIds,
-      paymentMethod
+      CartItemIds: cartItemIds,
+      PaymentMethod: paymentOption,
+      DeliveryType: deliveryOption,
     });
 
-    return response.data; // Axios automatically handles JSON parsing
+    return response.data;
   } catch (error: any) {
     console.error("Error placing order:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Failed to place order");
   }
 };
+
 
 
 export const fetchUserOrder = async () => {
@@ -268,5 +291,19 @@ export const fetchUserOrder = async () => {
     throw new Error(error.response?.data?.message || "Failed to fetch orders");
   }
 };
+
+export const fetchPaymentRetry = async (orderId: number) => {
+  try {
+    const response = await API.get(`/order/retry-payment/${orderId}`);
+    console.log("API Response Data:", response.data); // Keep this for debugging
+
+    // Return the actual response data directly
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching orders:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "Failed to fetch orders");
+  }
+};
+
 
 export default API;

@@ -1,6 +1,13 @@
 "use client";
 import React from "react";
 import { IoClose } from "react-icons/io5"; 
+import { addUserAddress } from "@/utils/api";
+
+interface AddressModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddressAdded?: () => void;
+}
 
 const AddressModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   if (!isOpen) return null;

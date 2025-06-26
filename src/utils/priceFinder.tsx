@@ -292,8 +292,7 @@ export const findOffsetPrintingPricingRule = (
       (rule) =>
         rule.NoticeType?.ValueName.trim() === selectedSize.trim() &&
         rule.Quality?.ValueName.trim() === selectedQuality.trim() &&
-        rule.Quantity?.ValueName.trim() === selectedQuantity.toString().trim(), // ✅ Fix: Convert to string
-    ) || null;
+        rule.Quantity?.ValueName.trim() === "1000",    ) || null;
 
   console.log("✅ Matched Offset Printing Pricing Rule:", rule);
   if (!rule) {

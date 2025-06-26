@@ -2,24 +2,29 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const CartButton = () => { 
-    const router = useRouter(); 
-    const [isClient, setIsClient] = useState(false);
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
-    const handleClick = () => {
-        if (!isClient) return;
-    
-        const token = localStorage.getItem("jwtToken");
-    
-        if (token) {
-          router.push("/Cart");
-        } else {
-          localStorage.setItem("redirectAfterLogin", "/Order");
-          router.push("/auth/signin");
-        }
-      };
+const CartButton = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Preload the Cart and Signin pages
+    router.prefetch("/Cart");
+    router.prefetch("/auth/signin");
+  }, [router]);
+  
+  const handleClick = () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+
+      if (token) {
+        router.push("/Cart");
+      } else {
+        localStorage.setItem("redirectAfterLogin", "/Order");
+        router.push("/auth/signin");
+      }
+    } catch (error) {
+      console.error("Error accessing localStorage or redirecting:", error);
+    }
+  };
 
   return (
     <div

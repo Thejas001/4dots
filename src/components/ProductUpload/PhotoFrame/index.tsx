@@ -16,6 +16,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const productDetails = product; //stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
+  const [selectedFrameColor, setSelectedFrameColor] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [price, setPrice] = useState<number | null>(null);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -95,6 +96,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                   type="radio"
                   name="frame-color"
                   value="Black"
+                  checked={selectedFrameColor === "Black"}
+                  onChange={(e) => setSelectedFrameColor(e.target.value)}
                   className="peer hidden"
                 />
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#242424] peer-checked:ring-2 peer-checked:ring-[#242424] peer-checked:ring-offset-2">
@@ -111,6 +114,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                   type="radio"
                   name="frame-color"
                   value="White"
+                  checked={selectedFrameColor === "White"}
+                  onChange={(e) => setSelectedFrameColor(e.target.value)}
                   className="peer hidden"
                 />
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#242424] peer-checked:ring-2 peer-checked:ring-[#242424] peer-checked:ring-offset-2">
@@ -127,6 +132,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                   type="radio"
                   name="frame-color"
                   value="Brown"
+                  checked={selectedFrameColor === "Brown"}
+                  onChange={(e) => setSelectedFrameColor(e.target.value)}
                   className="peer hidden"
                 />
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#723100] peer-checked:ring-2 peer-checked:ring-[#723100] peer-checked:ring-offset-2">
@@ -141,10 +148,12 @@ const ProductUpload = ({ product }: { product: any }) => {
 
           {/**Cart Buttons */}
           <CartButton
+            uploadedImages={fileList}
             dataId={dataId}
             selectedQuantity={selectedQuantity}
             calculatedPrice={calculatedPrice}
             selectedPricingRule={selectedPricingRule}
+            selectedFrameColor={selectedFrameColor}
           />
         </div>
       </div>

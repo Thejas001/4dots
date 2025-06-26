@@ -29,7 +29,8 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
       pageCount, 
       selectedBindingType, 
       selectedAddonRule, 
-      addonBookCount 
+      addonBookCount,
+      uploadedDocumentId
     } = parsedItem;
 
     // Ensure numeric values

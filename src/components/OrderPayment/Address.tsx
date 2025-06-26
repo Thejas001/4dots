@@ -23,6 +23,7 @@ const Address: React.FC<AddressProps> = ({ hideLabel, buttonStyle = "default", b
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [address, setAddress] = useState<AddressType[]>([]);
   const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
     const fetchAddress = async () => {
       setLoading(true);

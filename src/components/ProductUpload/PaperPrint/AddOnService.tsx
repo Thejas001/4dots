@@ -110,11 +110,11 @@ const AddOnService = ({
             </div>
 
             <input
-              type="text"
-              placeholder="Numerical Text"
+              type="number"
+              placeholder="Number"
               value={customCopies}
               onChange={handleCustomCopiesChange}
-              className="border border-gray-300 px-3 py-2 rounded-md text-gray-500 w-24"
+              className="border border-gray-300 px-3 py-2 mt-12.5 rounded-md text-gray-500 w-26 no-spinner"
               disabled={copySelection === "all"}
             />
             {/* Select Binding Type Section */}

@@ -75,7 +75,7 @@ export const extractPaperPrintingPricingRules = (
     const matchingAddons = addons
       .filter((addon) => {
         // Ensure addon.Rules exists and is an array
-        if (!addon.Rules || !Array.isArray(addon.Rules)) {
+        if (!addon.Id ||!addon.Rules || !Array.isArray(addon.Rules)) {
           console.warn("Invalid addon.Rules for addon:", addon);
           return false;
         }
@@ -90,6 +90,7 @@ export const extractPaperPrintingPricingRules = (
             addonRule.PageRange === rule.PageRange.ValueName
           )
           .map((addonRule: any) => ({
+            Id: addon.Id,
             AddonName: addon.AddonName,
             PaperSize: addonRule.PaperSize,
             ColorName: addonRule.ColorName,

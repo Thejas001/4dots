@@ -22,12 +22,12 @@ const DeliveryOption: React.FC<DeliveryOptionProps> = ({ selectedOption, setSele
         {/* Pick-Up Option */}
         <div
           className="flex items-center cursor-pointer gap-4"
-          onClick={() => setSelectedOption("pickup")} // Set selected option
+          onClick={() => setSelectedOption("Pickup")} // Set selected option
         >
           {/* Radio Button */}
           <div
             className={`w-7.5 h-7.5 flex items-center justify-center rounded-full border ${
-              selectedOption === "pickup" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
+              selectedOption === "Pickup" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
             }`}
           ></div>
           <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Pick-up from shop location</span>
@@ -36,12 +36,12 @@ const DeliveryOption: React.FC<DeliveryOptionProps> = ({ selectedOption, setSele
         {/* Delivery Option */}
         <div
           className="flex items-center gap-4 cursor-pointer"
-          onClick={() => setSelectedOption("delivery")} // Set selected option
+          onClick={() => setSelectedOption("Delivery")} // Set selected option
         >
          {/* Radio Button */}
          <div
             className={`w-7.5 h-7.5 flex items-center justify-center rounded-full border ${
-              selectedOption === "delivery" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
+              selectedOption === "Delivery" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
             }`}
           ></div>
           <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Delivery the product</span>

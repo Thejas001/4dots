@@ -39,6 +39,7 @@ export const addToCart = async (
     Quantity: { AttributeID: number; ValueID: number };
     Price: number;
   },
+  documentId?: number 
 ) => {
   const cartItem = {
     ProductID: productId, //Matches `CartItems` type
@@ -62,6 +63,7 @@ export const addToCart = async (
       },
     ],
     DynamicAttributes: [], //Keeping this empty unless required
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
   console.log("Corrected Cart Data:", JSON.stringify(cartItem, null, 2));
@@ -82,6 +84,7 @@ export const addToCartPolaroidCard = async (
     Price: number;
   },
   selectedQuantity: number, //"NumberOfCards" as a dynamic attribute
+  documentId?: number 
 ) => {
   const cartItem: CartItems = {
     ProductID: productId, //Matches expected key format
@@ -102,6 +105,8 @@ export const addToCartPolaroidCard = async (
         AttributeValue: selectedQuantity.toString(), // Convert to string as per API format
       },
     ],
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
+
   };
 
   console.log("Polaroid Card Cart Data:", JSON.stringify(cartItem, null, 2));
@@ -122,6 +127,7 @@ export const addToCartNameSlip = async (
     Price: number;
   },
   selectedQuantity: number, //"NumberOfSlips" as a dynamic attribute
+  documentId?: number 
 ) => {
   const cartItem: CartItems = {
     ProductID: productId, //Matches expected key format
@@ -142,6 +148,7 @@ export const addToCartNameSlip = async (
         AttributeValue: selectedQuantity.toString(), // Convert to string as per API format
       },
     ],
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
   console.log("🛒 Name Slip Cart Data:", JSON.stringify(cartItem, null, 2));
@@ -164,10 +171,11 @@ export const addToCartOffSetPrinting = async (
     Price: number;
   },
   selectedQuantity: number, //"NumberOfSlips" as a dynamic attribute
+  documentId?: number 
 ) => {
   const cartItem: CartItems = {
-    ProductID: productId, //Matches expected key format
-    Price: pricingRule.Price, // Price included
+    ProductID: productId,
+    Price: pricingRule.Price,
     Attributes: [
       {
         AttributeId: pricingRule.NoticeType.AttributeID,
@@ -184,22 +192,24 @@ export const addToCartOffSetPrinting = async (
     ],
     DynamicAttributes: [
       {
-        AttributeName: "OffSetBundleQuantity", //Matches API requirement
-        AttributeValue: selectedQuantity.toString(), // Convert to string as per API format
+        AttributeName: "OffSetBundleQuantity",
+        AttributeValue: selectedQuantity.toString(),
       },
     ],
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
-
+  console .log("selectedQuantity", selectedQuantity);
+  console.log("🧾 Document IDs:", cartItem.CartItemDocumentIds);
   console.log("🛒 Offset printing Data:", JSON.stringify(cartItem, null, 2));
 
   try {
-    const response = await addToCartApi(cartItem); // Corrected variable name
-    console.log("Successfully added Offset printing Data to cart:", response);
-    console.log("Offset printing Data added to cart!");
+    const response = await addToCartApi(cartItem);
+    console.log("✅ Successfully added Offset printing Data to cart:", response);
   } catch (error) {
-    console.log("Failed to add Offset printing Data to cart. Please try again.");
+    console.log("❌ Failed to add Offset printing Data to cart. Please try again.");
   }
 };
+
 
 export const addToCartBusinessCard = async (
   productId: number,
@@ -208,6 +218,7 @@ export const addToCartBusinessCard = async (
     Finish: { AttributeID: number; ValueID: number };
     Price: number;
   },
+  documentId?: number
 ) => {
   const cartItem: CartItems = {
     ProductID: productId, //Matches expected key format
@@ -223,6 +234,7 @@ export const addToCartBusinessCard = async (
       },
     ],
     DynamicAttributes: [],
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
   console.log("🛒 Offset printing Data:", JSON.stringify(cartItem, null, 2));
@@ -243,6 +255,7 @@ export const addToCartCanvasPrinting = async (
     PricePerSquareFoot: number;
   },
   sqftRange: number,
+  documentId?: number 
 ) => {
   const cartItem: CartItems = {
     ProductID: productId, //Matches expected key format
@@ -259,6 +272,8 @@ export const addToCartCanvasPrinting = async (
         AttributeValue: sqftRange.toString(), // Convert to string as per API format
       },
     ],
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
+
   };
 
   console.log("🛒 Canvas Printing Data:", JSON.stringify(cartItem, null, 2));
@@ -279,8 +294,13 @@ export const addToCartPhotoFrame = async (
     Quantity: { AttributeID: number; ValueID: number };
     Price: number;
   },
-  selectedQuantity: number // Pass the actual quantity chosen by the user
+  selectedQuantity: number, // Pass the actual quantity chosen by the user
+  documentId?: number[],
+  selectedFrameColor?: string
 ) => {
+    if (!selectedFrameColor) {
+    throw new Error("Frame color is required.");
+  }
   // API expects Quantity 8 attributes if selectedQuantity > 8
   const quantityToSend = selectedQuantity > 8 ? 8 : selectedQuantity;
 
@@ -300,13 +320,15 @@ export const addToCartPhotoFrame = async (
     DynamicAttributes: [
         {
           "AttributeName": "Color",
-          "AttributeValue": "Black"
+          "AttributeValue": selectedFrameColor // Use the selected frame color
         },
       {
         AttributeName: "PhotoFrameQuantity",
         AttributeValue: selectedQuantity.toString(), // Send actual selected quantity
       },
     ],
+    CartItemDocumentIds: documentId ?? [],
+
   };
 
   console.log("🛒 PhotoFrame Data Sent to API:", JSON.stringify(cartItem, null, 2));
@@ -328,14 +350,27 @@ export const addToCartPaperPrint = async (
   pricingRule: {
     PaperSize: { AttributeID: number; ValueID: number };
     ColorType: { AttributeID: number; ValueID: number };
-   // PageRange: { AttributeID: number; ValueID: number };
     PricePerPage: number;
   },
   pageCount: number,
   selectedBindingType?: string,
   addonRule?: any,
   addonBookCount?: number,
+  documentId?: number
 ) => {
+
+  // ✅ Map binding type to AddonID
+  const bindingTypeToAddonIdMap: Record<string, number> = {
+    "Spiral Binding": 1,
+    "Soft Binding": 2,
+    "Hard Binding": 3
+  };
+
+const resolvedAddonId = selectedBindingType
+  ? bindingTypeToAddonIdMap[selectedBindingType] ?? selectedBindingType
+  : null; // explicitly set to null if undefined
+
+
   const cartItem: CartItems = {
     ProductID: productId,
     Price: pricingRule.PricePerPage,
@@ -349,25 +384,29 @@ export const addToCartPaperPrint = async (
         AttributeValueId: pricingRule.ColorType.ValueID,
       },
     ],
-    Addons: addonRule && selectedBindingType
-    ? [
-        {
-          AddonID: addonRule.AddonName, // Use AddonID from the rule
-          IsDeleted: false,
-          NumberOfBooks: addonBookCount || 1, // Use user-specified or default to 1
-        },
-      ]
-    : [],
-  
+    Addons:
+      addonRule && selectedBindingType && resolvedAddonId !== null
+        ? [
+            {
+              AddonID: resolvedAddonId,
+              IsDeleted: false,
+              NumberOfBooks: addonBookCount || 1,
+            },
+          ]
+        : [],
+
     DynamicAttributes: [
       {
         AttributeName: "PageCount",
         AttributeValue: pageCount.toString(),
       },
     ],
+    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
   console.log("🛒 Cart Item:", JSON.stringify(cartItem, null, 2));
+  console.log("Selected Binding Type:", selectedBindingType);
+  console.log("Addon Rule:", addonRule);
 
   try {
     const response = await addToCartApi(cartItem);

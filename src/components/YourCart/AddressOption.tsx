@@ -1,6 +1,7 @@
 'use client'
-import React, { useState } from "react";
-import AddressModal from "./AddressModal";
+import React, { useState , useEffect } from "react";
+import AddressModal from "@/components/OrderPayment/AddressModal"; // Adjust the import path as necessary
+import { getUserAddress } from "@/utils/api"; // Adjust the import path as necessary
 
 interface AddressProps {
   hideLabel?: boolean;
@@ -8,9 +9,48 @@ interface AddressProps {
   buttonAlignment?: "left" | "right";
 }
 
+interface AddressType {
+  Id: number;
+  Address: string;
+  City: string;
+  Country: string;
+  PinCode: string;
+  IsPrimary: boolean;
+}
+
 const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "default", buttonAlignment = "right" }) => {
   const [selectedOption, setSelectedOption] = useState(""); // Track which option is selected
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [address, setAddress] = useState<AddressType[]>([]);
+  const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+      const fetchAddress = async () => {
+        setLoading(true);
+        try {
+          const data = await getUserAddress();
+          setAddress(data); // ✅ Adjust if your API returns nested structure
+          const primary = data.find((addr: AddressType) => addr.IsPrimary);
+          if (primary) setSelectedOption(primary.Id.toString());
+
+        } catch (err) {
+          console.error("Failed to fetch address", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchAddress();
+    }, []);
+  
+    const refreshAddresses = async () => {
+      try {
+        const data = await getUserAddress();
+        setAddress(data);
+      } catch (err) {
+        console.error("Failed to fetch address", err);
+      }
+    };
 
   return (
     <div className="flex flex-col rounded-[20px]  xl:max-w-[468px] border border-[#ECECEC] py-5 mb-4">
@@ -22,38 +62,30 @@ const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "defa
       {/* Options */}
       <div className="flex flex-col space-y-4 mt-4 px-4">
         {/* Pick-Up Option */}
-        <div
+        {loading ? (
+         <p className="text-sm text-gray-500">Loading addresses...</p>
+            ) : address.length > 0 ? (
+           address.map((addr) => (
+        <div key={addr.Id}
           className="flex items-center cursor-pointer gap-4"
-          onClick={() => setSelectedOption("pickup")} // Set selected option
+          onClick={() => setSelectedOption(addr.Id.toString())} // Set selected option
         >
           {/* Radio Button */}
           <div
             className={`w-7.5 h-7.5 flex items-center justify-center rounded-full border ${
-              selectedOption === "pickup" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
+              selectedOption === addr.Id.toString()
+ ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
             }`}
           ></div>
           <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]"> 
-            206, 2nd Floor, Valiulla Complex, Nagdevi Street,
-            <br />
-            Nagdevi - 400003
+          {addr.Address},<br />
+          {addr.City}, {addr.Country} - {addr.PinCode}
             </span>
         </div>
-
-        {/* Delivery Option 
-        <div
-          className="flex items-center gap-4 cursor-pointer"
-          onClick={() => setSelectedOption("delivery")} // Set selected option
-        >
-         {/* Radio Button 
-         <div
-            className={`w-7.5 h-7.5 flex items-center justify-center rounded-full border ${
-              selectedOption === "delivery" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
-            }`}
-          ></div>
-          <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Delivery the product</span>
-        </div> */}
-
-              {/* Address Button - Customizable Position & Style */}
+           ))
+        ) : (
+          <p className="text-sm text-gray-500">No addresses available</p>
+        )}
       <div className={`mb-4 mr-[21px] mt-7.5 flex items-center ${buttonAlignment === "left" ? "justify-start" : "justify-end"}`}>
         <button
           className={`flex items-center justify-center rounded-full border px-5 py-2 text-sm md:text-base xl:h-10 xl:w-[211px] transition
@@ -66,7 +98,7 @@ const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "defa
       </div>
 
         {/* Address Modal */}
-        <AddressModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <AddressModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddressAdded={refreshAddresses} />
 
       </div>
     </div>
