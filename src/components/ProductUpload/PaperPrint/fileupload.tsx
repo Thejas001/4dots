@@ -18,7 +18,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
 
   const props: UploadProps = {
     name: "document",
-    action: "https://localhost:7049/api/document/upload?returnPageCount=true",
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload?returnPageCount=true",
     method: "POST",
     accept: ".pdf",
     headers: {
