@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 jobs:
@@ -12,31 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📦 Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: 🔧 Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '18' # or match what you use locally
 
-      - name: Install dependencies
+      - name: 🧩 Install dependencies
         run: npm ci
 
-      - name: Build Next.js app
+      - name: 🛠 Build the Next.js app
         run: npm run build
 
-      - name: Prepare deployment package
+      - name: 📁 Prepare deploy package
         run: |
           mkdir output
-          cp -r .next public node_modules package.json output/
+          cp -r .next public node_modules package.json next.config.js output/
 
-      - name: Login to Azure
+      - name: 🔐 Login to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure Web App
+      - name: 🚀 Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: fourdotsui
