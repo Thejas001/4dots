@@ -90,7 +90,7 @@ const CartButton: React.FC<CartButtonProps> = ({
         const formData = new FormData();
         formData.append("document", image.originFileObj);
   
-        const response = await fetch("https://fourdotsapp.azurewebsites.net/api/document/upload", {
+        const response = await fetch("https://localhost:7049/api/document/upload", {
           method: "POST",
           body: formData,
         });
@@ -166,7 +166,7 @@ const CartButton: React.FC<CartButtonProps> = ({
         const formData = new FormData();
         formData.append("document", image.originFileObj);
   
-        const response = await fetch("https://fourdotsapp.azurewebsites.net/api/document/upload", {
+        const response = await fetch("https://localhost:7049/api/document/upload", {
           method: "POST",
           body: formData,
         });

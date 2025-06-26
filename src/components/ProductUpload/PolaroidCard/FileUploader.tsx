@@ -15,7 +15,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [fileType, setFileType] = useState<"pdf" | null>(null);
   const props: UploadProps = {
     name: "document",  // Important: match backend's expected form field name
-    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
+    action: "https://localhost:7049/api/document/upload",
     method: "POST",
     accept: ".pdf",
     headers: {

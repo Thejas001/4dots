@@ -59,7 +59,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         if (docId) {
           try {
             // Call your delete document API here
-            await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
+            await fetch(`https://localhost:7049/api/document/delete/${docId}`, {
               method: "DELETE",
             });
     
