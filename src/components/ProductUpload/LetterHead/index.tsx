@@ -28,7 +28,14 @@ const ProductUpload = ({ product }: { product: any }) => {
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
 
-  // Check if user is logged in
+const isReadyToShowPrice =
+    selectedOption !== "" &&
+    selectedQuality !== "" &&
+    selectedQuantity !== null &&
+    selectedSize !== "";
+
+
+
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
     return !!token;
@@ -39,15 +46,18 @@ const ProductUpload = ({ product }: { product: any }) => {
     setUploadedDocumentId(documentId);
   };
 
-  useEffect(() => {
+useEffect(() => {
     if (
       !productDetails ||
       !selectedSize ||
       !selectedQuantity ||
       !selectedQuality ||
       !selectedOption
-    )
+    ) {
+      setSelectedPrice(0); // Display 0 while incomplete
       return;
+    }
+
 
     // Reset error message first
     setErrorMessage(null);
@@ -127,7 +137,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       toast.success("Product added to cart!");
-      incrementCart();
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
       return;
     }
@@ -283,7 +292,11 @@ const ProductUpload = ({ product }: { product: any }) => {
                   />
                 </svg>
               </span>
-              <span className="font-bold">{selectedPrice || "0"}</span>
+              <span className="font-bold">
+                {isReadyToShowPrice && selectedPrice !== null ? selectedPrice : "0"}
+              </span>
+
+
               <span className="pl-4 font-medium">Proceed To Cart</span>
             </button>
           </div>

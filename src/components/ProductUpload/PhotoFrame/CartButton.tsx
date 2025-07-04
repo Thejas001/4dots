@@ -121,7 +121,6 @@ const CartButton: React.FC<CartButtonProps> = ({
         };
         sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
         toast.success("Product added to cart!");
-        incrementCart();
         router.push(`/auth/signin?redirect=/`);
         return;
       }

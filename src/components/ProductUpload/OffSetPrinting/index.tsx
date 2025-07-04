@@ -127,7 +127,6 @@ useEffect(() => {
             sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
             router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
             toast.success("Product added to cart!");
-            incrementCart();           
             return;
           }
           try{

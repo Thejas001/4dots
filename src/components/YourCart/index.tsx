@@ -9,7 +9,7 @@ import PaymentMethod from "./PaymentMethod";
 import { fetchCartItems , deleteCartItem } from "@/utils/cart"; //api
 import { getUserDetails } from "@/utils/api"; //api
 import { useCartStore } from "@/utils/store/cartStore";
-
+import Loader from "../common/Loader";
 import { CartData } from "@/app/models/CartItems"; //model
 import { processPendingCartItem } from "@/utils/processPendingCartItem";
 import PopupModal from "../PopUpModal";
@@ -24,6 +24,7 @@ const Cart = () => {
   const [user, setUser] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const clearCartCount = useCartStore((state) => state.clearCartCount);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
   const [selectedDesign, setSelectedDesign] = useState<{
     url: string;
@@ -61,15 +62,23 @@ const Cart = () => {
     }
   }, []);
   
-
-  useEffect(() => {
-    const loadCartItems = async () => {
+useEffect(() => {
+  const loadCartItems = async () => {
+    try {
       const data = await fetchCartItems();
-      console.log("Cart Data:", data); // Debugging output
+      console.log("Cart Data:", data);
       setCartData(data);
-    };
-    loadCartItems();
-  },[]);
+    } catch (error) {
+      console.error("Error loading cart items:", error);
+    } finally {
+      setIsLoading(false); // ✅ safely stop loader after fetching
+    }
+  };
+
+  loadCartItems();
+}, []);
+
+
 
   useEffect(() => {
     console.log("Updated Cart Data in State:", cartData);
@@ -152,8 +161,10 @@ const Cart = () => {
   
     {/* Bottom Section */}
     <div className="grid h-auto grid-cols-12 xl:grid-cols-2 pl-36 mt-9 ">
-      {cartData.Items.length > 0 ? (
-       <> 
+     {isLoading ? (
+       <Loader />
+    ) : cartData.Items.length > 0 ? (
+       <>
       <div className="flex flex-col  ">
          {cartData.Items.map((item) => {
            const document = item.Documents?.[0];

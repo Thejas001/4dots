@@ -177,7 +177,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       toast.success("Product added to cart!");
-      incrementCart();
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
       return;
     }

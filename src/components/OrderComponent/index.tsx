@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import paymentRetry from  "./paymentRetry";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import Loader from "../common/Loader";
 
 interface Attribute {
   OrderItemAttributeId: number;
@@ -58,8 +59,11 @@ interface AddressType {
 
 const OrderComponent = () => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingOrders, setLoadingOrders] = useState<boolean>(true);
+  const [loadingAddresses, setLoadingAddresses] = useState<boolean>(true);
+
   const [address, setAddress] = useState<AddressType[]>([]);
+  
   const router = useRouter();
   const userId = 2; // Replace with actual user ID
   const clearOrderBadge = useCartStore((state) => state.clearOrderBadge);
@@ -74,6 +78,7 @@ const OrderComponent = () => {
     // When this component mounts (cart opens), reset the badge
     clearOrderBadge();
   }, [clearOrderBadge]);
+
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -86,7 +91,7 @@ const OrderComponent = () => {
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
-        setLoading(false);
+        setLoadingOrders(false);
       }
     };
 
@@ -95,22 +100,21 @@ const OrderComponent = () => {
 
   useEffect(() => {
     const fetchAddress = async () => {
-      setLoading(true);
       try {
         const data = await getUserAddress();
         setAddress(data); // ✅ Adjust if your API returns nested structure
       } catch (err) {
         console.error("Failed to fetch address", err);
       } finally {
-        setLoading(false);
+        setLoadingAddresses(false);
       }
     };
 
     fetchAddress();
   }, []);
 
-  if (loading) {
-    return <p>Loading orders...</p>;
+  if (loadingOrders) {
+    return <Loader />;
   }
 
   const formatDate = (dateString: string) => {
@@ -149,6 +153,10 @@ const handleCancelOrder = async (orderId: number) => {
   }
 };
 ;
+  // ✅ Show loader only while orders are loading
+  if (loadingOrders) {
+    return <Loader />;
+  }
 
   return (
     <div className="w-2xl grid h-auto  grid-rows-[auto,1fr] bg-[#fff]">
@@ -428,7 +436,7 @@ const handleCancelOrder = async (orderId: number) => {
                         </label>
                       </div>
                       <div className="ml-2">
-                        {loading ? (
+                        {loadingAddresses ? (
                           <span className="text-sm font-medium text-[#000] xl:text-base">
                             Loading...
                           </span>

@@ -14,11 +14,8 @@ import { CartItems } from "@/app/models/CartItems";
 const agent = new https.Agent({  
   rejectUnauthorized: false, // ✅ Allow self-signed certificates
 }); 
-
 export const API = axios.create({
-
   baseURL: "https://fourdotsapp.azurewebsites.net/api",
-  // /api",
   headers: { "Content-Type": "application/json" },
   httpsAgent: agent, // ✅ Use the custom HTTPS agent
 });
