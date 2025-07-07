@@ -70,6 +70,7 @@ const DropDown = ({
             type="number"
             className="w-full rounded-md border bg-white px-5 py-3 text-gray-700 focus:ring-2 focus:ring-gray-300"
             value={selectedCopies || ""}
+            min="1"
             placeholder="Enter No. of Copies"
             onChange={(e) => {
               const value = e.target.value;

@@ -223,7 +223,7 @@ const handleCancelOrder = async (orderId: number) => {
                   <div className="mx-4  flex items-center">
                     {/* Order Placed */}
                     <div className=" ml-5 mr-1.5 flex flex-col items-center">
-                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
+                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "COD" || order.OrderStatus === "Pending" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="18"
@@ -233,22 +233,22 @@ const handleCancelOrder = async (orderId: number) => {
                         >
                           <path
                             d="M3.66022 12.7201V5.92653L2.52614 3.43301C2.4876 3.34375 2.48614 3.24936 2.52175 3.14986C2.55735 3.05035 2.61979 2.98084 2.70905 2.94133C2.79832 2.90182 2.89294 2.89987 2.99294 2.93548C3.09293 2.97109 3.16195 3.03279 3.2 3.12059L4.45335 5.88995H13.1104L14.3638 3.12132C14.4023 3.03206 14.4713 2.96962 14.5708 2.93401C14.6708 2.89841 14.7655 2.90109 14.8547 2.94206C14.944 2.9806 15.0064 3.04986 15.042 3.14986C15.0776 3.24985 15.0762 3.34424 15.0376 3.43301L13.9036 5.92653V12.7201C13.9036 13.0469 13.7884 13.3256 13.5582 13.5564C13.328 13.7866 13.0492 13.9017 12.7219 13.9017H4.84186C4.51505 13.9017 4.23628 13.7866 4.00557 13.5564C3.77533 13.3261 3.66022 13.0474 3.66022 12.7201ZM7.31855 9.14586H10.2452C10.3496 9.14586 10.4367 9.11099 10.5064 9.04124C10.5762 8.97148 10.6111 8.88442 10.6111 8.78003C10.6111 8.67565 10.5762 8.58858 10.5064 8.51883C10.4367 8.44907 10.3496 8.4142 10.2452 8.4142H7.31855C7.21465 8.4142 7.12759 8.44907 7.05735 8.51883C6.98711 8.58858 6.95223 8.67565 6.95272 8.78003C6.95321 8.88442 6.98808 8.97148 7.05735 9.04124C7.12661 9.11099 7.21368 9.14586 7.31855 9.14586ZM4.84259 13.17H12.7219C12.8531 13.17 12.9609 13.1278 13.0453 13.0435C13.1297 12.9591 13.1719 12.8513 13.1719 12.7201V6.62161H4.39189V12.7201C4.39189 12.8513 4.43408 12.9591 4.51846 13.0435C4.60285 13.1278 4.71089 13.17 4.84259 13.17Z"
-                            fill={order.OrderStatus === "Shipped"  || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "black" : "#B5B5B5"}
+                            fill={ order.OrderStatus === "COD" || order.OrderStatus === "Pending" ||   order.OrderStatus === "Shipped"  || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "black" : "#B5B5B5"}
                           />
                           <path
                             d="M4.39189 6.62161H13.1719V12.7201C13.1719 12.8513 13.1297 12.9591 13.0453 13.0435C12.9609 13.1278 12.8531 13.17 12.7219 13.17H4.84259C4.71089 13.17 4.60285 13.1278 4.51846 13.0435C4.43408 12.9591 4.39189 12.8513 4.39189 12.7201V6.62161ZM4.39189 6.62161V13.17M3.66022 12.7201V5.92653L2.52614 3.43301C2.4876 3.34375 2.48614 3.24936 2.52175 3.14986C2.55735 3.05035 2.61979 2.98084 2.70905 2.94133C2.79832 2.90182 2.89294 2.89987 2.99294 2.93548C3.09293 2.97109 3.16195 3.03279 3.2 3.12059L4.45335 5.88995H13.1104L14.3638 3.12132C14.4023 3.03206 14.4713 2.96962 14.5708 2.93401C14.6708 2.89841 14.7655 2.90109 14.8547 2.94206C14.944 2.9806 15.0064 3.04986 15.042 3.14986C15.0776 3.24985 15.0762 3.34424 15.0376 3.43301L13.9036 5.92653V12.7201C13.9036 13.0469 13.7884 13.3256 13.5582 13.5564C13.328 13.7866 13.0492 13.9017 12.7219 13.9017H4.84186C4.51505 13.9017 4.23628 13.7866 4.00557 13.5564C3.77533 13.3261 3.66022 13.0474 3.66022 12.7201ZM7.31855 9.14586H10.2452C10.3496 9.14586 10.4367 9.11099 10.5064 9.04124C10.5762 8.97148 10.6111 8.88442 10.6111 8.78003C10.6111 8.67565 10.5762 8.58858 10.5064 8.51883C10.4367 8.44907 10.3496 8.4142 10.2452 8.4142H7.31855C7.21466 8.4142 7.12759 8.44907 7.05735 8.51883C6.98711 8.58858 6.95223 8.67565 6.95272 8.78003C6.95321 8.88442 6.98808 8.97148 7.05735 9.04124C7.12661 9.11099 7.21368 9.14586 7.31855 9.14586Z"
-                            stroke={order.OrderStatus === "Shipped" ||order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "black" : "#B5B5B5"}
+                            stroke={order.OrderStatus === "COD" ||  order.OrderStatus === "Pending" ||  order.OrderStatus === "Shipped" ||order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "black" : "#B5B5B5"}
                             strokeWidth="0.5"
                           />
                         </svg>
-                        <div className={`absolute top-10 w-32 text-center text-sm font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-10 w-32 text-center text-sm font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD" ||order.OrderStatus === "Pending" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           Order Placed
                         </div>
                       </div>
                     </div>
 
                     {/* Divider */}
-                    <div className={`w-[181px] border ${order.OrderStatus === "Shipped"  || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
+                    <div className={`w-[181px] border ${order.OrderStatus === "Pending" ||order.OrderStatus === "COD" ||  order.OrderStatus === "Shipped"  || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
 
                     {/* Printing Started */}
                     <div className=" ml-1.5 mr-1.5 flex flex-col items-center">
