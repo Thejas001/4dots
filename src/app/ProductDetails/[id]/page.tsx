@@ -11,6 +11,8 @@ import PolaroidCard from "@/components/ProductUpload/PolaroidCard";
 import CustomNameSlip from "@/components/ProductUpload/CustomNameSlip";
 import { Metadata } from "next";
 import NetworkErrorPage from "@/components/NetworkErrorPage";
+import { Suspense } from "react";
+import Loader from "@/components/common/Loader";
 
 export const metadata: Metadata = {
   title: "4 Dots",
@@ -55,11 +57,13 @@ export default async function PageDetails({
 
   return (
     <DefaultLayout>
+      <Suspense fallback={<Loader />}>
       {/* ✅ Pass fetched product details to ProductDescription */}
       <ProductDescription product={product} />
 
       {/* ✅ Pass product data to the specific product component */}
       <SpecificProductComponent product={product} />
+      </Suspense>
     </DefaultLayout>
   );
 }

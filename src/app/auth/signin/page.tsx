@@ -18,7 +18,9 @@ const SignIn: React.FC = () => {
   return (
     <DefaultLayout>
       <div className="mb-6 ml-12 mt-3">
+        <Link href={"/"}>
         <img src={"/images/login/back-arrow.svg"} alt={"Back Button"} />
+        </Link>
       </div>
       <div className=" mx-12 mb-12 flex  flex-col md:flex-row">
         {/* Image Section */}
