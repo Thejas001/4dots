@@ -126,17 +126,17 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
         <div></div>
       </div>
       <div className="grid w-full grid-cols-12">
-        <div className="sticky top-10 col-span-1 pl-8">
+        <div className="sticky top-10 ml-[-100px] xl:ml-0  col-span-1 pl-8">
           <ProgressBar orderStatus={selectedOrder.OrderStatus} />
         </div>
         {/* Bottom Section */}
-        <div className="mb-10 mt-9 grid  h-auto grid-cols-12 pl-36 pr-39 xl:grid-cols-1">
+        <div className="mb-10 mt-9 grid h-auto grid-cols-3 gap-4 ml-[60px]  xl:grid-cols-12 w-full">
           {orders.length > 0 ? (
             <div className="flex flex-col ">
               {selectedOrder.Items.map((item, index) => (
                 <div
                   key={`${selectedOrder.OrderId}-${index}`}
-                  className="bg-lightgray col-span-12 mb-4 flex flex-col rounded-[10px] border border-[#E9E9E9] bg-white p-5 shadow-[0px_4px_16px_0px_rgba(91,91,91,0.20)] xl:w-[1143px]"
+                  className="bg-lightgray col-span-12 mb-4 flex flex-col rounded-[10px] border border-[#E9E9E9] bg-white p-5 shadow-[0px_4px_16px_0px_rgba(91,91,91,0.20)] w-[300px] xl:w-[1143px]"
                 >
                   {/* Centered Heading */}
 
