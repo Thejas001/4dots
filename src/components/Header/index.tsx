@@ -112,9 +112,11 @@ const Header = () => {
 
       {isOpen && (
         <div id="mobile-menu" className="sm:hidden absolute top-[60px] right-0 w-full shadow-lg py-4 z-50 bg-white">
+          <Link href="/YourCart">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
             Your Cart
           </button>
+          </Link>
           
           <Link href="/Order">
           <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
