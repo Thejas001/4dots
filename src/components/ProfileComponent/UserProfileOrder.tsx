@@ -128,7 +128,7 @@ const UserProfileOrder = () => {
 
                                         <div className="flex items-center justify-between text-[#242424] mt-6.5">
                                             <span className="text-[#0075FF] italic underline text-base font-medium leading-6 tracking-[-0.2px]">
-                                                Uploaded Design
+                                              {/**   Uploaded Design*/}
                                             </span>
 
                                             {!expandedItems[item.OrderItemId] ? (
