@@ -112,7 +112,7 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
   return (
     <div className="w-2xl grid h-auto  grid-rows-[auto,1fr] bg-[#fff]">
       {/* Top Section */}
-      <div className=" my-2 ml-20 flex flex-row">
+      <div className=" my-6 ml-10 flex flex-row">
         <img
           src={"/images/login/back-arrow.svg"}
           alt={"SignIn Cover"}
@@ -130,7 +130,7 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
           <ProgressBar orderStatus={selectedOrder.OrderStatus} />
         </div>
         {/* Bottom Section */}
-        <div className="mb-10 mt-9 grid h-auto grid-cols-3 gap-4 ml-[60px]  xl:grid-cols-12 w-full">
+        <div className="mb-10 mt-9 ml-[100px]  grid h-auto grid-cols-3 gap-4 ml-[60px]  xl:grid-cols-12 w-full">
           {orders.length > 0 ? (
             <div className="flex flex-col ">
               {selectedOrder.Items.map((item, index) => (
@@ -141,7 +141,7 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
                   {/* Centered Heading */}
 
                   {/**Second row */}
-                  <div className="mt-2 flex">
+                  <div className="mt-2 flex flex-col xl:flex-row">
                     <img
                       src="/images/product/Rectangle4597.svg"
                       alt="Product Image"
@@ -149,7 +149,7 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
                     />
 
                     {/**Right Section */}
-                    <div className="ml-4 mt-2 flex flex-1 flex-col">
+                    <div className="ml-1 mt-2 flex flex-1 flex-col">
                       <div className=" flex items-center justify-between">
                         <div className="">
                           <span className="text-md flex-grow  font-semibold text-[#000] xl:text-xl">
