@@ -23,19 +23,15 @@ const Cart = () => {
   const router = useRouter(); // ✅ Define router here
   const [user, setUser] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
-  const clearCartCount = useCartStore((state) => state.clearCartCount);
   const [isLoading, setIsLoading] = useState(true);
   const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
+  const { refreshCart } = useCartStore();
   const [selectedDesign, setSelectedDesign] = useState<{
     url: string;
     isPdf: boolean;
     productName: string;
   } | null>(null);
 
-  useEffect(() => {
-    // When this component mounts (cart opens), reset the badge
-    clearCartCount();
-  }, [clearCartCount]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -93,7 +89,7 @@ useEffect(() => {
         ...prevCart,
         Items: prevCart.Items.filter(item => item.CartItemId !== cartItemId),
       }));
-  
+      await refreshCart();
       // ✅ Wait 200ms before refetching the cart from the backend
       setTimeout(async () => {
         const updatedCart = await fetchCartItems();
