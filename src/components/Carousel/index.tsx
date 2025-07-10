@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const images = [
   "/images/login/sign_in_carousel.svg",
@@ -11,28 +12,40 @@ const images = [
 
 export default function Carousel() {
   const [index, setIndex] = useState(0);
+  const [firstRender, setFirstRender] = useState(true); // ✅ Track first mount to skip animation
 
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     }, 3000); // Auto-slide every 3 seconds
     return () => clearInterval(interval);
-  }, [index]);
+  }, []);
+
+  useEffect(() => {
+    setFirstRender(false);
+  }, []);
+  
 
   return (
-    <div className="relative mx-auto w-full max-w-3xl">
+    <div className="relative mx-auto w-full max-w-3xl aspect-[4/3]">
       <div className="overflow-hidden rounded-xl shadow-lg">
         <AnimatePresence mode="wait">
-          <motion.img
-            key={index} // Ensure each image has a unique key
+        <motion.div
+          key={index}
+          initial={firstRender ? { opacity: 1 } : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}          
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
+          <Image
             src={images[index]}
             alt={`Slide ${index + 1}`}
-            className="object-cover"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            width={600} // Adjust to your container width
+            height={600} // Maintain aspect ratio
+            className="object-cover w-full h-auto"
+            priority={index === 0} // Prioritize the first image
           />
+          </motion.div>
         </AnimatePresence>
       </div>
 

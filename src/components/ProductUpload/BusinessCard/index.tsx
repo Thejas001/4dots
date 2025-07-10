@@ -133,7 +133,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     try {
       await addToCartBusinessCard(dataId, selectedPricingRule,  uploadedDocumentId ?? undefined);
-      incrementCart();
+      //incrementCart();
       toast.success("Product added to cart!");
       router.push("/");
     } catch (error) {

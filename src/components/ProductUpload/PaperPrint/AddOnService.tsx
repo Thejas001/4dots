@@ -66,7 +66,7 @@ const AddOnService = ({
 
   return (
     <div className="relative w-full">
-      {/* Button to Toggle Dropdown */}
+      {/* Button to Toggle Dropdown 
       {!isOpen && (
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -74,18 +74,18 @@ const AddOnService = ({
         >
           View Add-on Services
         </button>
-      )}
+      )}*/}
 
       {/* Dropdown Content */}
-      {isOpen && (
+
         <div className="mt-2 w-full relative">
-          {/* Close Button (X) */}
+          {/* Close Button (X)
           <button
             onClick={() => setIsOpen(false)}
             className="absolute top-2 right-2 text-gray-600 hover:text-black"
           >
             ✕
-          </button>
+          </button> */}
 
           {/* Add-on Services Title */}
           <span className="text-lg font-semibold">Add-on Services</span>
@@ -186,7 +186,7 @@ const AddOnService = ({
             </div>
           </div>
         </div>
-      )}
+     
     </div>
   );
 };

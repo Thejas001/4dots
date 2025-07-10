@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { FaUser } from "react-icons/fa";
 
 const LoginButton = () => { 
 
@@ -15,7 +16,7 @@ const LoginButton = () => {
         <div className="flex items-center bg-[#ECECEC] border border-[#B5B5B5] rounded-full w-[84px] h-8 ml-0 px-1 py-2 cursor-pointer">
           
           <div className="bg-black text-white rounded-full w-7 h-7 flex items-center justify-center">
-            RR
+            <FaUser />
           </div>
           <span className="text-[#242424] w-[40px] h-[21px] text-sm font-medium pl-2">
            {isLoggedIn ? "Profile" : "Login"}
