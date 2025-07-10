@@ -18,6 +18,17 @@ export const metadata: Metadata = {
 const SignIn: React.FC = () => {
   return (
     <DefaultLayout>
+            <div className="mb-6 mt-3">
+        <Link href={"/"}>
+          <Image
+            src="/images/login/back-arrow.svg"
+            alt="Back Button"
+            width={24}
+            height={24}
+            priority
+          />
+        </Link>
+      </div>
       <SigininComponent />
     </DefaultLayout>
   );

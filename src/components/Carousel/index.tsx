@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 const images = [
-  "/images/login/sign_in_carousel.svg",
-  "/images/login/sign_in_carousel.svg",
-  "/images/login/sign_in_carousel.svg",
-  "/images/login/sign_in_carousel.svg",
+  "/images/login/sign_in_icon.svg",
+  "/images/login/sign_in_icon.svg",
+  "/images/login/sign_in_icon.svg",
+  "/images/login/sign_in_icon.svg",
 ];
 
 export default function Carousel() {
