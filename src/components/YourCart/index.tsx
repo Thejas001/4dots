@@ -156,7 +156,7 @@ const Cart = () => {
                       </span>
                       <div
                         onClick={() => handleDelete(item.CartItemId)}
-                        className="ml-auto mt-2 sm:mt-0 p-2 rounded-full bg-[#f4f4f4] hover:bg-[#ddd] transition duration-200 cursor-pointer flex items-center justify-center w-8 h-8"
+                        className="ml-auto mt-[-150px] xl:mt-0 mb-[120px] xl:mb-0 p-2 rounded-full bg-[#f4f4f4] hover:bg-[#ddd] transition duration-200 cursor-pointer flex items-center justify-center w-8 h-8"
                         title="Remove"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 12 12" fill="none">
@@ -192,8 +192,8 @@ const Cart = () => {
                     </div>
                     <div className="flex items-center text-[#242424] mt-4">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <path d="..." fill="#242424" />
-                      </svg>
+                           <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#242424"/>
+                    </svg>
                       <span className="ml-2 text-lg font-semibold">{item.ItemPrice}</span>
                     </div>
                   </div>
