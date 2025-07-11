@@ -46,7 +46,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ orderStatus }) => {
               </svg>
             </div>
             <div
-              className={`mt-2 text-center w-32 text-sm font-normal leading-6 tracking-[-0.2px] text-[#242424] ${orderStatus === "Shipped" || orderStatus === "InProgress" || orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
+              className={`mt-2 text-center w-32 text-[11px] font-normal leading-6 tracking-[-0.2px] text-[#242424] ${orderStatus === "Shipped" || orderStatus === "InProgress" || orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
             >
               Order Placed
             </div>
@@ -120,7 +120,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ orderStatus }) => {
               </svg>
             </div>
             <div
-              className={`mt-2 text-center w-32 text-sm font-normal leading-6 tracking-[-0.2px] text-[#242424] ${orderStatus === "Shipped" || orderStatus === "InProgress" || orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
+              className={`mt-2 text-center w-32 text-[11px] font-normal leading-6 tracking-[-0.2px] text-[#242424] ${orderStatus === "Shipped" || orderStatus === "InProgress" || orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
             >
               Printing Started
             </div>
@@ -168,7 +168,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ orderStatus }) => {
               </svg>
             </div>
             <div
-              className={`mt-2 text-center w-32 text-sm font-normal leading-6 tracking-[-0.2px]  ${orderStatus === "Shipped" || orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
+              className={`mt-2 text-center w-32 text-[11px] font-normal leading-6 tracking-[-0.2px]  ${orderStatus === "Shipped" || orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
             >
               Order Shipped
             </div>
@@ -205,7 +205,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ orderStatus }) => {
               </svg>
             </div>
             <div
-              className={`mt-2 text-center w-32 text-sm font-normal leading-6 tracking-[-0.2px] ${orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
+              className={`mt-2 text-center w-32 text-[11px] font-normal leading-6 tracking-[-0.2px] ${orderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}
             >
               Out For Delivery
             </div>

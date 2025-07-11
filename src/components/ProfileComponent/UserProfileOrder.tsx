@@ -106,8 +106,8 @@ const UserProfileOrder = () => {
                                             </div>
                                         </div>
 
-                                        <div className="xl:w-[448px] mt-[14px] flex justify-between items-center">
-                                            <div className="flex items-center">
+                                        <div className="flex-col xl:flex-row xl:w-[448px] mt-[14px] flex justify-between items-center">
+                                            <div className="w-[230px] flex items-center">
                                                 <span className="text-[#272727] text-base font-medium leading-6 tracking-[-0.2px]">
                                                     Date Of Order:
                                                 </span>
@@ -116,7 +116,7 @@ const UserProfileOrder = () => {
                                                 </span>
                                             </div>
 
-                                            <div className="flex items-center">
+                                            <div className=" w-[230px] flex items-center">
                                                 <span className="text-[#272727] text-base font-medium leading-6 tracking-[-0.2px]">
                                                     Total Amount Paid:
                                                 </span>

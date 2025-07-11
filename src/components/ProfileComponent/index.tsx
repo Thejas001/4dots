@@ -45,6 +45,15 @@ const ProfileComponent = () => {
     router.push("/");
   };
 
+
+  function getInitials(name: string) {
+  if (!name) return "";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+
   return (
     <div className="bg-[#fff] h-full grid grid-rows-[auto,1fr]">
       {/* Top Section */}
@@ -94,19 +103,20 @@ const ProfileComponent = () => {
         {/* Left Column */}
         <div className="flex flex-col gap-6">
           {/* Profile Card */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start rounded-[10px] border border-[#ECECEC] p-5 w-full">
+          <div className="flex flex-row gap-4 items-start rounded-[10px] border border-[#ECECEC] p-5 w-full">
             {/* Profile Icon */}
-            <div className="w-[100px] h-[100px] flex items-center justify-center rounded-[10px] bg-[#ECECEC] text-gray-700 font-medium text-lg">
-              RR
+            <div className="w-[200px] h-[100px] flex items-center justify-center rounded-[10px] bg-[#ECECEC] text-gray-700 font-medium text-lg">
+              {getInitials(userDetails?.Name || "UserName")}
             </div>
 
+
             {/* User Details */}
-            <div className="flex flex-col gap-3 flex-grow sm:ml-4 w-full">
+            <div className="flex flex-col gap-1 xl:gap-3 flex-grow sm:ml-4 w-full">
               <div className="text-[#000] text-xl font-normal">
                 {userDetails?.Name || "UserName"}
               </div>
               <div>
-                <span className="text-base font-normal text-[#000]">
+                <span className="text-[15px] font-normal text-[#000]">
                   Mobile Number :
                 </span>
                 <span className="pl-2.5 text-[#06f] text-base underline">
@@ -116,10 +126,10 @@ const ProfileComponent = () => {
             </div>
 
             {/* Edit Button */}
-            <div className="mt-4 sm:mt-0 sm:ml-auto">
+            <div className="mt-4  sm:mt-0 sm:ml-auto">
               <button
                 onClick={() => setIsOpen(true)}
-                className="flex items-center gap-2 rounded-lg border border-[#B5B5B5] bg-[#F7F7F7] px-5 py-2.5 text-sm text-[#000]"
+                className="flex items-center gap-2 rounded-lg border border-[#B5B5B5] bg-[#F7F7F7] px-3 py-1.5 text-sm sm:px-5 sm:py-2.5 sm:text-sm text-xs"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
