@@ -123,7 +123,7 @@ const Footer = () => {
                         <li key={item.href}>
                           <Link
                             href={item.href}
-                            className="flex items-center gap-2 group transition-transform duration-200 hover:translate-x-1 hover:text-blue-400 hover:font-semibold"
+                            className="flex items-center gap-2 group font-semibold transition-transform duration-200 hover:translate-x-1 hover:text-blue-400"
                           >
                             <span className="transition-colors duration-200 group-hover:text-blue-400">{item.icon}</span>
                             <span>{item.label}</span>

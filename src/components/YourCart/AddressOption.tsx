@@ -53,21 +53,21 @@ const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "defa
     };
 
   return (
-    <div className="flex flex-col rounded-[20px]  xl:max-w-[468px] border border-[#ECECEC] py-5 mb-4">
+    <div className="flex flex-col rounded-[20px] w-full max-w-[468px] border border-[#ECECEC] py-5 mb-4 px-2 sm:px-4">
       {/* Header */}
       <div className="flex items-center justify-center">
         <span className="text-[#000] text-lg font-medium">Address</span>
       </div>
 
       {/* Options */}
-      <div className="flex flex-col space-y-4 mt-4 px-4">
+      <div className="flex flex-col space-y-4 mt-4">
         {/* Pick-Up Option */}
         {loading ? (
          <p className="text-sm text-gray-500">Loading addresses...</p>
             ) : address.length > 0 ? (
            address.map((addr) => (
         <div key={addr.Id}
-          className="flex items-center cursor-pointer gap-4"
+          className="flex flex-row items-center cursor-pointer gap-2 sm:gap-4"
           onClick={() => setSelectedOption(addr.Id.toString())} // Set selected option
         >
           {/* Radio Button */}
@@ -86,9 +86,9 @@ const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "defa
         ) : (
           <p className="text-sm text-gray-500">No addresses available</p>
         )}
-      <div className={`mb-4 mr-[21px] mt-7.5 flex items-center ${buttonAlignment === "left" ? "justify-start" : "justify-end"}`}>
+      <div className={`mb-4 mr-0 sm:mr-[21px] mt-7.5 flex items-center w-full ${buttonAlignment === "left" ? "justify-start" : "justify-end"}`}>
         <button
-          className={`flex items-center justify-center rounded-full border px-5 py-2 text-sm md:text-base xl:h-10 xl:w-[211px] transition
+          className={`flex items-center justify-center rounded-full border px-5 py-2 text-sm md:text-base xl:h-10 w-full sm:w-auto xl:w-[211px] transition
             ${buttonStyle === "black" ? "bg-black text-white border-black hover:bg-gray-800" : "bg-[#FCFCFC] text-[#242424] border-[#242424] hover:bg-gray-200"}
           `}
           onClick={() => setIsModalOpen(true)}

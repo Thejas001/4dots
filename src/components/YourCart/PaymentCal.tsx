@@ -87,14 +87,14 @@ const handlePlaceOrder = async () => {
 
     return(
         <div>
-            <div className="flex flex-col rounded-[20px] border border-[#ECECEC] xl:max-w-[468px] pt-5">
+            <div className="flex flex-col rounded-[20px] w-full max-w-[468px] border border-[#ECECEC] pt-5 px-2 sm:px-4">
             {/* Header */}
             <div className="flex items-center justify-center">
             <span className="text-[#000] text-lg font-medium">Payment Breakdown</span>
             </div>
             
             {/* Total Mrp */}
-            <div className="flex justify-between pl-9 pr-[33px] mt-8 text-base font-medium text-[#000]">
+            <div className="flex justify-between px-2 sm:px-9 md:px-[33px] mt-8 text-base font-medium text-[#000]">
                 <div><span>Total MRP :</span></div>
                 <div className="flex" >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
@@ -122,7 +122,7 @@ const handlePlaceOrder = async () => {
             )}*/}
 
             {/* Total Amount */}
-            <div className="flex justify-between py-4 pl-9 pr-[33px] mt-4.5 text-lg font-semibold text-[#000] rounded-b-[20px] border border-[#ECECEC] bg-white">
+            <div className="flex justify-between py-4 px-2 sm:px-9 md:px-[33px] mt-4.5 text-lg font-semibold text-[#000] rounded-b-[20px] border border-[#ECECEC] bg-white">
                 <div><span>Total Amount :</span></div>
                     <div className="flex items-center justify-center" >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none" className="mb-1">
@@ -132,8 +132,8 @@ const handlePlaceOrder = async () => {
                     </div>
                 </div>
         </div>
-        <div onClick={handlePlaceOrder} className="flex-1 flex-col mb-26 mt-5.5 xl:w-[468px] ">
-                <div className="flex justify-center p-2.5 bg-[#242424] text-[#fff] rounded-[43px]  items-center cursor-pointer">
+        <div onClick={handlePlaceOrder} className="flex-1 flex-col mb-26 mt-5.5 w-full max-w-[468px]">
+                <div className="flex justify-center p-2.5 bg-[#242424] text-[#fff] rounded-[43px]  items-center cursor-pointer w-full">
                     <span className="text-lg font-semibold ">Place Order</span>
                 </div>
           </div>

@@ -29,11 +29,14 @@ export default function RootLayout({
           <Toaster
             position="bottom-right"
             toastOptions={{
+              duration: 5000,
               style: {
                 background: '#000', // black background
                 color: '#fff',      // white text
-                borderRadius: '8px',
-                padding: '12px 16px',
+                borderRadius: '10px',
+                padding: '20px 32px',
+                fontSize: '1.25rem',
+                minWidth: '320px',
               },
             }}
           />

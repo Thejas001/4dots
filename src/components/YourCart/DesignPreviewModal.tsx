@@ -18,8 +18,8 @@ const DesignPreviewModal: React.FC<DesignPreviewModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[90%] max-w-[800px] max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-2">
+      <div className="bg-white rounded-lg p-2 sm:p-6 w-full max-w-[800px] max-h-[90vh] overflow-auto">
         {/* Modal Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">{productName}</h2>
@@ -38,14 +38,14 @@ const DesignPreviewModal: React.FC<DesignPreviewModalProps> = ({
               src={documentUrl}
               type="application/pdf"
               width="100%"
-              height="500px"
-              className="border border-gray-300"
+              height="300px"
+              className="border border-gray-300 sm:h-[500px]"
             />
           ) : (
             <img
               src={documentUrl}
               alt="Uploaded Design"
-              className="max-w-full max-h-[60vh] object-contain"
+              className="max-w-full max-h-[40vh] sm:max-h-[60vh] object-contain"
             />
           )}
         </div>

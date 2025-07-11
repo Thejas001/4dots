@@ -11,17 +11,17 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({ selectedPaymentOption, se
   //const [selectedOption, setSelectedOption] = useState(""); // Track which option is selected
 
   return (
-    <div className="flex flex-col rounded-[20px]  xl:max-w-[468px] border border-[#ECECEC] py-5 mb-4">
+    <div className="flex flex-col rounded-[20px] w-full max-w-[468px] border border-[#ECECEC] py-5 mb-4 px-2 sm:px-4">
       {/* Header */}
       <div className="flex items-center justify-center">
         <span className="text-[#000] text-lg font-medium">Select Payment Type</span>
       </div>
 
       {/* Options */}
-      <div className="flex flex-col space-y-4 mt-4 px-4">
+      <div className="flex flex-col space-y-4 mt-4">
         {/* Pick-Up Option */}
         <div
-          className="flex items-center cursor-pointer gap-4"
+          className="flex flex-row items-center cursor-pointer gap-2 sm:gap-4"
           onClick={() => setSelectedPaymentOption("CashOnDelivery")} // Set selected option
         >
           {/* Radio Button */}
@@ -35,7 +35,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({ selectedPaymentOption, se
 
         {/* Delivery Option */}
         <div
-          className="flex items-center gap-4 cursor-pointer"
+          className="flex flex-row items-center gap-2 sm:gap-4 cursor-pointer"
           onClick={() => setSelectedPaymentOption("Online")} // Set selected option
         >
          {/* Radio Button */}
