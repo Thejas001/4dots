@@ -125,17 +125,17 @@ const ProductUpload = ({ product }: { product: any }) => {
           <DropDown onSqftChange={(sqft) => setSqftRange(sqft)}  />
 
            {/**Note */}
-           <div className="flex-1 flex flex-row mt-10 text-base text-[#000]">
-              <span className="font-medium">Note :</span>
-              <span className="font-normal italic">The rate for Canvas printing is based on square-feet (10sqft : 250rs/sqft)</span>
+           <div className="flex-1 flex flex-row mt-10 ml-0 md:ml-30 text-base text-[#000] overflow-hidden">
+              <span className="font-medium whitespace-nowrap">Note :</span>
+              <span className="font-normal italic whitespace-nowrap">The rate for Canvas printing is based on square-feet (10sqft : 250rs/sqft)</span>
            </div>
            {/**Cart & Payment Button*/}
-          <div className="flex-1 flex flex-row justify-center gap-19 mt-[252px]">
+          <div className="flex-1 flex flex-col md:flex-row justify-center gap-2 md:gap-19 mt-[252px]">
             {/* First Button */}
             <button
               onClick={handleAddToCart} 
               disabled={isAddToCartDisabled}
-              className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+              className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center gap-4 rounded-[48px] text-lg
                 ${isAddToCartDisabled
                   ? "cursor-not-allowed bg-gray-300 text-gray-500"
                   : "cursor-pointer bg-[#242424] text-white"

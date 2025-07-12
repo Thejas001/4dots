@@ -196,18 +196,18 @@ useEffect(() => {
            onQualityChange={setSelectedQuality}
           />}
           {/**Note */}
-          <div className="flex-1 flex flex-row mt-10 ml-30 text-base text-[#000]">
-              <span className="font-medium">Note :</span>
-              <span className="font-normal italic"> In Offset Printing, quantity 1 represents 1000 copies.</span>
+          <div className="flex-1 flex flex-row mt-10 ml-0 md:ml-30 text-base text-[#000] overflow-hidden">
+              <span className="font-medium whitespace-nowrap">Note :</span>
+              <span className="font-normal italic whitespace-nowrap"> In Offset Printing, quantity 1 represents 1000 copies.</span>
           </div>
           <div className="flex-1 flex-col items-start justify-start mt-10">
           </div>
-          <div className="flex-1 flex flex-row justify-center gap-19 mt-19">
+          <div className="flex-1 flex flex-col md:flex-row justify-center gap-2 md:gap-19 mt-19">
             {/* First Button */}
             <button 
                 onClick={handleAddToCart} 
                 disabled={isAddToCartDisabled} 
-                className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+                className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center gap-4 rounded-[48px] text-lg
                   ${isAddToCartDisabled
                     ? "cursor-not-allowed bg-gray-300 text-gray-500"
                     : "cursor-pointer bg-[#242424] text-white"
@@ -225,7 +225,7 @@ useEffect(() => {
             <button
             onClick={handleProceedToCart}
             disabled={isAddToCartDisabled}
-            className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] border-2 text-lg md:w-[378px]
+            className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center rounded-[48px] border-2 text-lg
               ${isAddToCartDisabled
                 ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
                 : "cursor-pointer border-[#242424] bg-white text-[#242424]"

@@ -228,11 +228,11 @@ const CartButton: React.FC<CartButtonProps> = ({
   }, []);
 
   return (
-    <div className="mt-4 flex flex-1 flex-row justify-center gap-4">
+    <div className="mt-4 flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-4">
       <button
         onClick={handleAddToCart}
         disabled={isAddToCartDisabled}
-        className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+        className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center gap-4 rounded-[48px] text-lg
           ${isAddToCartDisabled
             ? "cursor-not-allowed bg-gray-300 text-gray-500"
             : "cursor-pointer bg-[#242424] text-white"
@@ -245,7 +245,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       <button
         onClick={handleProceedToCart}
         disabled={isAddToCartDisabled}
-        className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] border-2 text-lg md:w-[378px]
+        className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center rounded-[48px] border-2 text-lg
           ${isAddToCartDisabled
             ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
             : "cursor-pointer border-[#242424] bg-white text-[#242424]"
