@@ -201,17 +201,17 @@ const ProductUpload = ({ product }: { product: any }) => {
             {error && <div className="text-red-500">{error}</div>}
           </div>
           {/**Cart & Payment Button*/}
-          <div className="mt-[316px] flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-19">
-            {/* First Button */}
-            <button
-              onClick={handleAddToCart}
-              disabled={isProceedToCartDisabled}
-              className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center gap-4 rounded-[48px] text-lg
-                ${isProceedToCartDisabled
-                  ? "cursor-not-allowed bg-gray-300 text-gray-500"
-                  : "cursor-pointer bg-[#242424] text-white"
-                }`}               
-                >
+          <div className="mt-10 flex w-full max-w-[800px] flex-col md:flex-row justify-center gap-3 md:gap-6 px-4 mx-auto">
+  {/* First Button */}
+  <button
+    onClick={handleAddToCart}
+    disabled={isProceedToCartDisabled}
+    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-2 rounded-[48px] text-lg
+      ${isProceedToCartDisabled
+        ? "cursor-not-allowed bg-gray-300 text-gray-500"
+        : "cursor-pointer bg-[#242424] text-white"
+      }`}
+  >
               <span className="pr-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -229,19 +229,19 @@ const ProductUpload = ({ product }: { product: any }) => {
                   />
                 </svg>
               </span>
-              <span className="text-lg font-medium">Add to Cart</span>
-            </button>
+    <span className="text-lg font-medium">Add to Cart</span>
+  </button>
 
-            {/* Second Button */}
-            <button
-              onClick={handleProceddToCart} 
-              disabled={isProceedToCartDisabled}
-              className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center rounded-[48px] border-2 text-lg
-                ${isProceedToCartDisabled
-                  ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
-                  : "cursor-pointer border-[#242424] bg-white text-[#242424]"
-                }`}                
-                >
+  {/* Second Button */}
+  <button
+    onClick={handleProceddToCart}
+    disabled={isProceedToCartDisabled}
+    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg
+      ${isProceedToCartDisabled
+        ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
+        : "cursor-pointer border-[#242424] bg-white text-[#242424]"
+      }`}
+  >
               <span className="pr-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -256,10 +256,13 @@ const ProductUpload = ({ product }: { product: any }) => {
                   />
                 </svg>
               </span>
-              <span className="font-bold">{price !== null ? price : "0"}</span>
-              <span className="pl-4 font-medium">Proceed To Cart</span>
-            </button>
-          </div>
+    <span className="font-bold">{price !== null ? price : "0"}</span>
+    <span className="pl-4 font-medium">Proceed To Cart</span>
+  </button>
+</div>
+
+
+
         </div>
       </div>
     </div>

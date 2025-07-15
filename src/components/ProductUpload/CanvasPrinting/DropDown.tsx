@@ -11,6 +11,9 @@ const DropDown = ({ onSqftChange }: { onSqftChange: (sqft: number) => void }) =>
       const sqft = selectedWidth * selectedHeight;
       setCalculatedSquareFeet(sqft);
       onSqftChange(sqft); // Pass the calculated value to the parent
+    } else {
+      setCalculatedSquareFeet(null);
+      onSqftChange(null); // Reset in parent
     }
   }, [selectedWidth, selectedHeight, onSqftChange]);
 

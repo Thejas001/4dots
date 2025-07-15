@@ -243,7 +243,7 @@ useEffect(() => {
             <button 
               onClick={handleAddToCart}
               disabled={isAddToCartDisabled}
-              className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center gap-4 rounded-[48px] text-lg
+              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg
                 ${isProceedToCartDisabled
                   ? "cursor-not-allowed bg-gray-300 text-gray-500"
                   : "cursor-pointer bg-[#242424] text-white"
@@ -273,7 +273,7 @@ useEffect(() => {
             <button
               onClick={handleProceedToCart}
               disabled={isAddToCartDisabled}
-              className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center rounded-[48px] border-2 text-lg
+              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg
                 ${isAddToCartDisabled
                   ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
                   : "cursor-pointer border-[#242424] bg-white text-[#242424]"

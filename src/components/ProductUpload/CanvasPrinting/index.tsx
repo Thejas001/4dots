@@ -35,10 +35,14 @@ const ProductUpload = ({ product }: { product: any }) => {
     };
 
     useEffect(() => {
-        if (!productDetails || sqftRange === null) return;
+        if (!productDetails || sqftRange === null) {
+            setSelectedPrice(0);
+            setSelectedPricingRule(null);
+            return;
+        }
         const pricingRule = findCanvasPricingRule(productDetails.CanvasPricingRules, sqftRange);
         setSelectedPricingRule(pricingRule);
-        setSelectedPrice(pricingRule ? pricingRule.PricePerSquareFoot  * sqftRange : null);
+        setSelectedPrice(pricingRule ? pricingRule.PricePerSquareFoot  * sqftRange : 0);
     }, [sqftRange, productDetails]);
 
 
@@ -125,17 +129,19 @@ const ProductUpload = ({ product }: { product: any }) => {
           <DropDown onSqftChange={(sqft) => setSqftRange(sqft)}  />
 
            {/**Note */}
-           <div className="flex-1 flex flex-row mt-10 ml-0 md:ml-30 text-base text-[#000] overflow-hidden">
-              <span className="font-medium whitespace-nowrap">Note :</span>
-              <span className="font-normal italic whitespace-nowrap">The rate for Canvas printing is based on square-feet (10sqft : 250rs/sqft)</span>
-           </div>
+           <div className="mt-10 w-full max-w-[800px] mx-auto px-4 text-base text-[#000]">
+            <p className="font-medium">
+              Note: <span className="font-normal italic">The rate for Canvas printing is based on square-feet (10sqft : 250rs/sqft)</span>
+            </p>
+          </div>
+
            {/**Cart & Payment Button*/}
           <div className="flex-1 flex flex-col md:flex-row justify-center gap-2 md:gap-19 mt-[252px]">
             {/* First Button */}
             <button
               onClick={handleAddToCart} 
               disabled={isAddToCartDisabled}
-              className={`relative flex h-[44px] w-full md:w-[378px] items-center justify-center gap-4 rounded-[48px] text-lg
+              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg
                 ${isAddToCartDisabled
                   ? "cursor-not-allowed bg-gray-300 text-gray-500"
                   : "cursor-pointer bg-[#242424] text-white"
@@ -153,7 +159,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             <button
               onClick={handleProceedToCart}
               disabled={isAddToCartDisabled}
-              className={`flex justify-center w-full md:w-[378px] h-[44px] rounded-[48px] text-lg items-center cursor-pointer 
+              className={`flex justify-center w-full md:flex-1 h-[44px] rounded-[48px] text-lg items-center cursor-pointer 
               ${selectedPrice ? "bg-[#fff] text-[#242424] border-2 border-[#242424]" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
             >
               <span className="pr-1">

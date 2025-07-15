@@ -76,11 +76,11 @@ const FileUploader = ({
   };
 
   return (
-    <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
+    <div className="flex flex-col bg-[#F7F7F7] w-full max-w-md md:max-w-xs lg:max-w-sm px-4 sm:px-8 items-center shadow h-auto py-6">
       <Upload {...props} disabled={quantity === null || quantity === 0}>
         <Button
           icon={<UploadOutlined />}
-          className="flex mt-5 justify-center items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium disabled:bg-gray-300"
+          className="flex mt-5 justify-center items-center bg-[#242424] w-full max-w-[180px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium disabled:bg-gray-300"
           disabled={quantity === null || quantity === 0}
         >
           Upload Images
@@ -88,17 +88,17 @@ const FileUploader = ({
       </Upload>
 
       {uploadedImages.length > 0 && (
-        <div className="mt-[11px] relative">
+        <div className="mt-3 relative w-full flex justify-center">
           <img
             src={uploadedImages[currentImageIndex]?.url}
             alt={uploadedImages[currentImageIndex]?.name}
-            className="w-[350px] h-[445px] object-contain rounded-md"
+            className="w-full max-w-[320px] h-auto max-h-[400px] object-contain rounded-md"
             onError={(e) => (e.currentTarget.src = "https://placehold.co/200")}
           />
-          <div className="absolute top-1/2 -left-7 cursor-pointer" onClick={handlePrevious}>
+          <div className="absolute top-1/2 left-2 -translate-y-1/2 cursor-pointer" onClick={handlePrevious}>
             <img src="/images/icon/vector-left.svg" alt="Previous" />
           </div>
-          <div className="absolute top-1/2 -right-7 cursor-pointer" onClick={handleNext}>
+          <div className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer" onClick={handleNext}>
             <img src="/images/icon/vector-right.svg" alt="Next" />
           </div>
         </div>
@@ -106,8 +106,7 @@ const FileUploader = ({
 
       {uploadedImages.length > 0 && (
         <div
-          className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-[11px] px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px] 
-          flex justify-center items-center text-center"
+          className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-3 px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px] flex justify-center items-center text-center"
           style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
         >
           {currentImageIndex + 1} / {uploadedImages.length}

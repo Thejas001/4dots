@@ -77,19 +77,19 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   }, []);
 
   return (
-    <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
+    <div className="flex flex-col bg-[#F7F7F7] w-full max-w-md md:max-w-xs lg:max-w-sm px-4 sm:px-8 items-center shadow h-auto py-6">
       {/* Upload Button */}
       <Upload {...props} showUploadList={false}>
         <Button
           icon={<UploadOutlined />}
-          className="flex justify-center mt-5 items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium"
+          className="flex justify-center mt-5 items-center bg-[#242424] w-full max-w-[180px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium"
         >
           Upload File
         </Button>
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
+      <div className="mt-3 relative w-full max-w-[280px] sm:max-w-[300px] h-[320px] sm:h-[400px] flex items-center justify-center border rounded-md bg-white">
         {selectedFile ? (
           fileType === "pdf" ? (
             <iframe
