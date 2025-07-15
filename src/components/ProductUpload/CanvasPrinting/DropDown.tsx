@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const DropDown = ({ onSqftChange }: { onSqftChange: (sqft: number) => void }) => {
+const DropDown = ({ onSqftChange }: { onSqftChange: (sqft: number | null) => void }) => {
   const [selectedWidth, setSelectedWidth] = useState<number | null>(null);
   const [selectedHeight, setSelectedHeight] = useState<number | null>(null);
   const [calculatedSquareFeet, setCalculatedSquareFeet] = useState<number | null>(null);
