@@ -26,11 +26,9 @@ const Cart = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
   const { refreshCart } = useCartStore();
-  const [selectedDesign, setSelectedDesign] = useState<{
-    url: string;
-    isPdf: boolean;
-    productName: string;
-  } | null>(null);
+  const [selectedDesigns, setSelectedDesigns] = useState<
+    { url: string; isPdf: boolean; productName: string }[]
+  >([]);
 
 
   useEffect(() => {
@@ -103,19 +101,17 @@ useEffect(() => {
     Documents?: { ContentType: string; DocumentUrl: string }[];
     ProductName: string;
   }) => {
-    console.log('handleViewDesign called for item:', item); // Debugging
-    const document = item.Documents?.[0];
-    if (document) {
-      console.log('Document found:', document); // Debugging
-      setSelectedDesign({
-        url: document.DocumentUrl,
-        isPdf: document.ContentType === 'application/pdf',
-        productName: item.ProductName,
-      });
+    if (item.Documents && item.Documents.length > 0) {
+      setSelectedDesigns(
+        item.Documents.map((doc) => ({
+          url: doc.DocumentUrl,
+          isPdf: doc.ContentType === "application/pdf",
+          productName: item.ProductName,
+        }))
+      );
       setIsDesignModalOpen(true);
     } else {
-      console.warn('No document found for item:', item.ProductName); // Debugging
-      alert('No uploaded design available for this item.');
+      alert("No uploaded design available for this item.");
     }
   };
   
@@ -125,13 +121,11 @@ useEffect(() => {
   <div className="h-auto min-h-screen bg-[#fff] flex flex-col">
     {showModal && <PopupModal />}
     {/* Design Preview Modal */}
-      {selectedDesign && (
+      {selectedDesigns.length > 0 && (
         <DesignPreviewModal
           isOpen={isDesignModalOpen}
           onClose={() => setIsDesignModalOpen(false)}
-          documentUrl={selectedDesign.url}
-          isPdf={selectedDesign.isPdf}
-          productName={selectedDesign.productName}
+          designs={selectedDesigns}
         />
       )}
     {/* Top Section */} 
@@ -163,9 +157,10 @@ useEffect(() => {
        <>
       <div className="flex flex-col w-full xl:w-1/2">
          {cartData.Items.map((item) => {
-           const document = item.Documents?.[0];
-           const isPdf = document?.ContentType === "application/pdf";
-           const imageUrl = isPdf ? "/images/product/pdf.png" : document?.DocumentUrl;
+           const documents = item.Documents || [];
+           const hasMultiple = documents.length > 1;
+           const isPdf = documents[0]?.ContentType === "application/pdf";
+           const imageUrl = isPdf ? "/images/product/pdf.png" : documents[0]?.DocumentUrl;
            return (
           <div 
             key={item.CartItemId}
@@ -192,19 +187,28 @@ useEffect(() => {
               </div>
             </div>
             {/* Mobile: Product image below product name */}
-            <div className="flex justify-center items-center sm:items-start sm:mt-5 sm:ml-2 mb-2 sm:mb-0 flex-shrink-0">
-            {isPdf ? (
-                <img
-                  src="/images/product/pdf.png"
-                  alt="PDF Icon"
-                   className="w-10 h-10 sm:w-28 sm:h-28 md:w-32 md:h- object-contain"
-                />
-              ) : (
-                <img
-                  src={imageUrl}
-                  alt="Product Image"
-                  className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover"
-                />
+            <div className="flex justify-center items-center sm:items-start sm:mt-5 sm:ml-2 mb-2 sm:mb-0 flex-shrink-0 relative">
+              {documents.length > 0 && (
+                <>
+                  {documents[0].ContentType === "application/pdf" ? (
+                    <img
+                      src="/images/product/pdf.png"
+                      alt="PDF Icon"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
+                    />
+                  ) : (
+                    <img
+                      src={documents[0].DocumentUrl}
+                      alt="Product Image"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded"
+                    />
+                  )}
+                  {documents.length > 1 && (
+                    <span className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded-full">
+                      +{documents.length - 1}
+                    </span>
+                  )}
+                </>
               )}
             </div>
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden px-2 py-2">
@@ -266,7 +270,7 @@ useEffect(() => {
                 >
                   Uploaded Design
                 </span>
-                <button className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded">Edit</button>
+            {/**   <button className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded">Edit</button>*/}  
                 <span className="ml-auto text-lg text-[#242424] font-semibold leading-6 tracking-tighter-[-0.2px]">₹ {item.ItemPrice}</span>
               </div>
             </div>
@@ -282,7 +286,7 @@ useEffect(() => {
         </div>
         </>
       ) : (
-        <div className="col-span-12 text-center">
+        <div className="w-full xl:w-1/2 pt-8">
           <p className="text-gray-500 text-lg font-medium">Your cart is empty.</p>
         </div>
       )}

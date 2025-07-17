@@ -44,7 +44,7 @@ const DeliveryOption: React.FC<DeliveryOptionProps> = ({ selectedOption, setSele
               selectedOption === "Delivery" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
             }`}
           ></div>
-          <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Delivery the product</span>
+          <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Deliver the product</span>
         </div>
       </div>
     </div>
