@@ -41,6 +41,12 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
 
 
     console.log("✅ Processing pending item:", parsedItem);
+    if (productType === "photoFrame") {
+      console.log("PhotoFrame extra fields:", {
+        documentIds: parsedItem.documentIds,
+        selectedFrameColor: parsedItem.selectedFrameColor,
+      });
+    }
 
     // Remove from sessionStorage BEFORE API call to prevent duplicate processing
     sessionStorage.removeItem("pendingCartItem");
@@ -79,7 +85,13 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     // ✅ Call the correct function based on product type
     switch (productType) {
       case "photoFrame":
-        await addToCartPhotoFrame(dataId, selectedPricingRule, selectedQuantity);
+        await addToCartPhotoFrame(
+          dataId,
+          selectedPricingRule,
+          selectedQuantity,
+          parsedItem.documentIds,
+          parsedItem.selectedFrameColor
+        );
         break;
       case "offsetPrinting":
         await addToCartOffSetPrinting(dataId, selectedPricingRule, 2);

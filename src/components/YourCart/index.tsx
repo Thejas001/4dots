@@ -188,27 +188,44 @@ useEffect(() => {
             </div>
             {/* Mobile: Product image below product name */}
             <div className="flex justify-center items-center sm:items-start sm:mt-5 sm:ml-2 mb-2 sm:mb-0 flex-shrink-0 relative">
-              {documents.length > 0 && (
-                <>
-                  {documents[0].ContentType === "application/pdf" ? (
-                    <img
-                      src="/images/product/pdf.png"
-                      alt="PDF Icon"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
-                    />
-                  ) : (
-                    <img
-                      src={documents[0].DocumentUrl}
-                      alt="Product Image"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded"
-                    />
-                  )}
-                  {documents.length > 1 && (
-                    <span className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-2 py-0.5 rounded-full">
-                      +{documents.length - 1}
-                    </span>
-                  )}
-                </>
+              {documents.length > 0 ? (
+                <div className="flex gap-2">
+                  {documents.map((doc, idx) => {
+                    console.log("Rendering document:", doc); // Debug log
+                    if (doc.ContentType === "application/pdf") {
+                      return (
+                        <img
+                          key={idx}
+                          src="/images/product/pdf.png"
+                          alt="PDF Icon"
+                          className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
+                        />
+                      );
+                    } else if (doc.DocumentUrl) {
+                      return (
+                        <img
+                          key={idx}
+                          src={doc.DocumentUrl}
+                          alt="Product Image"
+                          className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded"
+                        />
+                      );
+                    } else {
+                      return (
+                        <div
+                          key={idx}
+                          className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center bg-gray-200 rounded"
+                        >
+                          <span className="text-gray-500">No Image</span>
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
+              ) : (
+                <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center bg-gray-200 rounded">
+                  <span className="text-gray-500">No Design</span>
+                </div>
               )}
             </div>
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden px-2 py-2">

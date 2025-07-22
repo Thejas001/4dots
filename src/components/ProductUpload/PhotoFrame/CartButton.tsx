@@ -45,6 +45,7 @@ const CartButton: React.FC<CartButtonProps> = ({
   // Process pending cart item
   const processPendingCartItem = async () => {
     const pendingCartItem = sessionStorage.getItem("pendingCartItem");
+    console.log("processPendingCartItem called. pendingCartItem:", pendingCartItem);
     if (!pendingCartItem) return;
 
     const {
@@ -52,7 +53,16 @@ const CartButton: React.FC<CartButtonProps> = ({
       selectedPricingRule: pendingPricingRule,
       selectedQuantity: pendingQuantity,
       documentIds: pendingDocumentIds,
+      selectedFrameColor: pendingFrameColor, // get from pending item!
     } = JSON.parse(pendingCartItem);
+
+    console.log("Parsed pendingCartItem:", {
+      pendingDataId,
+      pendingPricingRule,
+      pendingQuantity,
+      pendingDocumentIds,
+      pendingFrameColor,
+    });
 
     try {
       setIsLoading(true);
@@ -61,12 +71,15 @@ const CartButton: React.FC<CartButtonProps> = ({
         pendingPricingRule,
         Number(pendingQuantity),
         pendingDocumentIds,
-        selectedFrameColor
+        pendingFrameColor // use the value from pending item
       );
       sessionStorage.removeItem("pendingCartItem");
+      incrementCart(); // update cart count
+      toast.success("Product added to cart!"); // show feedback
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
       router.push("/Cart");
     } catch (error) {
+      console.error("Error in processPendingCartItem:", error);
       setErrorMessage("Failed to process pending cart item. Please try again.");
       setIsLoading(false);
     }
@@ -136,8 +149,9 @@ const CartButton: React.FC<CartButtonProps> = ({
           selectedFrameColor,
         };
         sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-        toast.success("Product added to cart!");
+        
         router.push(`/auth/signin?redirect=/`);
+        toast.success("Product added to cart!");
         return;
       }
 
