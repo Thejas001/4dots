@@ -41,7 +41,6 @@ const Cart = () => {
           setShowModal(true);
         }
       } catch (error) {
-        console.error("Could not fetch user details", error);
         setShowModal(true); // optionally show modal on error
       }
     };
@@ -60,10 +59,8 @@ useEffect(() => {
   const loadCartItems = async () => {
     try {
       const data = await fetchCartItems();
-      console.log("Cart Data:", data);
       setCartData(data);
     } catch (error) {
-      console.error("Error loading cart items:", error);
     } finally {
       setIsLoading(false); // ✅ safely stop loader after fetching
     }
@@ -75,7 +72,6 @@ useEffect(() => {
 
 
   useEffect(() => {
-    console.log("Updated Cart Data in State:", cartData);
   }, [cartData]);
   
   

@@ -19,20 +19,17 @@ const handlePlaceOrder = async () => {
   try {
     const response = await placeOrder(cartItemIds ,deliveryOption, paymentOption);
 
-    console.log("Order response:", response);
 
     
     if (paymentMethod === "cash") {
       // ✅ Skip Razorpay, redirect or show success
       incrementOrderBadge(); // Increment order badge count
       toast.success(" Cash on Delivery selected! Your order will be processed.");
-      console.log("✅ Cash on Delivery selected. Skipping Razorpay.");
       router.push("/"); // or your desired confirmation page
       return;
     }
 
     if (!response || !response.RazorpayOrderId) {
-      console.error("Invalid response from backend");
       return;
     }
 
@@ -44,7 +41,6 @@ const handlePlaceOrder = async () => {
       description: "Order Payment",
       order_id: response.RazorpayOrderId,
       handler: async function (razorpayResponse: any) {
-        console.log("✅ Payment successful:", razorpayResponse);
 
         // ✅ Optional: send to backend to verify signature
         // await fetch("/api/payment/verify", {

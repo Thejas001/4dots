@@ -34,7 +34,6 @@ const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "defa
           if (primary) setSelectedOption(primary.Id.toString());
 
         } catch (err) {
-          console.error("Failed to fetch address", err);
         } finally {
           setLoading(false);
         }
@@ -48,7 +47,6 @@ const AddressOption : React.FC<AddressProps> = ({ hideLabel, buttonStyle = "defa
         const data = await getUserAddress();
         setAddress(data);
       } catch (err) {
-        console.error("Failed to fetch address", err);
       }
     };
 

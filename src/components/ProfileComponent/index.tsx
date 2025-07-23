@@ -8,7 +8,7 @@ import Address from "@/components/OrderPayment/Address";
 import { motion } from "framer-motion";
 import { IoIosLogOut } from "react-icons/io";
 import UserProfileOrder from "./UserProfileOrder";
-import { getUserDetails } from "@/utils/api"; // adjust path if needed
+import { getUserDetails, getUserAddress, fetchUserOrder } from "@/utils/api"; // adjust path if needed
 
 interface UserDetails {
   Name: string;
@@ -21,6 +21,12 @@ const ProfileComponent = () => {
   const [userName, setUserName] = useState("");
   const router = useRouter();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [address, setAddress] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loadingAddress, setLoadingAddress] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [errorAddress, setErrorAddress] = useState("");
+  const [errorOrders, setErrorOrders] = useState("");
   
 // In ProfileComponent.tsx, update the refreshUser function:
   const refreshUser = async (currentName?: string) => {
@@ -40,23 +46,38 @@ const ProfileComponent = () => {
   const handleProfileUpdated = () => {
     refreshUser(); // Re-fetch or update local state
   };
-  useEffect(() => {
-    refreshUser();
-  }, []);
-  
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const data = await getUserDetails();
-        setUserDetails(data);
-      } catch (err) {
-        console.error("Failed to fetch user details:", err);
-      }
-    };
+const fetchAddress = async () => {
+  try {
+    setLoadingAddress(true);
+    setErrorAddress("");
+    const addressData = await getUserAddress();
+    setAddress(addressData);
+  } catch (err: any) {
+    setErrorAddress(err?.message || "Failed to fetch address");
+  } finally {
+    setLoadingAddress(false);
+  }
+};
 
-    fetchUserDetails();
-  }, []);
+useEffect(() => {
+  const fetchData = async () => {
+    await refreshUser();
+    await fetchAddress();
+    try {
+      setLoadingOrders(true);
+      setErrorOrders("");
+      const ordersData = await fetchUserOrder();
+      setOrders(ordersData);
+    } catch (err: any) {
+      setErrorOrders(err?.message || "Failed to fetch orders");
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+  fetchData();
+}, []);
+
 
   const handleLogout = () => {
     document.cookie = "jwtToken=; path=/; max-age=0; SameSite=Lax; Secure";
@@ -133,13 +154,13 @@ const ProfileComponent = () => {
       </div>
     </div>
   
-      {/**Your Order */}
-      <UserProfileOrder />
+      {/* Your Order */}
+      <UserProfileOrder orders={orders} loading={loadingOrders} error={errorOrders} />
     </div>
-      {/**Address Section*/}
+      {/* Address Section*/}
       <div className="col-span-12 xl:col-span-1 ml-6 mr-20 p-4 rounded-[10px] border border-[#ECECEC] h-20  min-h-[300px]">
-        <Address hideLabel buttonAlignment="left" buttonStyle="black" />
-        </div>
+        <Address hideLabel buttonAlignment="left" buttonStyle="black" address={address} loading={loadingAddress} error={errorAddress} refreshAddresses={fetchAddress} />
+      </div>
 
     </div>
 
