@@ -15,9 +15,9 @@ const agent = new https.Agent({
   rejectUnauthorized: false, // ✅ Allow self-signed certificates
 }); 
 export const API = axios.create({
-  baseURL: "https://localhost:7049/api", // fourdotsapp.azurewebsites.net
+  baseURL: "https://fourdotsapp.azurewebsites.net/api", // fourdotsapp.azurewebsites.net
   headers: { "Content-Type": "application/json" },
-  httpsAgent: agent, // ✅ Use the custom HTTPS agent
+  httpsAgent: agent, // ✅ Use the custom HTTPS agen
 });
 
 // ✅ Check for localStorage only in the browser
