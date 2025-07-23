@@ -23,18 +23,13 @@ const Cart = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
-  const clearCartCount = useCartStore((state) => state.clearCartCount);
   const [isLoading, setIsLoading] = useState(true);
   const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
-  const [selectedDesign, setSelectedDesign] = useState<{
-    url: string;
-    isPdf: boolean;
-    productName: string;
-  } | null>(null);
+  const { refreshCart } = useCartStore();
+  const [selectedDesigns, setSelectedDesigns] = useState<
+    { url: string; isPdf: boolean; productName: string }[]
+  >([]);
 
-  useEffect(() => {
-    clearCartCount();
-  }, [clearCartCount]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -87,7 +82,8 @@ const Cart = () => {
         ...prevCart,
         Items: prevCart.Items.filter(item => item.CartItemId !== cartItemId),
       }));
-
+      await refreshCart();
+      // ✅ Wait 200ms before refetching the cart from the backend
       setTimeout(async () => {
         const updatedCart = await fetchCartItems();
         setCartData(updatedCart);
@@ -99,121 +95,234 @@ const Cart = () => {
     Documents?: { ContentType: string; DocumentUrl: string }[];
     ProductName: string;
   }) => {
-    const document = item.Documents?.[0];
-    if (document) {
-      setSelectedDesign({
-        url: document.DocumentUrl,
-        isPdf: document.ContentType === 'application/pdf',
-        productName: item.ProductName,
-      });
+    if (item.Documents && item.Documents.length > 0) {
+      setSelectedDesigns(
+        item.Documents.map((doc) => ({
+          url: doc.DocumentUrl,
+          isPdf: doc.ContentType === "application/pdf",
+          productName: item.ProductName,
+        }))
+      );
       setIsDesignModalOpen(true);
     } else {
-      alert('No uploaded design available for this item.');
+      alert("No uploaded design available for this item.");
     }
   };
 
   const cartItemIds = cartData.Items.map(item => item.CartItemId);
 
   return (
-    <div className="h-auto bg-white px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-4">
-      {showModal && <PopupModal />}
-      {selectedDesign && (
+  <div className="h-auto min-h-screen bg-[#fff] flex flex-col">
+    {showModal && <PopupModal />}
+    {/* Design Preview Modal */}
+      {selectedDesigns.length > 0 && (
         <DesignPreviewModal
           isOpen={isDesignModalOpen}
           onClose={() => setIsDesignModalOpen(false)}
-          documentUrl={selectedDesign.url}
-          isPdf={selectedDesign.isPdf}
-          productName={selectedDesign.productName}
+          designs={selectedDesigns}
         />
       )}
-
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-[33.5px]">
-        <div className="border rounded border-[#242424] p-1">
-          <Link href="/">
-            <div className="text-gray-600 hover:text-gray-900 cursor-pointer">
-              <img src="/images/icon/Arrow-icon.svg" alt="Back" className="w-4 h-4" />
-            </div>
-          </Link>
-        </div>
-        <span className="text-black text-lg sm:text-[22px] font-normal leading-[26px]">
-          Your Cart
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-9">
-        {isLoading ? (
-          <Loader />
-        ) : cartData.Items.length > 0 ? (
-          <>
-            <div className="flex flex-col gap-4 w-full">
-              {cartData.Items.map((item) => (
-                <div key={item.CartItemId} className="flex flex-col sm:flex-row rounded-[10px] border border-[#ECECEC] p-4 gap-4 relative">
-                  <img src="/images/product/pdf.png" alt="PDF Icon" className="w-full sm:w-[120px] h-[120px] object-contain" />
-                  <div className="flex flex-col flex-1">
-                    <div className="flex flex-col sm:flex-row justify-between">
-                      <span className="text-sm sm:text-lg font-normal leading-7 text-black">
-                        {item.ProductName}
-                      </span>
-                      <div
-                        onClick={() => handleDelete(item.CartItemId)}
-                        className="ml-auto mt-[-150px] xl:mt-0 mb-[120px] xl:mb-0 p-2 rounded-full bg-[#f4f4f4] hover:bg-[#ddd] transition duration-200 cursor-pointer flex items-center justify-center w-8 h-8"
-                        title="Remove"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 12 12" fill="none">
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M7.2075 5.99758L11.7475 1.45758C12.0775 1.12758 12.0775 0.577578 11.7475 0.247578C11.5861 0.0889116 11.3688 0 11.1425 0C10.9162 0 10.6989 0.0889116 10.5375 0.247578L5.9975 4.78758L1.4575 0.247578C1.2961 0.0889116 1.07883 0 0.8525 0C0.626171 0 0.4089 0.0889116 0.2475 0.247578C-0.0825 0.577578 -0.0825 1.12758 0.2475 1.45758L4.7875 5.99758L0.2475 10.5376C-0.0825 10.8676 -0.0825 11.4176 0.2475 11.7476C0.5775 12.0776 1.1275 12.0776 1.4575 11.7476L5.9975 7.20758L10.5375 11.7476C10.8675 12.0776 11.4175 12.0776 11.7475 11.7476C12.0775 11.4176 12.0775 10.8676 11.7475 10.5376L7.2075 5.99758Z"
-                            fill="#242424"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-3 mt-4 text-sm sm:text-base text-[#242424]">
-                      {item.Attributes.map((attr) => (
-                        <div key={attr.AttributeName} className="flex items-center">
-                          <span>{attr.AttributeName}:</span>
-                          <span className="pl-2">{attr.AttributeValue}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-3 mt-4 text-sm sm:text-base text-[#242424]">
-                      {item.DynamicAttributes.map((attr) => (
-                        <div key={attr.AttributeName} className="flex items-center">
-                          <span>{attr.AttributeName}:</span>
-                          <span className="pl-2">{attr.AttributeValue}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center mt-4">
-                      <span onClick={() => handleViewDesign(item)} className="text-[#0075FF] italic underline text-sm sm:text-base cursor-pointer">
-                        Uploaded Design
-                      </span>
-                    </div>
-                    <div className="flex items-center text-[#242424] mt-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                           <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#242424"/>
-                    </svg>
-                      <span className="ml-2 text-lg font-semibold">{item.ItemPrice}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="w-full xl:w-auto">
-              <DeliveryOption selectedOption={deliveryOption} setSelectedOption={setDeliveryOption} />
-              {deliveryOption === "Delivery" && <AddressOption />}
-              <PaymentMethod selectedPaymentOption={paymentOption} setSelectedPaymentOption={setPaymentOption} />
-              <PaymentCal totalPrice={cartData.TotalPrice} userId={userId} cartItemIds={cartItemIds} deliveryOption={deliveryOption} paymentOption={paymentOption} />
-            </div>
-          </>
-        ) : (
-          <div className="col-span-12 text-center">
-            <p className="text-gray-500 text-lg font-medium">Your cart is empty.</p>
+    {/* Top Section */} 
+    <div className="flex items-center mt-4 gap-4 px-4 sm:gap-8 md:gap-[33.5px] sm:px-8 md:px-20">
+      {/* Back Button */}
+      <div className="border rounded-[4px] border-[#242424] p-1">
+        <Link href="/">
+          <div className="text-gray-600 hover:text-gray-900 cursor-pointer">
+            <img
+              src="/images/icon/Arrow-icon.svg"
+              alt="Back"
+              className="w-4 h-4"
+            />
           </div>
-        )}
+        </Link>
       </div>
+  
+      {/* Your Cart Text */}
+      <span className="text-[#000] text-lg sm:text-xl md:text-[22px] font-normal leading-[26px]">
+        Your Cart
+      </span>
     </div>
+  
+    {/* Bottom Section */}
+    <div className="flex flex-col xl:flex-row w-full mt-6 xl:mt-9 px-2 sm:px-6 md:px-12 xl:px-36 gap-6">
+     {isLoading ? (
+       <Loader />
+    ) : cartData.Items.length > 0 ? (
+       <>
+      <div className="flex flex-col w-full xl:w-1/2">
+         {cartData.Items.map((item) => {
+           const documents = item.Documents || [];
+           const hasMultiple = documents.length > 1;
+           const isPdf = documents[0]?.ContentType === "application/pdf";
+           const imageUrl = isPdf ? "/images/product/pdf.png" : documents[0]?.DocumentUrl;
+           return (
+          <div 
+            key={item.CartItemId}
+            className="flex flex-col sm:flex-row rounded-[10px] border border-[#ECECEC] pr-2.5 mb-4 w-full"
+          >
+            {/* Mobile: Product name and cross at the top */}
+            <div className="flex flex-row items-center justify-between sm:hidden mb-2 px-2 pt-2">
+              <span className="text-base font-semibold text-[#000] truncate max-w-[70%]">{item.ProductName}</span>
+              <div onClick={() => handleDelete(item.CartItemId)} className="flex-shrink-0 rounded-[33px] p-1.5 bg-[#ECECEC] cursor-pointer">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M7.2075 5.99758L11.7475 1.45758C12.0775 1.12758 12.0775 0.577578 11.7475 0.247578C11.5861 0.0889116 11.3688 0 11.1425 0C10.9162 0 10.6989 0.0889116 10.5375 0.247578L5.9975 4.78758L1.4575 0.247578C1.2961 0.0889116 1.07883 0 0.8525 0C0.626171 0 0.4089 0.0889116 0.2475 0.247578C-0.0825 0.577578 -0.0825 1.12758 0.2475 1.45758L4.7875 5.99758L0.2475 10.5376C-0.0825 10.8676 -0.0825 11.4176 0.2475 11.7476C0.5775 12.0776 1.1275 12.0776 1.4575 11.7476L5.9975 7.20758L10.5375 11.7476C10.8675 12.0776 11.4175 12.0776 11.7475 11.7476C12.0775 11.4176 12.0775 10.8676 11.7475 10.5376L7.2075 5.99758Z"
+                    fill="#242424"
+                  />
+                </svg>
+              </div>
+            </div>
+            {/* Mobile: Product image below product name */}
+<div className="flex justify-center items-center sm:items-start sm:mt-5 sm:ml-2 mb-2 sm:mb-0 flex-shrink-0 relative">
+  {documents.length > 0 ? (
+    <div className="relative">
+      {(() => {
+        const firstDoc = documents[0];
+        const remainingCount = documents.length - 1;
+
+        const isPdf =
+          firstDoc.ContentType?.toLowerCase().includes("pdf") ||
+          firstDoc.DocumentUrl?.toLowerCase().endsWith(".pdf");
+
+        if (isPdf) {
+          return (
+            <div className="relative">
+              <img
+                src="/images/product/pdf.png"
+                alt="PDF Icon"
+                className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
+              />
+              {remainingCount > 0 && (
+                <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white text-xs sm:text-sm px-2 py-0.5 rounded">
+                  +{remainingCount}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        if (firstDoc.DocumentUrl) {
+          return (
+            <div className="relative">
+              <img
+                src={firstDoc.DocumentUrl}
+                alt="Product Image"
+                className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded"
+              />
+              {remainingCount > 0 && (
+                <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white text-xs sm:text-sm px-2 py-0.5 rounded">
+                  +{remainingCount}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // Optional fallback if neither PDF nor URL:
+        return (
+          <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center bg-gray-200 text-gray-500 rounded">
+            No Preview
+          </div>
+        );
+      })()}
+    </div>
+  ) : (
+    <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center bg-gray-200 text-gray-500 rounded">
+      No Document
+    </div>
+  )}
+</div>
+
+
+            <div className="flex flex-col flex-1 min-w-0 overflow-hidden px-2 py-2">
+              {/* Desktop: Product name and cross in row as before */}
+              <div className="hidden sm:flex flex-row sm:items-center mt-2.5 xl:w-[448px] overflow-x-hidden">
+                <span className="text-sm text-[#000] xl:text-lg font-normal leading-7 flex-grow truncate max-w-[60%]">
+                  {item.ProductName}
+                </span>
+                <div onClick={() => handleDelete(item.CartItemId)}  className="flex-shrink-0 ml-8 rounded-[33px] p-1.5 bg-[#ECECEC] cursor-pointer">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M7.2075 5.99758L11.7475 1.45758C12.0775 1.12758 12.0775 0.577578 11.7475 0.247578C11.5861 0.0889116 11.3688 0 11.1425 0C10.9162 0 10.6989 0.0889116 10.5375 0.247578L5.9975 4.78758L1.4575 0.247578C1.2961 0.0889116 1.07883 0 0.8525 0C0.626171 0 0.4089 0.0889116 0.2475 0.247578C-0.0825 0.577578 -0.0825 1.12758 0.2475 1.45758L4.7875 5.99758L0.2475 10.5376C-0.0825 10.8676 -0.0825 11.4176 0.2475 11.7476C0.5775 12.0776 1.1275 12.0776 1.4575 11.7476L5.9975 7.20758L10.5375 11.7476C10.8675 12.0776 11.4175 12.0776 11.7475 11.7476C12.0775 11.4176 12.0775 10.8676 11.7475 10.5376L7.2075 5.99758Z"
+                      fill="#242424"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex flex-row text-[#242424] mt-4 gap-3 flex-wrap">
+                {/* Selected Attributes */}
+                {item.Attributes.map((attr) => (
+                  <div key={attr.AttributeName} className="text-base font-medium leading-6 tracking-[-0.2px] flex items-center">
+                    <span>{attr.AttributeName}:</span>
+                    <span className="pl-[9px]">{attr.AttributeValue}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-row text-[#242424] mt-2 gap-3 flex-wrap">
+                {/* Selected Attributes */}
+                {item.DynamicAttributes.map((attr) => (
+                  <div key={attr.AttributeName} className="text-base font-medium leading-6 tracking-[-0.2px] flex items-center">
+                    <span>{attr.AttributeName}:</span>
+                    <span className="pl-[9px]">{attr.AttributeValue}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Only keep the new mobile/desktop blocks for upload, edit, and price */}
+              <div className="flex flex-row items-center mt-2 sm:hidden">
+                <span
+                  onClick={() => handleViewDesign(item)}
+                  className="text-[#0075FF] italic underline text-base font-medium leading-6 tracking-[-0.2px] cursor-pointer"
+                >
+                  Uploaded Design
+                </span>
+                <button className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded">Edit</button>
+                <span className="ml-auto text-lg text-[#242424] font-semibold leading-6 tracking-tighter-[-0.2px]">₹ {item.ItemPrice}</span>
+              </div>
+              <div className="hidden sm:flex flex-row justify-start mt-4 items-center">
+                <span
+                  onClick={() => handleViewDesign(item)}
+                  className="text-[#0075FF] italic underline text-base font-medium leading-6 tracking-[-0.2px] cursor-pointer"
+                >
+                  Uploaded Design
+                </span>
+            {/**   <button className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded">Edit</button>*/}  
+                <span className="ml-auto text-lg text-[#242424] font-semibold leading-6 tracking-tighter-[-0.2px]">₹ {item.ItemPrice}</span>
+              </div>
+            </div>
+          </div>
+        );
+})}
+  </div>
+        <div className="w-full xl:w-1/2 xl:ml-6 xl:mr-20">
+        <DeliveryOption selectedOption={deliveryOption} setSelectedOption={setDeliveryOption} />
+        {deliveryOption === "Delivery" && <AddressOption />}
+        <PaymentMethod selectedPaymentOption={paymentOption} setSelectedPaymentOption={setPaymentOption} />
+        <PaymentCal totalPrice={cartData.TotalPrice}  userId={userId} cartItemIds={cartItemIds} deliveryOption={deliveryOption}  paymentOption={paymentOption}/>
+        </div>
+        </>
+      ) : (
+        <div className="w-full xl:w-1/2 pt-8">
+          <p className="text-gray-500 text-lg font-medium">Your cart is empty.</p>
+        </div>
+      )}
+    </div>
+  </div>
   );
 };
 

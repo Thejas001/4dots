@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const DropDown = ({ onSqftChange }: { onSqftChange: (sqft: number) => void }) => {
+const DropDown = ({ onSqftChange }: { onSqftChange: (sqft: number | null) => void }) => {
   const [selectedWidth, setSelectedWidth] = useState<number | null>(null);
   const [selectedHeight, setSelectedHeight] = useState<number | null>(null);
   const [calculatedSquareFeet, setCalculatedSquareFeet] = useState<number | null>(null);
@@ -11,6 +11,9 @@ const DropDown = ({ onSqftChange }: { onSqftChange: (sqft: number) => void }) =>
       const sqft = selectedWidth * selectedHeight;
       setCalculatedSquareFeet(sqft);
       onSqftChange(sqft); // Pass the calculated value to the parent
+    } else {
+      setCalculatedSquareFeet(null);
+      onSqftChange(null); // Reset in parent
     }
   }, [selectedWidth, selectedHeight, onSqftChange]);
 

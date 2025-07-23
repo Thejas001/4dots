@@ -3,61 +3,30 @@ import React from 'react';
 interface DesignPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  documentUrl: string;
-  isPdf: boolean;
-  productName: string;
+  designs: { url: string; isPdf: boolean; productName: string }[];
 }
 
 const DesignPreviewModal: React.FC<DesignPreviewModalProps> = ({
   isOpen,
   onClose,
-  documentUrl,
-  isPdf,
-  productName,
+  designs,
 }) => {
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[90%] max-w-[800px] max-h-[90vh] overflow-auto">
-        {/* Modal Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">{productName}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-600 hover:text-gray-900 text-2xl"
-          >
-            &times;
-          </button>
-        </div>
-
-        {/* Modal Content */}
-        <div className="flex justify-center">
-          {isPdf ? (
-            <embed
-              src={documentUrl}
-              type="application/pdf"
-              width="100%"
-              height="500px"
-              className="border border-gray-300"
-            />
-          ) : (
-            <img
-              src={documentUrl}
-              alt="Uploaded Design"
-              className="max-w-full max-h-[60vh] object-contain"
-            />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] mt-8 overflow-y-auto">
+        <button className="mb-4 px-4 py-2 bg-gray-200 rounded" onClick={onClose}>Close</button>
+        <div className="flex flex-wrap gap-4 justify-center">
+          {designs.map((design, idx) =>
+            design.isPdf ? (
+              <a key={idx} href={design.url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center">
+                <img src="/images/product/pdf.png" alt="PDF" className="w-32 h-32 object-contain" />
+                <div className="mt-2 text-sm text-center">{design.productName}</div>
+              </a>
+            ) : (
+              <img key={idx} src={design.url} alt={design.productName} className="w-32 h-32 object-cover rounded" />
+            )
           )}
-        </div>
-
-        {/* Modal Footer */}
-        <div className="mt-4 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

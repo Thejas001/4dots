@@ -18,7 +18,7 @@ const LoginButton = () => {
           <div className="bg-black text-white rounded-full w-7 h-7 flex items-center justify-center">
             <FaUser />
           </div>
-          <span className="text-[#242424] w-[40px] h-[21px] text-sm font-medium pl-2">
+          <span className="text-[#242424] w-[40px] h-[21px] text-sm font-medium pl-1">
            {isLoggedIn ? "Profile" : "Login"}
           </span>
           

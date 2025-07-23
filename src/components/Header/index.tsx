@@ -5,10 +5,14 @@ import CartButton from "./CartButton";
 import OrderButton from "./OrderButton";
 import LoginButton from "./LoginButton";
 import { useCartStore } from "@/utils/store/cartStore";
+import { CartData } from "@/app/models/CartItems";
+import { fetchCartItems } from "@/utils/cart";
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const cartCount = useCartStore((state) => state.cartCount);
+  const { cartCount, refreshCart } = useCartStore();
   const orderBadgeCount = useCartStore((state) => state.orderBadgeCount);
+  const [cartData, setCartData] = useState<CartData | null>(null);
 
 
   // Toggle function to open/close the dropdown
@@ -16,6 +20,15 @@ const Header = () => {
     e.stopPropagation();
     setIsOpen((prevState) => !prevState);
   };
+
+  // Refresh cart on initial mount
+  useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
+
+  
+
+  
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -28,6 +41,8 @@ const Header = () => {
     document.addEventListener("click", handleOutsideClick);
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [isOpen]);
+
+  const productCount = cartData?.Items.length ?? 0;
 
   return (
     <header className="fixed top-0 left-0 z-[999] w-full bg-[#fff] shadow-[0px_4px_16px_0px_rgba(91,91,91,0.05)] border">
@@ -73,11 +88,12 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-full bg-[#242424] opacity-0 transition-all duration-100 group-hover:opacity-100 group-hover:h-1" style={{ height: "1px" }}></span>
               <div className="transition-transform duration-100 group-hover:-translate-y-1">
                 <OrderButton />
+                {/** 
                 {orderBadgeCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                       {orderBadgeCount}
                     </span>
-                  )}
+                  )}*/}
               </div>
             </button>
 

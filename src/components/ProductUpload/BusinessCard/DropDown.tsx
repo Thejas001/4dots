@@ -32,9 +32,9 @@ const DropDown = ({
             <div className="flex flex-col gap-4 w-full md:w-1/2">
                 <label className="text-base font-medium text-[#242424]">Surface Finish</label>
                      {/* Color Options */}
-                    <div className="flex flex-row space-x-10">
+                    <div className="flex flex-wrap gap-4 sm:gap-6 md:gap-10">
                     <div
-                    className="flex items-center cursor-pointer gap-4"
+                    className="flex items-center cursor-pointer gap-2 sm:gap-4"
                     onClick={() => {
                         setSelectedSurface("Glossy Finish");
                         onSurfaceChange("GLOSSY");
@@ -45,12 +45,12 @@ const DropDown = ({
                         selectedSurface === "Glossy Finish" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
                         }`}
                     ></div>
-                    <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Glossy Finish</span>
+                    <span className="text-[#242424] text-sm sm:text-base font-medium leading-6 tracking-tighter-[-0.2px]">Glossy Finish</span>
                     </div>
 
                     {/* Delivery Option */}
                     <div
-                    className="flex items-center gap-4 cursor-pointer"
+                    className="flex items-center gap-2 sm:gap-4 cursor-pointer"
                     onClick={() => {
                         setSelectedSurface("Matte Finish");
                         onSurfaceChange("MATT");
@@ -61,7 +61,7 @@ const DropDown = ({
                         selectedSurface === "Matte Finish" ? "border-4 border-[#242424]" : "border-2 border-[#D1D5DB]"
                         }`}
                     ></div>
-                    <span className="text-[#242424] text-base font-medium leading-6 tracking-tighter-[-0.2px]">Matte Finish</span>
+                    <span className="text-[#242424] text-sm sm:text-base font-medium leading-6 tracking-tighter-[-0.2px]">Matte Finish</span>
                     </div>
                 </div>
                 {/**Orientation DropDown 
@@ -104,20 +104,20 @@ const DropDown = ({
                  Card Type
             </label>
             <div
-                className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
+                className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-2.5 sm:py-3 px-4 sm:px-5 bg-white cursor-pointer w-full"
                 onClick={() => setIsOpenCard(!isOpenCard)}
             >
                 <div className="text-sm font-normal text-gray-700">{SelectedCard || "Select Card Type"}</div>
-                <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <span className="absolute right-3 sm:right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
                 ▼
                 </span>
             </div>
             {isOpenCard && (
-                <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
+                <ul className="z-10 w-full mt-1 py-2 sm:py-3 bg-white border rounded-md shadow-lg">
                 {cardTypes.map((option, index) => (
                     <li
                     key={index}
-                    className={`px-5 py-3 text-sm cursor-pointer ${
+                    className={`px-4 sm:px-5 py-2.5 sm:py-3 text-sm cursor-pointer ${
                         SelectedCard === option ? "bg-[#242424] text-white" : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
                     }`}
                     onClick={() => { 

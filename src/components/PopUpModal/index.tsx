@@ -28,8 +28,8 @@ const PopupModal = () => {
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-7.5 rounded-lg shadow-lg w-[452px]">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-2">
+          <div className="bg-white p-4 sm:p-7.5 rounded-lg shadow-lg w-full max-w-[452px]">
             <div className="flex flex-col items-center">
               <span className="text-2xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">

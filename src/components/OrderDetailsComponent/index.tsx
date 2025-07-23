@@ -125,12 +125,12 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
         </span>
         <div></div>
       </div>
-      <div className="grid  grid-cols-12">
-        <div className="sticky top-10  z-10 mt-6 xl:w-full ml-[-110px] xl:ml-0  col-span-1 pl-8">
+      <div className="grid w-full grid-cols-12">
+        <div className="sticky top-10 ml-[-100px] xl:ml-0  col-span-1 pl-8">
           <ProgressBar orderStatus={selectedOrder.OrderStatus} />
         </div>
         {/* Bottom Section */}
-        <div className="mb-20 mt-9 ml-[68px] xl:ml-[130px]  grid h-auto grid-cols-3 gap-4 ml-[60px]  xl:grid-cols-12 w-full">
+        <div className="mb-10 mt-9  grid h-auto grid-cols-3 gap-4 ml-[60px]  xl:grid-cols-12 w-full">
           {orders.length > 0 ? (
             <div className="flex flex-col ">
               {selectedOrder.Items.map((item, index) => (

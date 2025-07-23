@@ -238,12 +238,12 @@ useEffect(() => {
           <div className="flex w-full flex-col items-center justify-center ">
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           </div>
-          <div className="mt-[182px] flex flex-1 flex-row justify-center gap-19">
+          <div className="mt-[182px] flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-19">
             {/* First Button */}
             <button 
               onClick={handleAddToCart}
               disabled={isAddToCartDisabled}
-              className={`relative flex h-[44px] w-full items-center justify-center gap-4 rounded-[48px] text-lg md:w-[378px]
+              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg
                 ${isProceedToCartDisabled
                   ? "cursor-not-allowed bg-gray-300 text-gray-500"
                   : "cursor-pointer bg-[#242424] text-white"
@@ -273,7 +273,7 @@ useEffect(() => {
             <button
               onClick={handleProceedToCart}
               disabled={isAddToCartDisabled}
-              className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] border-2 text-lg md:w-[378px]
+              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg
                 ${isAddToCartDisabled
                   ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
                   : "cursor-pointer border-[#242424] bg-white text-[#242424]"

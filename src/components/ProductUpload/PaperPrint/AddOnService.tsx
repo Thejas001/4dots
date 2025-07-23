@@ -112,6 +112,7 @@ const AddOnService = ({
             <input
               type="number"
               placeholder="Number"
+              min="0"
               value={customCopies}
               onChange={handleCustomCopiesChange}
               className="border border-gray-300 px-3 py-2 mt-12.5 rounded-md text-gray-500 w-26 no-spinner"

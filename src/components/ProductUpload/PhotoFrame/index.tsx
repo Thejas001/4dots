@@ -71,9 +71,9 @@ const ProductUpload = ({ product }: { product: any }) => {
               UpdatedQuantity={selectedQuantity}
             />
           )}
-          <div className="mt-10 flex-1 flex-col">
+          <div className="mt-8 sm:mt-10 flex-1 flex-col">
             <div className="">
-              <label className="mb-2.5 block text-base font-medium leading-6 tracking-[-0.2px] text-[#242424]">
+              <label className="mb-2.5 block text-base sm:text-lg font-medium leading-6 tracking-[-0.2px] text-[#242424]">
                 Images Selection
               </label>
             </div>
@@ -83,15 +83,15 @@ const ProductUpload = ({ product }: { product: any }) => {
               setUploadedImages={setFileList}
             />
           </div>
-          <div className="mt-10 flex-1 flex-col">
+          <div className="mt-8 sm:mt-10 flex-1 flex-col">
             <div>
-              <label className="mb-2.5 block text-base font-medium leading-6 tracking-[-0.2px] text-[#242424]">
+              <label className="mb-2.5 block text-base sm:text-lg font-medium leading-6 tracking-[-0.2px] text-[#242424]">
                 Frame Color
               </label>
             </div>
-            <div className="relative flex flex-row gap-7.5">
+            <div className="relative flex flex-wrap gap-4 sm:gap-6 md:gap-7.5">
               {/* Black */}
-              <label className="flex cursor-pointer items-center">
+              <label className="flex cursor-pointer items-center mb-2 sm:mb-0">
                 <input
                   type="radio"
                   name="frame-color"
@@ -109,7 +109,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               </label>
 
               {/* White */}
-              <label className="flex cursor-pointer items-center">
+              <label className="flex cursor-pointer items-center mb-2 sm:mb-0">
                 <input
                   type="radio"
                   name="frame-color"
@@ -127,7 +127,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               </label>
 
               {/* Brown */}
-              <label className="flex cursor-pointer items-center">
+              <label className="flex cursor-pointer items-center mb-2 sm:mb-0">
                 <input
                   type="radio"
                   name="frame-color"
@@ -147,14 +147,16 @@ const ProductUpload = ({ product }: { product: any }) => {
           </div>
 
           {/**Cart Buttons */}
-          <CartButton
-            uploadedImages={fileList}
-            dataId={dataId}
-            selectedQuantity={selectedQuantity}
-            calculatedPrice={calculatedPrice}
-            selectedPricingRule={selectedPricingRule}
-            selectedFrameColor={selectedFrameColor}
-          />
+          <div className="mt-8 sm:mt-10">
+            <CartButton
+              uploadedImages={fileList}
+              dataId={dataId}
+              selectedQuantity={selectedQuantity}
+              calculatedPrice={calculatedPrice}
+              selectedPricingRule={selectedPricingRule}
+              selectedFrameColor={selectedFrameColor}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ import { FaEdit } from "react-icons/fa"; // Using FontAwesome React icons
 import { sendOtp , verifyOTP } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import Loader from "../common/Loader";
 
 function OTPInputComponent() {
   const [showOTP, setShowOTP] = useState(false);
@@ -160,7 +162,7 @@ function OTPInputComponent() {
             </label>
             <div className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-white">
               <div className="flex items-center px-4">
-                <img
+               {/** */} <img
                   src={"/images/login/flag-india.svg"}
                   alt={"Flag"}
                   className="mr-2"
