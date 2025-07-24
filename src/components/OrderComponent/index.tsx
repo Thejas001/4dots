@@ -146,13 +146,13 @@ const OrderComponent = () => {
 
 const handleCancelOrder = async (orderId: number) => {
   try {
-    await updateOrderStatus(orderId, 3); // 3 = Cancelled
+      await updateOrderStatus(orderId, 6); // 3 = Cancelled
     toast.success("Order Canceled!");
     setCancelledOrders((prev) => [...prev, orderId]);
   } catch (error) {
+    toast.error("Failed to cancel order. Please try again.");
   }
 };
-;
   // ✅ Show loader only while orders are loading
   if (loadingOrders) {
     return <Loader />;
@@ -186,7 +186,7 @@ const handleCancelOrder = async (orderId: number) => {
               >
 
                                 {/* Payment Failed Banner */}
-            {(order.Payment?.PaymentStatus === "Failed" || order.Payment?.PaymentStatus === "Pending") && (
+            {(order.Payment?.PaymentStatus === "Failed" || order.Payment?.PaymentStatus === "Pending") && order.OrderStatus !== "CancelledByUser" && (
                   <div className="mb-3 rounded-md bg-red-100 p-3 text-sm text-red-700">
                     ⚠ Payment for this order failed. Please try again or contact
                     support.
@@ -203,7 +203,7 @@ const handleCancelOrder = async (orderId: number) => {
                   </div>
                 )}
 
-                {order.Payment?.PaymentStatus === "InProgress" && (
+                {order.Payment?.PaymentStatus === "InProgress" && order.OrderStatus !== "CancelledByUser" && (
                     <div className="mb-3 rounded-md bg-yellow-100 p-3 text-sm text-yellow-800">
                       ⏳ Payment for this order is pending. Please complete the payment to proceed.
                       <div className="mt-2">
@@ -410,22 +410,29 @@ const handleCancelOrder = async (orderId: number) => {
                         )}
                       </div>
                         <div className="text-[12px] xl:text-[18px] font-normal leading-[24px] tracking-[-0.2px] text-[#E50000] cursor-pointer">
-                          <button
+                        <button
                             onClick={() => handleCancelOrder(order.OrderId)}
                             disabled={
                               cancelledOrders.includes(order.OrderId) ||
-                              order.OrderStatus === "CancelledByUser"
+                              order.OrderStatus === "CancelledByUser" ||
+                              order.OrderStatus === "InProgress"
                             }
                             className={`bg-transparent border-none p-0 m-0 text-inherit ${
-                              cancelledOrders.includes(order.OrderId) || order.OrderStatus === "CancelledByUser"
+                              cancelledOrders.includes(order.OrderId) ||
+                              order.OrderStatus === "CancelledByUser" ||
+                              order.OrderStatus === "InProgress"
                                 ? "cursor-not-allowed text-gray-400"
                                 : "cursor-pointer text-[#E50000]"
                             }`}
                           >
-                            {cancelledOrders.includes(order.OrderId) || order.OrderStatus === "CancelledByUser"
+                            {cancelledOrders.includes(order.OrderId) ||
+                            order.OrderStatus === "CancelledByUser"
                               ? "Order Canceled"
+                              : order.OrderStatus === "InProgress"
+                              ? "Processing"
                               : "Cancel Order"}
                           </button>
+
                         </div>
                     </div>
 

@@ -81,8 +81,8 @@ export const updateUserDetails = async (userDetails: any) => {
 }
 export const updateOrderStatus = async (orderId: number, status: number) => {
   try {
-    const response = await API.put(`/order/${orderId}/status`, {
-      OrderStatus: status,
+      const response = await API.put(`/order/${orderId}/status`, {
+      OrderStatus: 6,
     });
     return response.data; // Adjust as per your API's response structure
   } catch (error: any) {
