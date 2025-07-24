@@ -5,17 +5,16 @@ import { Product } from "@/app/models/products";
 const DropDown = ({
   productDetails,
   onSizeChange,
-  onQuantityChange,
   onPriceCalculation, // Added to pass price and error to the parent
+  quantity,
 }: {
   productDetails: Product;
   onSizeChange: (size: string) => void;
-  onQuantityChange: (quantity: string) => void;
   onPriceCalculation: (price: number | null, error: string | null) => void; // Expecting both price and error in the parent
+  quantity: number;
 }) => {
   const [isOpenSize, setIsOpenSize] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
-  const [selectedQuantity, setSelectedQuantity] = useState<string | null>(null);
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -38,70 +37,39 @@ const DropDown = ({
     return null;
   };
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSelectedQuantity(value);
-
-    // Validate that the entered value is a valid number
-    const parsedValue = Number(value);
-    if (!isNaN(parsedValue) && parsedValue > 0) {
-      if (selectedSize) {
-        const price = findPriceForSizeAndQuantity(selectedSize, parsedValue);
-        if (price !== null) {
-          setCalculatedPrice(price);
-          setErrorMessage(null); // Clear error message if price is found
-        } else {
-          setCalculatedPrice(null);
-          setErrorMessage("Quantity is out of the valid range for the selected size.");
-        }
-      }
-    } else {
-      setCalculatedPrice(null);
-      setErrorMessage("Please enter a valid quantity.");
-    }
-
-    onQuantityChange(value);
-
-    // Send updated price and error to the parent
-    onPriceCalculation(calculatedPrice, errorMessage);
-  };
-
   const handleSizeChange = (size: string) => {
     setSelectedSize(size);
     onSizeChange(size);
 
     // Recalculate price and check if quantity is valid
-    if (selectedQuantity && !isNaN(Number(selectedQuantity))) {
-      const parsedQuantity = Number(selectedQuantity);
-      const price = findPriceForSizeAndQuantity(size, parsedQuantity);
+    if (size) {
+      const price = findPriceForSizeAndQuantity(size, quantity);
       if (price !== null) {
         setCalculatedPrice(price);
-        setErrorMessage(null); // Clear error message if price is found
+        setErrorMessage(null);
+        onPriceCalculation(price, null);
       } else {
         setCalculatedPrice(null);
         setErrorMessage("Not a valid quantity for the selected size.");
+        onPriceCalculation(null, "Not a valid quantity for the selected size.");
       }
     }
-
-    // Send updated price and error to the parent
-    onPriceCalculation(calculatedPrice, errorMessage);
   };
 
   useEffect(() => {
-    if (selectedQuantity && selectedSize && !isNaN(Number(selectedQuantity))) {
-      const price = findPriceForSizeAndQuantity(selectedSize, Number(selectedQuantity));
+    if (selectedSize) {
+      const price = findPriceForSizeAndQuantity(selectedSize, quantity);
       if (price !== null) {
         setCalculatedPrice(price);
-        setErrorMessage(null); // Clear error message if price is found
+        setErrorMessage(null);
+        onPriceCalculation(price, null);
       } else {
         setCalculatedPrice(null);
         setErrorMessage("Quantity is out of the valid range for the selected size.");
+        onPriceCalculation(null, "Quantity is out of the valid range for the selected size.");
       }
     }
-
-    // Send updated price and error to the parent
-    onPriceCalculation(calculatedPrice, errorMessage);
-  }, [selectedSize, selectedQuantity]);
+  }, [selectedSize, quantity]);
 
   useEffect(() => {
     // Send updated price and error to the parent whenever they change
@@ -144,7 +112,7 @@ const DropDown = ({
         </div>
       </div>
 
-      {/* Right Input Section with Quantity as Input */}
+      {/* Right Input Section with Quantity as Input 
       <div className="flex flex-col gap-4 w-full md:w-1/2">
         <div className="h-auto">
           <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
@@ -154,12 +122,12 @@ const DropDown = ({
               type="number"
               min="1"
               className="border rounded-md focus:ring-2 focus:ring-gray-300 py-2.5 px-5 bg-white text-gray-700 w-full"
-              value={selectedQuantity || ""}
+              value={selectedQuantity ?? ""}
               placeholder="Enter Quantity"
               onChange={handleQuantityChange}
             />
         </div>
-      </div>
+      </div>*/}
     </div>
   );
 };

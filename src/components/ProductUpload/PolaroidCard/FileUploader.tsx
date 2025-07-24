@@ -1,20 +1,30 @@
 "use client";
 
-import React, { useState ,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { UploadOutlined } from "@ant-design/icons";
-import type { UploadProps } from "antd";
-import { Button, message, Upload } from "antd";
+import { Button, Upload, message } from "antd";
+import type { UploadFile, UploadProps } from "antd/es/upload";
 
-interface FileUploaderProps {
-  onUploadSuccess: (documentId: number) => void;
-}
+const FileUploader = ({
+  quantity,
+  uploadedImages,
+  setUploadedImages,
+  setQuantity,
+  currentImageIndex,
+  handleNext,
+  handlePrevious,
+}: {
+  quantity: number | null;
+  uploadedImages: UploadFile[];
+  setUploadedImages: React.Dispatch<React.SetStateAction<UploadFile[]>>;
+  setQuantity: (q: number) => void;
+  currentImageIndex: number;
+  handleNext: () => void;
+  handlePrevious: () => void;
+}) => {
+  // Removed currentImageIndex state and handlers
 
-
-const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [fileType, setFileType] = useState<"pdf" | null>(null);
-  
-    const isImageFile = (fileName: string) => {
+  const isImageFile = (fileName: string) => {
     const imageExtensions = [
       ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",
        ".svg", ".webp"
@@ -34,104 +44,116 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     if (lower.endsWith(".ppt") || lower.endsWith(".pptx")) return "PowerPoint Presentation";
     return "File Preview Unavailable";
   };
-  
-  const props: UploadProps = {
-    name: "document",  // Important: match backend's expected form field name
-    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
-    method: "POST",
-    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps",
-    headers: {
-      authorization: "authorization-text",
-    },
-    beforeUpload: (file) => {
-      const fileURL = URL.createObjectURL(file);
-      setSelectedFile(fileURL);
-  
-      if (file.type === "application/pdf") {
-        setFileType("pdf");
-        return true;
-      } else {
-        message.error("Unsupported file type. Please upload a PDF.");
-        return false;
-      }
-    },
-    onChange(info) {
-      if (info.file.status === "done") {
-        const response = info.file.response;
-  
-        if (response?.Success) {
-          const documentId = response.Data?.Id;  
-          sessionStorage.setItem("uploadedDocumentId", documentId);
-          onUploadSuccess(documentId); 
-          message.success(`${info.file.name} uploaded successfully`);
-          console.log("📄 Document ID:", documentId);
-        } else {
-          message.error("Upload failed. Server did not return success.");        }
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} upload failed.`);
-      }
-    },
-  };
+
   useEffect(() => {
-    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
-      const docId = sessionStorage.getItem("uploadedDocumentId");
-  
-      if (docId) {
-        try {
-          // Call your delete document API here
-          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
-            method: "DELETE",
-          });
-  
-          sessionStorage.removeItem("uploadedDocumentId");
-          console.log("🧹 Document removed on unload.");
-        } catch (err) {
-          console.error("❌ Failed to delete document on unload:", err);
-        }
-      }
-    };
-  
-    window.addEventListener("beforeunload", handleBeforeUnload);
-  
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
-  
-  
+    if (quantity === null || quantity === 0) {
+      setUploadedImages([]);
+    } else if (uploadedImages.length > quantity) {
+      setUploadedImages((prev) => prev.slice(0, quantity));
+    }
+  }, [quantity, setUploadedImages]);
+
+  const props: UploadProps = {
+    name: "document",
+    multiple: true,
+    accept:
+      ".jpg,.jpeg,.jfif,.bmp,.png,.pdf,.psd",
+    showUploadList: false,
+    beforeUpload: (file, newFileList) => {
+      // Remove quantity check, set quantity based on selected files
+      const totalFiles = uploadedImages.length + newFileList.length;
+      setQuantity(totalFiles);
+
+      // Only allow new files that don't exceed the new total
+      const previewUrl = URL.createObjectURL(file);
+      const newFile: UploadFile = {
+        uid: file.uid || file.name + Date.now(),
+        name: file.name,
+        url: previewUrl,
+        status: "done" as UploadFile["status"],
+        originFileObj: file,
+      };
+
+      setUploadedImages((prev) => [...prev, newFile]);
+
+      return false; // Prevent auto upload
+    },
+    fileList: uploadedImages,
+    maxCount: quantity ?? undefined,
+  };
+
+  useEffect(() => {
+    setQuantity(uploadedImages.length > 0 ? uploadedImages.length : 1);
+}, [uploadedImages]);
+
 
   return (
-    <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
-      {/* Upload Button */}
-      <Upload {...props} showUploadList={false}>
+    <div className="flex flex-col bg-[#F7F7F7] w-full max-w-md md:max-w-xs lg:max-w-sm px-4 sm:px-8 items-center shadow h-full py-6">
+      <Upload {...props}>
         <Button
           icon={<UploadOutlined />}
-          className="flex justify-center mt-5 items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium"
+          className="flex mt-5 justify-center items-center bg-[#242424] w-full max-w-[180px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium disabled:bg-gray-300"
+          
         >
-          Upload File
+          Upload Files
         </Button>
       </Upload>
 
-      {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
-        {selectedFile ? (
-          fileType === "pdf" ? (
-            <iframe
-              src={`${selectedFile}#toolbar=0`}
-              width="100%"
-              height="100%"
-              className="rounded-md border"
-              title="PDF Preview"
+      {uploadedImages.length > 0 && (
+        <div className="mt-3 relative w-full flex justify-center items-center">
+          {isImageFile(uploadedImages[currentImageIndex]?.name) ? (
+            <img
+              src={uploadedImages[currentImageIndex]?.url}
+              alt={uploadedImages[currentImageIndex]?.name}
+              className="w-full max-w-[320px] h-auto max-h-[400px] object-contain rounded-md"
+              onError={(e) => (e.currentTarget.src = "https://placehold.co/200")}
+            />
+          ) : isPdfFile(uploadedImages[currentImageIndex]?.name) ? (
+            <embed
+              src={uploadedImages[currentImageIndex]?.url}
+              type="application/pdf"
+              className="w-full max-w-[320px] h-[400px] rounded-md"
             />
           ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
-          )
-        ) : (
-          <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
-        )}
-      </div>
-      <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-      Supported file formats: JPG, JPEG, PNG, PDF, PSD.
+            <div className="flex flex-col items-center justify-center w-full max-w-[320px] h-[200px] bg-gray-100 rounded-md">
+              <img
+                src="/images/icon/file-icon.svg" // Replace with your icon
+                alt="File Icon"
+                className="w-12 h-12 mb-2"
+              />
+              <p className="text-sm text-gray-600">{getFileTypeLabel(uploadedImages[currentImageIndex]?.name)}</p>
+            </div>
+          )}
+
+          {uploadedImages.length > 1 && (
+            <>
+              <div
+                className="absolute top-1/2 left-2 -translate-y-1/2 cursor-pointer"
+                onClick={handlePrevious}
+              >
+                <img src="/images/icon/vector-left.svg" alt="Previous" />
+              </div>
+              <div
+                className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
+                onClick={handleNext}
+              >
+                <img src="/images/icon/vector-right.svg" alt="Next" />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {uploadedImages.length > 0 && (
+        <div
+          className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-3 px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px] flex justify-center items-center text-center"
+          style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
+        >
+          {currentImageIndex + 1} / {uploadedImages.length}
+        </div>
+      )}
+    <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+      Supported file formats: JPG, JPEG, PNG, PSD, PDF.
     </div>
     </div>
   );
