@@ -127,6 +127,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
 >
   {pageCount}
 </div>
+    <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+      Supported file formats:  PDF.
+    </div>
 
     </div>
   );

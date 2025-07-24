@@ -153,7 +153,7 @@ const DropDown = ({
             <input
               type="number"
               min="1"
-              className="border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white text-gray-700 w-full"
+              className="border rounded-md focus:ring-2 focus:ring-gray-300 py-2.5 px-5 bg-white text-gray-700 w-full"
               value={selectedQuantity || ""}
               placeholder="Enter Quantity"
               onChange={handleQuantityChange}

@@ -532,8 +532,18 @@ const handleCancelOrder = async (orderId: number) => {
             ))}
           </div>
         ) : (
-          <div className="mt-10 text-center">
-            <p>No orders found.</p>
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+            <img
+              src="/images/errorimages/no-order.png"
+              alt="No Orders Found"
+              className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 mb-4 object-contain"
+            />
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
+              No Orders Found
+            </h2>
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-md">
+              It looks like you haven&apos;t placed any orders yet. Start shopping now to see your orders here!
+            </p>
           </div>
         )}
       </div>

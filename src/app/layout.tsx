@@ -31,12 +31,23 @@ export default function RootLayout({
             toastOptions={{
               duration: 5000,
               style: {
-                background: '#000', // black background
+                background: '#000', // default black background
                 color: '#fff',      // white text
                 borderRadius: '10px',
                 padding: '20px 32px',
                 fontSize: '1.25rem',
                 minWidth: '320px',
+              },
+              // Custom styles for error toasts
+              error: {
+                style: {
+                  background: '#e53935', // red background for errors
+                  color: '#fff',
+                },
+                iconTheme: {
+                  primary: '#fff',
+                  secondary: '#e53935',
+                },
               },
             }}
           />

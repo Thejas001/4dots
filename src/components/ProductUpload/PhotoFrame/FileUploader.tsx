@@ -19,7 +19,7 @@ const FileUploader = ({
   const isImageFile = (fileName: string) => {
     const imageExtensions = [
       ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",
-      ".heic", ".svg", ".webp", ".tif", ".tiff"
+       ".svg", ".webp"
     ];
     return imageExtensions.some((ext) =>
       fileName.toLowerCase().endsWith(ext)
@@ -49,11 +49,15 @@ const FileUploader = ({
     name: "document",
     multiple: true,
     accept:
-      ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
+      ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
     showUploadList: false,
     beforeUpload: (file, newFileList) => {
       if (quantity === null || quantity === 0) {
         message.error("Please select a quantity first.");
+        return false;
+      }
+      if (uploadedImages.length >= quantity) {
+        message.error(`You can only upload up to  ${quantity}. To add more images, please increase the quantity.`);
         return false;
       }
 
@@ -162,6 +166,9 @@ const FileUploader = ({
           {currentImageIndex + 1} / {uploadedImages.length}
         </div>
       )}
+    <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+      Supported file formats: JPG, JPEG, PNG, GIF, HEIC, SVG, WEBP, PDF, PSD, AI, EPS.
+    </div>
     </div>
   );
 };

@@ -11,6 +11,41 @@ import FileUploader from "./FileUploader";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 
+const showErrorToast = (message: string) => {
+  toast.custom((t) => (
+    <div
+      style={{
+        background: "#e53935",
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "20px 32px",
+        fontSize: "1.25rem",
+        minWidth: "320px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
+      <span>{message}</span>
+      <button
+        onClick={() => toast.dismiss(t.id)}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: "#fff",
+          fontSize: "1.5rem",
+          marginLeft: "16px",
+          cursor: "pointer",
+        }}
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+  ));
+};
+
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
@@ -100,8 +135,12 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   //add to cart function
   const handleAddToCart = async () => {
-    if (!productDetails || !selectedPricingRule) {
-      setErrorMessage("Please select all options before adding to the cart.");
+    const missing = [];
+    if (!selectedSize) missing.push("size");
+    if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
+    if (!uploadedDocumentId) missing.push("document upload");
+    if (missing.length > 0) {
+      showErrorToast("Please select: " + missing.join(", "));
       return;
     }
     if (!isLoggedIn()) {
@@ -121,7 +160,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     try {
       await addToCartPolaroidCard(
         dataId,
-        selectedPricingRule,
+        selectedPricingRule!,
         Number(selectedQuantity),
         uploadedDocumentId ?? undefined 
       );
@@ -137,8 +176,12 @@ const ProductUpload = ({ product }: { product: any }) => {
 // Utility to check if all required options are selected
 
 const handleProceedToCart = async () => {
-  if (isProceedToCartDisabled) {
-    setErrorMessage("Please select all options (size, quantity, and upload a document) before proceeding to cart.");
+  const missing = [];
+  if (!selectedSize) missing.push("size");
+  if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
+  if (!uploadedDocumentId) missing.push("document upload");
+  if (missing.length > 0) {
+    showErrorToast("Please select: " + missing.join(", "));
     return;
   }
 
@@ -158,7 +201,7 @@ const handleProceedToCart = async () => {
   try {
     await addToCartPolaroidCard(
       dataId,
-      selectedPricingRule,
+      selectedPricingRule!,
       Number(selectedQuantity),
       uploadedDocumentId ?? undefined
     );
@@ -205,42 +248,16 @@ const handleProceedToCart = async () => {
   {/* First Button */}
   <button
     onClick={handleAddToCart}
-    disabled={isProceedToCartDisabled}
-    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-2 rounded-[48px] text-lg
-      ${isProceedToCartDisabled
-        ? "cursor-not-allowed bg-gray-300 text-gray-500"
-        : "cursor-pointer bg-[#242424] text-white"
-      }`}
+    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isProceedToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
   >
-    <span className="pr-1">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="25"
-        height="24"
-        viewBox="0 0 25 24"
-        fill="none"
-      >
-        <path
-          d="M14.5003 5C14.5003 4.46957 14.2896 3.96086 13.9145 3.58579C13.5395 3.21071 13.0308 3 12.5003 3C11.9699 3 11.4612 3.21071 11.0861 3.58579C10.711 3.96086 10.5003 4.46957 10.5003 5M9.49232 15H12.4923M12.4923 15H15.4923M12.4923 15V12M12.4923 15V18M19.7603 9.696L21.1453 18.696C21.1891 18.9808 21.1709 19.2718 21.0917 19.5489C21.0126 19.8261 20.8746 20.0828 20.687 20.3016C20.4995 20.5204 20.2668 20.6961 20.005 20.8167C19.7433 20.9372 19.4585 20.9997 19.1703 21H5.83032C5.54195 21 5.25699 20.9377 4.99496 20.8173C4.73294 20.6969 4.50005 20.5212 4.31226 20.3024C4.12448 20.0836 3.98624 19.8267 3.90702 19.5494C3.82781 19.2721 3.80949 18.981 3.85332 18.696L5.23832 9.696C5.31097 9.22359 5.5504 8.79282 5.91324 8.4817C6.27609 8.17059 6.73835 7.9997 7.21632 8H17.7843C18.2621 7.99994 18.7241 8.17094 19.0868 8.48203C19.4494 8.79312 19.6877 9.22376 19.7603 9.696Z"
-          stroke="white"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
+    <span className="pr-1">🛒</span>
     <span className="text-lg font-medium">Add to Cart</span>
   </button>
 
   {/* Second Button */}
   <button
     onClick={handleProceedToCart}
-    disabled={isProceedToCartDisabled}
-    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg
-      ${isProceedToCartDisabled
-        ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
-        : "cursor-pointer border-[#242424] bg-white text-[#242424]"
-      }`}
+    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isProceedToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
   >
     <span className="pr-1">
       <svg
@@ -256,7 +273,7 @@ const handleProceedToCart = async () => {
         />
       </svg>
     </span>
-    <span className="font-bold">{price !== null ? price : "0"}</span>
+    <span className="font-bold">{calculatedPrice}</span>
     <span className="pl-4 font-medium">Proceed To Cart</span>
   </button>
 </div>

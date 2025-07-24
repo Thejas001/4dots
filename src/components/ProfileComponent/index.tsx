@@ -91,7 +91,7 @@ useEffect(() => {
     {/* Top Section */} 
     <div className="flex items-center mt-4 gap-[33.5px] px-20">
       {/* Back Button */}
-      <div className="border rounded-[4px] border-[#242424] p-1">
+      <div className="border rounded-[4px] border-[#242424] p-1 ml-[80px]">
         <Link href="/">
           <div className="text-gray-600 hover:text-gray-900 cursor-pointer">
             <img

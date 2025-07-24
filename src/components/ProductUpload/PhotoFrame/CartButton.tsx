@@ -5,6 +5,7 @@ import Loader from "@/components/common/Loader";
 import { addToCartPhotoFrame } from "@/utils/cart";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+//import { message } from "antd";
 
 interface CartButtonProps {
   selectedQuantity: number | null;  
@@ -13,6 +14,7 @@ interface CartButtonProps {
   dataId: number;
   uploadedImages: any[];
   selectedFrameColor: string;  
+  selectedSize: string;
 }
 
 
@@ -23,6 +25,7 @@ const CartButton: React.FC<CartButtonProps> = ({
   dataId,
   uploadedImages,
   selectedFrameColor,
+  selectedSize,
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -109,9 +112,54 @@ const CartButton: React.FC<CartButtonProps> = ({
     }
   }, [isLoading, pathname]);
 
+  const showErrorToast = (message: string) => {
+    toast.custom((t) => (
+      <div
+        style={{
+          background: "#e53935",
+          color: "#fff",
+          borderRadius: "10px",
+          padding: "20px 32px",
+          fontSize: "1.25rem",
+          minWidth: "320px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        }}
+      >
+        <span>{message}</span>
+        <button
+          onClick={() => toast.dismiss(t.id)}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "#fff",
+            fontSize: "1.5rem",
+            marginLeft: "16px",
+            cursor: "pointer",
+          }}
+          aria-label="Close"
+        >
+          &times;
+        </button>
+      </div>
+    ));
+  };
+
+  // Add a function to check missing options
+  const getMissingOptions = () => {
+    const missing = [];
+    if (!selectedSize) missing.push("size");
+    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+    if (!selectedFrameColor) missing.push("frame color");
+    if (!uploadedImages || uploadedImages.length === 0) missing.push("image upload");
+    return missing;
+  };
+
   const handleAddToCart = async () => {
     if (!selectedPricingRule || !selectedQuantity) {
-      setErrorMessage("Please select all options before adding to the cart.");
+      showErrorToast("Please select all required options before continuing.");
       return;
     }
 
@@ -170,14 +218,14 @@ const CartButton: React.FC<CartButtonProps> = ({
       router.push("/");
     } catch (error) {
       console.error("Cart error:", error);
-      setErrorMessage("Failed to add to cart. Please try again.");
+      toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
     }
   };
 
   const handleProceedToCart = async () => {
     if (!selectedPricingRule || !selectedQuantity) {
-      setErrorMessage("Please select all options before adding to the cart.");
+      showErrorToast("Please select all required options before continuing.");
       return;
     }
 
@@ -231,7 +279,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       router.push("/Cart");
     } catch (error) {
       console.error("Cart error:", error);
-      setErrorMessage("Failed to add to cart. Please try again.");
+      toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
     }
   };
@@ -246,26 +294,31 @@ const CartButton: React.FC<CartButtonProps> = ({
       )}
       <div className="mt-4 flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-4">
         <button
-          onClick={handleAddToCart}
-          disabled={isAddToCartDisabled}
-          className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg
-            ${isAddToCartDisabled
-              ? "cursor-not-allowed bg-gray-300 text-gray-500"
-              : "cursor-pointer bg-[#242424] text-white"
-            }`}               
+              onClick={() => {
+                const missing = getMissingOptions();
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleAddToCart();
+              }}
+          className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}               
             >
           <span className="pr-1">🛒</span>
           <span className="text-lg font-medium">Add to Cart</span>
         </button>
 
         <button
-          onClick={handleProceedToCart}
-          disabled={isAddToCartDisabled}
-          className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg
-            ${isAddToCartDisabled
-              ? "cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500"
-              : "cursor-pointer border-[#242424] bg-white text-[#242424]"
-            }`}                
+             onClick={() => {
+              const missing = getMissingOptions();
+              if (missing.length > 0) {
+                showErrorToast("Please select: " + missing.join(", "));
+                return;
+              }
+              handleProceedToCart();
+            }}
+          className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                
             >
           <span className="pr-1">
             <svg

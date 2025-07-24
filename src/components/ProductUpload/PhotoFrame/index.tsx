@@ -153,6 +153,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               calculatedPrice={calculatedPrice}
               selectedPricingRule={selectedPricingRule}
               selectedFrameColor={selectedFrameColor}
+              selectedSize={selectedSize}
             />
           </div>
         </div>

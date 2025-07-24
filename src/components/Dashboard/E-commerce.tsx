@@ -2,7 +2,6 @@
 import dynamic from "next/dynamic";
 import React from "react";
 import ProductList from "../ProductList";
-import Footer from "@/components/Footer";
 import { Product } from "@/app/models/products";
 
 interface ECommerceProps {
@@ -18,7 +17,6 @@ const ECommerce: React.FC<ECommerceProps> = ({ products }) => {
       {/** */}
       <div className="md:pt-10 md:pb-[47.7px] pt-15 pb-12.5 bg-[#fff]">
       </div>
-      <Footer/>
         
     </>
   );

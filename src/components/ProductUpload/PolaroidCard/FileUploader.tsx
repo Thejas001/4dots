@@ -13,11 +13,33 @@ interface FileUploaderProps {
 const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<"pdf" | null>(null);
+  
+    const isImageFile = (fileName: string) => {
+    const imageExtensions = [
+      ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",
+       ".svg", ".webp"
+    ];
+    return imageExtensions.some((ext) =>
+      fileName.toLowerCase().endsWith(ext)
+    );
+  };
+
+  const isPdfFile = (fileName: string) => fileName.toLowerCase().endsWith(".pdf");
+
+  const getFileTypeLabel = (fileName: string) => {
+    const lower = fileName.toLowerCase();
+    if (lower.endsWith(".pdf")) return "PDF Document";
+    if (lower.endsWith(".psd")) return "Photoshop Document";
+    if (lower.endsWith(".ai") || lower.endsWith(".eps") || lower.endsWith(".ait")) return "Illustrator Document";
+    if (lower.endsWith(".ppt") || lower.endsWith(".pptx")) return "PowerPoint Presentation";
+    return "File Preview Unavailable";
+  };
+  
   const props: UploadProps = {
     name: "document",  // Important: match backend's expected form field name
     action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
-    accept: ".pdf",
+    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps",
     headers: {
       authorization: "authorization-text",
     },
@@ -108,6 +130,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
         )}
       </div>
+      <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+      Supported file formats: JPG, JPEG, PNG, PDF, PSD.
+    </div>
     </div>
   );
 };
