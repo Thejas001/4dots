@@ -353,10 +353,12 @@ export const addToCartPaperPrint = async (
     PricePerPage: number;
   },
   pageCount: number,
+  noOfCopies: number,
   selectedBindingType?: string,
   addonRule?: any,
   addonBookCount?: number,
-  documentId?: number
+  
+  documentId?: number,
 ) => {
 
   // ✅ Map binding type to AddonID
@@ -400,6 +402,10 @@ const resolvedAddonId = selectedBindingType
         AttributeName: "PageCount",
         AttributeValue: pageCount.toString(),
       },
+      {
+        "AttributeName": "NumberOfCopies",
+        "AttributeValue": noOfCopies.toString()
+      }
     ],
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };

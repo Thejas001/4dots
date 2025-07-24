@@ -139,6 +139,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedBindingType: pendingBindingType,
       selectedAddonRule: pendingAddonRule,
       addonBookCount: pendingAddonBookCount,
+      noOfCopies: pendingNoOfCopies,
+      uploadedDocumentId: pendingUploadedDocumentId, // <-- add this
     } = JSON.parse(pendingCartItem);
 
     try {
@@ -146,9 +148,11 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         pendingDataId,
         pendingPricingRule,
         pendingPageCount,
+        pendingNoOfCopies,
         pendingBindingType,
         pendingAddonRule,
         pendingAddonBookCount,
+        pendingUploadedDocumentId // <-- pass this
       );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
@@ -164,9 +168,14 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       setErrorMessage("Please select all options before adding to the cart.");
       return;
     }
+    if (!uploadedDocumentId) {
+      setErrorMessage("Please upload a document before adding to cart.");
+      return;
+    }
 
     if (!isLoggedIn()) {
       const pendingItem = {
+        dataId, // <-- add this line
         productType: "paperprinting",
         selectedPricingRule,
         pageCount, // ✅ Store page count
@@ -174,6 +183,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedAddonRule, // ✅ Store addon rule
         addonBookCount:
           copySelection === "all" ? noOfCopies : customCopies || 0, // ✅ Store copies count
+        uploadedDocumentId, // <-- add this
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       toast.success("Product added to cart!");
@@ -197,9 +207,11 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         dataId,
         selectedPricingRule,
         pageCount,
+        noOfCopies,
         selectedBindingType,
         selectedAddonRule,
         addonBookCount,
+        uploadedDocumentId // <-- always pass this
       );
       toast.success("Product added to cart!");
       incrementCart();
@@ -214,16 +226,23 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       setErrorMessage("Please select all options before adding to the cart.");
       return;
     }
+    if (!uploadedDocumentId) {
+      setErrorMessage("Please upload a document before adding to cart.");
+      return;
+    }
 
     if (!isLoggedIn()) {
       const pendingItem = {
+        dataId, // <-- add this line
         productType: "paperprinting",
         selectedPricingRule,
         pageCount, // ✅ Store page count
         selectedBindingType, // ✅ Store binding type
         selectedAddonRule, // ✅ Store addon rule
+        noOfCopies,
         addonBookCount:
           copySelection === "all" ? noOfCopies : customCopies || 0, // ✅ Store copies count
+        uploadedDocumentId, // <-- add this
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
@@ -247,9 +266,11 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         dataId,
         selectedPricingRule,
         pageCount,
+        noOfCopies,
         selectedBindingType,
         selectedAddonRule,
         addonBookCount,
+        uploadedDocumentId // <-- always pass this
       );
       toast.success("Product added to cart!");
       router.push("/Cart");
