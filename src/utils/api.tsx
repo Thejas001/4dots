@@ -36,7 +36,6 @@ export const getUserDetails = async () => {
     const response = await API.get("/account/profile");
     return response.data; // Assuming the API returns user details directly
   } catch (error: any) {
-    console.error("Error fetching user details:", error);
     throw error.response?.data?.message || "Failed to fetch user details";
   }
 };
