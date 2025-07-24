@@ -43,12 +43,10 @@ const ProductUpload = ({ product }: { product: any }) => {
     if (pricingrule) {
       setPrice(pricingrule.Price); // Store the price in state
     } else {
-      console.warn("No matching pricing rule found.");
       setPrice(null);
     }
 
     setSelectedPricingRule(pricingrule);
-    console.log("Matched Pricing Rule:", pricingrule);
   }, [productDetails, selectedSize, selectedQuantity]);
 
   return (
@@ -155,6 +153,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               calculatedPrice={calculatedPrice}
               selectedPricingRule={selectedPricingRule}
               selectedFrameColor={selectedFrameColor}
+              selectedSize={selectedSize}
             />
           </div>
         </div>

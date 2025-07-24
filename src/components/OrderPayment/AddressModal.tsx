@@ -59,7 +59,6 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
       setIsSubmitting(false);
     }
   };
-  if (onAddressAdded) onAddressAdded();
 
 
   if (!isOpen) return null;

@@ -6,7 +6,7 @@
 
 @layer base {
     body {
-        @apply flex justify-center items-center relative z-1 bg-[#fff] font-sans text-base font-normal  mt-[85.96px];
+        @apply flex justify-center items-center relative z-1 bg-[#fff] font-sans text-base font-normal  mt-[85.96px] w-full;
     }
 }
 

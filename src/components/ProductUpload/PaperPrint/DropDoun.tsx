@@ -23,13 +23,14 @@ const DropDown = ({
   return (
     <div className="flex w-full flex-col gap-6 md:flex-row md:gap-[45px]">
       {/* Size Dropdown */}
-      <div className="flex w-full flex-col gap-4 md:w-1/2">
-        <label className="mb-2.5 block text-base font-medium text-[#242424]">
-          Select Size
+      <div className="flex flex-col gap-5 md:gap-10 w-full md:w-1/2">
+      <div className="h-auto">
+       <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+      Select Size
         </label>
         <div
-          className="relative cursor-pointer rounded-md border bg-white px-5 py-3"
-          onClick={() => setIsOpenSize(!isOpenSize)}
+            className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
+            onClick={() => setIsOpenSize(!isOpenSize)}
         >
           <div className="text-sm font-normal text-gray-700">
             {selectedSize || "Select Size"}
@@ -59,16 +60,18 @@ const DropDown = ({
             ))}
           </ul>
         )}
+        </div>
       </div>
 
       {/* No. of Copies Dropdown */}
       <div className="flex w-full flex-col gap-4 md:w-1/2">
-        <label className="mb-2.5 block text-base font-medium text-[#242424]">
-          No. of Copies
+      <div className="h-auto">
+      <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+      No. of Copies
         </label>
         <input
             type="number"
-            className="w-full rounded-md border bg-white px-5 py-3 text-gray-700 focus:ring-2 focus:ring-gray-300"
+            className="border rounded-md focus:ring-2 focus:ring-gray-300 py-2.5 px-5 bg-white text-gray-700 w-full"
             value={selectedCopies || ""}
             min="1"
             placeholder="Enter No. of Copies"
@@ -78,6 +81,7 @@ const DropDown = ({
               onCopiesChange(Number(value));
             }}
           />
+      </div>
       </div>
     </div>
   );

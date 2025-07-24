@@ -43,7 +43,7 @@ const Footer = () => {
         </div>
     
         {/* Wrapper for alignment */}
-        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start px-6 md:px-16 gap-y-10 sm:gap-y-0">
+        <div className="w-full flex flex-col sm:flex-row justify-between items-start px-6 md:px-16 gap-y-10 sm:gap-y-0">
             {/* Left Section */}
             <div className="flex flex-col items-start sm:w-auto">
                 <div className="mb-4.5 flex flex-col items-start">

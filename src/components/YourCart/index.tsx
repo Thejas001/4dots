@@ -18,8 +18,8 @@ import DesignPreviewModal from './DesignPreviewModal';
 
 // Define the EmptyCartState component within the same file or import it
 const EmptyCartState = () => (
-  <div className="w-full flex flex-col items-center justify-center py-12 lg:py-24">
-    <div className="relative w-64 h-64 mb-6">
+  <div className="flex-1 flex items-center justify-center w-full flex-col">
+    <div className="relative w-64 h-64">
       <Image
         src="/images/errorimages/empty-cart.png"
         alt="Empty Cart"
@@ -59,8 +59,8 @@ const Cart = () => {
           setShowModal(true);
         }
       } catch (error) {
-        console.error("Could not fetch user details", error);
-        setShowModal(true);
+      setShowModal(true); // optionally show modal on error
+
       }
     };
 
@@ -72,7 +72,21 @@ const Cart = () => {
     if (token) {
       processPendingCartItem(setCartData);
     }
-  }, []);
+  }, []);  
+useEffect(() => {
+  const loadCartItems = async () => {
+    try {
+      const data = await fetchCartItems();
+      setCartData(data);
+    } catch (error) {
+    } finally {
+      setIsLoading(false); // ✅ safely stop loader after fetching
+    }
+  };
+
+  loadCartItems();
+}, []);
+
 
   useEffect(() => {
     const loadCartItems = async () => {
@@ -90,7 +104,6 @@ const Cart = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Updated Cart Data in State:", cartData);
   }, [cartData]);
 
   const handleDelete = async (cartItemId: number) => {
@@ -130,18 +143,9 @@ const Cart = () => {
   const cartItemIds = cartData.Items.map(item => item.CartItemId);
 
   return (
-    <div className="h-auto min-h-screen bg-[#fff] flex flex-col">
-      {showModal && <PopupModal />}
-      {/* Design Preview Modal */}
-      {selectedDesigns.length > 0 && (
-        <DesignPreviewModal
-          isOpen={isDesignModalOpen}
-          onClose={() => setIsDesignModalOpen(false)}
-          designs={selectedDesigns}
-        />
-      )}
-      {/* Top Section */} 
-      <div className="flex items-center mt-4 gap-4 px-4 sm:gap-8 md:gap-[33.5px] sm:px-8 md:px-20">
+<div className="w-screen min-h-screen flex flex-col bg-[#fff]">
+{/* Top Section */} 
+      <div className="flex mt-4 lg:ml-20 gap-7">
         {/* Back Button */}
         <div className="border rounded-[4px] border-[#242424] p-1">
           <Link href="/">
@@ -154,17 +158,28 @@ const Cart = () => {
             </div>
           </Link>
         </div>
-  
         {/* Your Cart Text */}
         <span className="text-[#000] text-lg sm:text-xl md:text-[22px] font-normal leading-[26px]">
           Your Cart
         </span>
       </div>
-  
+
+      {showModal && <PopupModal />}
+      {/* Design Preview Modal */}
+      {selectedDesigns.length > 0 && (
+        <DesignPreviewModal
+          isOpen={isDesignModalOpen}
+          onClose={() => setIsDesignModalOpen(false)}
+          designs={selectedDesigns}
+        />
+      )}
+
       {/* Bottom Section */}
-      <div className="flex flex-col xl:flex-row w-full mt-6 xl:mt-9 px-2 sm:px-6 md:px-12 xl:px-36 gap-6">
+      <div className="flex flex-col xl:flex-row w-full mt-6 xl:mt-9 px-2 sm:px-6 md:px-12 xl:pl-36 gap-9">
         {isLoading ? (
+          <div className="w-full flex justify-center items-center">
           <Loader />
+        </div>
         ) : cartData.Items.length > 0 ? (
           <>
             <div className="flex flex-col w-full xl:w-1/2">
@@ -176,7 +191,7 @@ const Cart = () => {
                 return (
                   <div 
                     key={item.CartItemId}
-                    className="flex flex-col sm:flex-row rounded-[10px] border border-[#ECECEC] pr-2.5 mb-4 w-full"
+                    className="flex flex-col sm:flex-row rounded-[20px] border border-[#ECECEC] pr-2.5 mb-4 w-full"
                   >
                     {/* Mobile: Product name and cross at the top */}
                     <div className="flex flex-row items-center justify-between sm:hidden mb-2 px-2 pt-2">
@@ -260,12 +275,14 @@ const Cart = () => {
                     </div>
 
                     <div className="flex flex-col flex-1 min-w-0 overflow-hidden px-2 py-2">
-                      {/* Desktop: Product name and cross in row as before */}
-                      <div className="hidden sm:flex flex-row sm:items-center mt-2.5 xl:w-[448px] overflow-x-hidden">
-                        <span className="text-sm text-[#000] xl:text-lg font-normal leading-7 flex-grow truncate max-w-[60%]">
-                          {item.ProductName}
+                    {/* Desktop: Product name and cross in row as before */}
+                    <div className="hidden sm:flex flex-row items-center mt-2.5 w-full  relative">
+                    <span className="text-sm text-[#000] xl:text-lg font-normal leading-7 truncate">
+                    {item.ProductName}
                         </span>
-                        <div onClick={() => handleDelete(item.CartItemId)} className="flex-shrink-0 ml-8 rounded-[33px] p-1.5 bg-[#ECECEC] cursor-pointer">
+                        <div onClick={() => handleDelete(item.CartItemId)}
+                         className="flex-shrink-0 rounded-[33px] p-0.5 bg-[#ECECEC] cursor-pointer ml-auto lg:mr-1"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="12"

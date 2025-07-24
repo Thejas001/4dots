@@ -16,11 +16,19 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     name: "document",  // Important: match backend's expected form field name
     action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
-    accept: ".pdf",
+    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
     headers: {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
+      const allowedExtensions = [
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
+        return false;
+      }
       const fileURL = URL.createObjectURL(file);
       setSelectedFile(fileURL);
   
@@ -105,6 +113,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
         )}
+      </div>
+      <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+        Supported file formats: JPG, JPEG, PNG, GIF, HEIC, SVG, WEBP, PDF, PSD, AI, EPS.
       </div>
     </div>
   );

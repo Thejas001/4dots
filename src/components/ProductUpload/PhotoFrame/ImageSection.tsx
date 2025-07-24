@@ -61,7 +61,9 @@ const ImageSection = ({
         {uploadedImages.length > 0 ? (
           uploadedImages.slice(startIndex, startIndex + maxVisible).map((file, index) => (
             <div key={file.uid || file.name || index} className="relative">
-              {file.url ? (
+              {file.url && file.name && file.name.toLowerCase().endsWith('.pdf') ? (
+                <img src="/images/product/pdf.png" alt="PDF" className="w-24 h-24 object-cover rounded-md" />
+              ) : file.url ? (
                 <img src={file.url} alt={file.name} className="w-24 h-24 object-cover rounded-md" />
               ) : (
                 <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded-md">

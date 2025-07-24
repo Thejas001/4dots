@@ -106,6 +106,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
         )}
       </div>
+      <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+      Supported file formats: JPG, JPEG, PNG, PDF, PSD.
+    </div>
     </div>
   );
 };

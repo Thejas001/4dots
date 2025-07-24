@@ -133,7 +133,8 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
           />
           <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-          {getProductDetails(5)?.name || "Loading..."}
+          {getProductDetails(5) ? "Bulk Flyers" : "Loading..."}
+
           </div>
             <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
                 <span className="flex items-center">

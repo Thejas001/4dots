@@ -30,7 +30,8 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
       selectedBindingType, 
       selectedAddonRule, 
       addonBookCount,
-      uploadedDocumentId
+      uploadedDocumentId,
+      noOfCopies
     } = parsedItem;
 
     // Ensure numeric values
@@ -116,9 +117,11 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
           dataId,
           selectedPricingRule,
           pageCount,
+          noOfCopies,
           selectedBindingType,
           selectedAddonRule,
-          addonBookCount
+          addonBookCount,
+          uploadedDocumentId
         );
         break;
       default:
