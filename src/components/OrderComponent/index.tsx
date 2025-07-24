@@ -88,7 +88,6 @@ const OrderComponent = () => {
       );
       setOrders(sortedOrders);
     } catch (error) {
-      console.error("Failed to fetch orders:", error);
     } finally {
       setLoadingOrders(false);
     }
@@ -104,7 +103,6 @@ const OrderComponent = () => {
         const data = await getUserAddress();
         setAddress(data); // ✅ Adjust if your API returns nested structure
       } catch (err) {
-        console.error("Failed to fetch address", err);
       } finally {
         setLoadingAddresses(false);
       }
@@ -141,7 +139,7 @@ const OrderComponent = () => {
       await fetchOrders();
     });
   } catch (error) {
-    console.error("Retry failed:", error);
+
     // Show toast or error UI if needed
   }
 };
@@ -152,7 +150,6 @@ const handleCancelOrder = async (orderId: number) => {
     toast.success("Order Canceled!");
     setCancelledOrders((prev) => [...prev, orderId]);
   } catch (error) {
-    alert(`Failed to cancel order: ${error}`);
   }
 };
 ;
