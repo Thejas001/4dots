@@ -139,12 +139,12 @@ const AddOnService = ({
             <div className="flex-1 min-w-0">
               <label className="block text-black font-medium mb-2">Select Binding Type</label>
               {!isSelectionComplete ? (
-                <div className="text-gray-500 font-medium">Please select paper size, color, and enter page count.</div>
+                <div className="text-gray-500 font-medium">Please select paper size, color, and upload your file.</div>
               ) : allowedBindingTypes.length > 0 ? (
                 <div className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer w-full"
                      onClick={() => setIsOpenBinding(!isOpenBinding)}>
                   <div className="text-sm font-normal text-gray-700">
-                    {bindingType || "Dropdown"}
+                    {bindingType || "Select Binding Type"}
                   </div>
                   <span className="absolute right-5 top-1/2 -translate-y-1/2 transform text-gray-400">
                     ▼
