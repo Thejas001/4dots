@@ -1,116 +1,166 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import ProfileModal from "@/components/ProfileModal";
+import Address from "@/components/OrderPayment/Address";
+import UserProfileOrder from "./UserProfileOrder";
+import { getUserDetails } from "@/utils/api";
 
-interface CustomerDetails {
-  name: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  profileImage: string;
+interface UserDetails {
+  Name: string;
+  PhoneNumber: string;
 }
 
-const CustomerProfilePage = () => {
-  const [data, setData] = useState<CustomerDetails | null>(null);
+const ProfileComponent = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const router = useRouter();
+
+  const refreshUser = async (currentName?: string) => {
+    try {
+      const data = await getUserDetails();
+      if (data.Name !== currentName) {
+        setUserName(data.Name || "");
+        setUserDetails(data);
+      }
+    } catch (err) {
+      console.error("Failed to refresh user:", err);
+    }
+  };
+
+  const handleProfileUpdated = () => {
+    refreshUser();
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      try {
-        const response = await axios.get(
-          "https://printdot.in/api/Account/customer-details",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setData(response.data.data);
-      } catch (error) {
-        console.error("Error fetching customer details:", error);
-      }
-    };
-
-    fetchData();
+    refreshUser();
   }, []);
 
+  const handleLogout = () => {
+    document.cookie = "jwtToken=; path=/; max-age=0; SameSite=Lax; Secure";
+    localStorage.removeItem("jwtToken");
+    router.push("/");
+  };
+
+  function getInitials(name: string) {
+    if (!name) return "";
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="md:flex">
-          {/* Left Section */}
-          <div className="w-full md:w-1/3 bg-blue-600 text-white p-6 flex flex-col items-center justify-center">
-            {/* Mobile View - Pic and Name side by side */}
-            <div className="md:hidden flex items-center gap-3 justify-center">
-              <Image
-                src={data?.profileImage || "/default-profile.png"}
-                width={60}
-                height={60}
-                alt="Profile"
-                className="rounded-full object-cover"
+    <div className="bg-[#fff] h-full grid grid-rows-[auto,1fr]">
+      {/* Top Section */}
+      <div className="flex flex-wrap items-center gap-4 sm:gap-8 px-4 sm:px-10 md:px-20 py-4">
+        {/* Back Button */}
+        <div className="border rounded-[4px] border-[#242424] p-1">
+          <Link href="/">
+            <img
+              src="/images/icon/Arrow-icon.svg"
+              alt="Back"
+              className="w-4 h-4"
+            />
+          </Link>
+        </div>
+        {/* Profile Heading */}
+        <span className="text-[#000] text-lg sm:text-xl md:text-2xl font-normal">
+          Your Profile
+        </span>
+        {/* Logout Button */}
+        <div className="ml-auto">
+          <div
+            onClick={handleLogout}
+            className="flex items-center gap-2 rounded-[28px] border border-[#B5B5B5] bg-[#ECECEC] px-3 py-1.5 cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M13.496 21H6.5C5.395 21 4.5 19.849 4.5 18.429V5.57C4.5 4.151 5.395 3 6.5 3H13.5M16 15.5L19.5 12L16 8.5M9.5 11.996H19.5"
+                stroke="black"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
-              <p className="text-lg font-semibold">{data?.name}</p>
+            </svg>
+            <span className="text-base font-normal text-black">Logout</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 px-4 sm:px-10 md:px-20 pb-10">
+        {/* Left Column */}
+        <div className="flex flex-col gap-6">
+          {/* Profile Card */}
+          <div className="flex flex-row gap-4 items-start rounded-[10px] border border-[#ECECEC] p-5 w-full">
+            {/* Profile Icon */}
+            <div className="w-[200px] h-[100px] flex items-center justify-center rounded-[10px] bg-[#ECECEC] text-gray-700 font-medium text-lg">
+              {getInitials(userDetails?.Name || "UserName")}
             </div>
 
-            {/* Desktop View - Pic then Name */}
-            <div className="hidden md:flex flex-col items-center">
-              <Image
-                src={data?.profileImage || "/default-profile.png"}
-                width={80}
-                height={80}
-                alt="Profile"
-                className="rounded-full object-cover mb-3"
-              />
-              <p className="text-xl font-bold">{data?.name}</p>
+            {/* User Details */}
+            <div className="flex flex-col gap-1 xl:gap-3 flex-grow sm:ml-4 w-full">
+              <div className="text-[#000] text-xl font-normal">
+                {userDetails?.Name || "UserName"}
+              </div>
+              <div>
+                <span className="text-[15px] font-normal text-[#000]">
+                  Mobile Number :
+                </span>
+                <span className="pl-2.5 text-[#06f] text-base underline">
+                  {userDetails?.PhoneNumber || ""}
+                </span>
+              </div>
             </div>
 
-            <p className="mt-1 text-sm opacity-80">{data?.email}</p>
-            <p className="text-sm opacity-80">{data?.phoneNumber}</p>
+            {/* Edit Button */}
+            <div className="mt-4 sm:mt-0 sm:ml-auto">
+              <button
+                onClick={() => setIsOpen(true)}
+                className="flex items-center gap-2 rounded-lg border border-[#B5B5B5] bg-[#F7F7F7] px-3 py-1.5 text-sm sm:px-5 sm:py-2.5 sm:text-sm text-xs"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="21"
+                  height="20"
+                  viewBox="0 0 21 20"
+                  fill="none"
+                >
+                  <path
+                    d="M14.4748 1.89692C15.6147 0.757016 17.4628 0.757016 18.6028 1.89692C19.7427 3.03683 19.7427 4.88498 18.6028 6.02488L13.0627 11.565C12.7533 11.8744 12.5595 12.0683 12.3432 12.237C12.0884 12.4356 11.8128 12.606 11.5211 12.745C11.2735 12.863 11.0135 12.9497 10.5983 13.088L8.1779 13.8948C7.73103 14.0438 7.23835 13.9275 6.90528 13.5944C6.5722 13.2613 6.45589 12.7686 6.60485 12.3218L7.41166 9.90135C7.55001 9.48621 7.63667 9.22615 7.75468 8.97853C7.89367 8.68689 8.06402 8.41125 8.26272 8.15651C8.43142 7.94022 8.62527 7.7464 8.93472 7.43699L14.4748 1.89692Z"
+                    fill="#242424"
+                  />
+                </svg>
+                Edit Details
+              </button>
+              <ProfileModal
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                onProfileUpdated={handleProfileUpdated}
+              />
+            </div>
           </div>
 
-          {/* Right Section */}
-          <div className="w-full md:w-2/3 p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Account Information
-            </h2>
+          {/* User Orders */}
+          <UserProfileOrder />
+        </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Name
-                </label>
-                <p className="text-gray-800">{data?.name}</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Email
-                </label>
-                <p className="text-gray-800">{data?.email}</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Phone Number
-                </label>
-                <p className="text-gray-800">{data?.phoneNumber}</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Address
-                </label>
-                <p className="text-gray-800">{data?.address}</p>
-              </div>
-            </div>
-          </div>
+        {/* Right Column - Address Section */}
+        <div className="border border-[#ECECEC] rounded-[10px] p-4 w-full min-h-[300px]">
+          <Address hideLabel buttonAlignment="left" buttonStyle="black" />
         </div>
       </div>
     </div>
   );
 };
 
-export default CustomerProfilePage;
+export default ProfileComponent;
