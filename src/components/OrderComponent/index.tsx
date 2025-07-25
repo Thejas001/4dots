@@ -35,6 +35,7 @@ interface Order {
   OrderId: number;
   TotalAmount: number;
   OrderStatus: string;
+  DeliveryType: string;
   CreatedAt: string;
   Payment: {
     PaymentMethod: string;
@@ -220,8 +221,7 @@ const handleCancelOrder = async (orderId: number) => {
                 {/* Centered Heading */}
                 <div className="w-[125%] xl:w-[1243px] text-center ">
                   {/* Progress Bar */}
-                  
-                  <div className="mr-5 flex items-center ">
+                  <div className=" flex items-center ">
                     {/* Order Placed */}
                     <div className=" ml-2 xl:ml-7 mr-1.5 flex flex-col items-center">
                       <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "COD" || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
@@ -242,14 +242,14 @@ const handleCancelOrder = async (orderId: number) => {
                             strokeWidth="0.5"
                           />
                         </svg>
-                        <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD" ||order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD"  || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           Order Placed
                         </div>
                       </div>
                     </div>
 
                     {/* Divider */}
-                    <div className={`w-[190px]  md:w-[190px] lg:w-[200px] border ${order.OrderStatus === "PaymentSuccessful" ||order.OrderStatus === "COD" ||  order.OrderStatus === "Shipped"  || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
+                    <div className={`w-[190px]  md:w-[190px] lg:w-[200px] border ${order.OrderStatus === "Shipped"  || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
 
                     {/* Printing Started */}
                     <div className=" ml-3 xl:ml-1.5 mr-1.5 flex flex-col items-center">
@@ -320,15 +320,15 @@ const handleCancelOrder = async (orderId: number) => {
                           />
                         </svg>
                         <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
-                          Order Shipped
+                          {order.DeliveryType === "Pickup" ? "Order Ready to Pick" : "Order Shipped"}
                         </div>
                       </div>
                     </div>
 
-                    {/* Divider */}
+                    {/* Divider 
                     <div className={`w-[181px] border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Delivered"  ? "border-[#242424]" : "border-gray-300"}`}></div>
-
-                    {/* Out For Delivery */}
+                    */}
+                    {/* Out For Delivery 
                     <div className=" ml-1.5 flex flex-col items-center">
                       <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
                         <svg
@@ -355,10 +355,10 @@ const handleCancelOrder = async (orderId: number) => {
                           Out For Delivery
                         </div>
                       </div>
-                    </div>
+                    </div>*/}
+
                     {/**divider*/}
-                    <div className="ml-20 w-[1px] bg-gray-300"></div>
-                </div>
+                 </div>
                 </div>
 
 
@@ -429,7 +429,7 @@ const handleCancelOrder = async (orderId: number) => {
                             order.OrderStatus === "CancelledByUser"
                               ? "Order Canceled"
                               : order.OrderStatus === "InProgress"
-                              ? "Processing"
+                              ? "Cancel Order"
                               : "Cancel Order"}
                           </button>
 

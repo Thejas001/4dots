@@ -98,7 +98,12 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
         await addToCartOffSetPrinting(dataId, selectedPricingRule, 2);
         break;
       case "polaroidCard":
-        await addToCartPolaroidCard(dataId, selectedPricingRule, selectedQuantity);
+        await addToCartPolaroidCard(
+          dataId,
+          selectedPricingRule,
+          selectedQuantity,
+          parsedItem.uploadedDocumentIds // Pass the uploaded document IDs
+        );
         break;
       case "nameslip":
         await addToCartNameSlip(dataId, selectedPricingRule, selectedQuantity);

@@ -23,7 +23,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     },
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+        ".jpg", ".jpeg", ".png", ".pdf", ".psd", ".eps"
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {
@@ -117,7 +117,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         )}
       </div>
       <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-        Supported file formats: JPG, JPEG, PNG, GIF, HEIC, SVG, WEBP, PDF, PSD, AI, EPS.
+        Supported file formats: JPG, JPEG, PNG, PDF, PSD.
       </div>
     </div>
   );

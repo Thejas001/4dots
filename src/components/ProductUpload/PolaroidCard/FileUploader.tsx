@@ -57,7 +57,7 @@ const FileUploader = ({
     name: "document",
     multiple: true,
     accept:
-      ".jpg,.jpeg,.jfif,.bmp,.png,.pdf,.psd",
+      ".jpg,.jpeg,.png,.pdf,.psd",
     showUploadList: false,
     beforeUpload: (file, newFileList) => {
       // Remove quantity check, set quantity based on selected files

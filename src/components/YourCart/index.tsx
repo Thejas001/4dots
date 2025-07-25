@@ -346,7 +346,7 @@ useEffect(() => {
             <div className="w-full xl:w-1/2 xl:ml-6 xl:mr-20">
               <DeliveryOption selectedOption={deliveryOption} setSelectedOption={setDeliveryOption} />
               {deliveryOption === "Delivery" && <AddressOption />}
-              <PaymentMethod selectedPaymentOption={paymentOption} setSelectedPaymentOption={setPaymentOption} />
+              <PaymentMethod selectedPaymentOption={paymentOption} setSelectedPaymentOption={setPaymentOption} totalPrice={cartData.TotalPrice} />
               <PaymentCal totalPrice={cartData.TotalPrice} userId={userId} cartItemIds={cartItemIds} deliveryOption={deliveryOption} paymentOption={paymentOption}/>
             </div>
           </>

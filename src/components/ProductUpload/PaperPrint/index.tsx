@@ -198,6 +198,14 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   //add to cart
 
+  const getApiPageCount = () => {
+    // Use the same logic as PriceCalculator
+    if (selectedSize && selectedSize.toUpperCase().includes("DOUBLE SIDE")) {
+      return Math.ceil(pageCount / 2);
+    }
+    return pageCount;
+  };
+
   const handleAddToCart = async () => {
     const missing = [];
     if (!selectedPricingRule) missing.push("pricing rule");
@@ -208,12 +216,14 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       return;
     }
 
+    const apiPageCount = getApiPageCount();
+
     if (!isLoggedIn()) {
       const pendingItem = {
         dataId, // <-- add this line
         productType: "paperprinting",
         selectedPricingRule,
-        pageCount, // ✅ Store page count
+        pageCount: apiPageCount, // Use calculated page count
         selectedBindingType, // ✅ Store binding type
         selectedAddonRule, // ✅ Store addon rule
         addonBookCount:
@@ -233,7 +243,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedBindingType,
       selectedSize,
       selectedColor: selectedOption,
-      pageCount,
+      pageCount: apiPageCount,
       addonBookCount,
     };
 
@@ -241,7 +251,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       await addToCartPaperPrint(
         dataId,
         selectedPricingRule!,
-        pageCount,
+        apiPageCount, // Use calculated page count
         noOfCopies,
         selectedBindingType,
         selectedAddonRule,
@@ -265,12 +275,14 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       return;
     }
 
+    const apiPageCount = getApiPageCount();
+
     if (!isLoggedIn()) {
       const pendingItem = {
         dataId, // <-- add this line
         productType: "paperprinting",
         selectedPricingRule,
-        pageCount, // ✅ Store page count
+        pageCount: apiPageCount, // Use calculated page count
         selectedBindingType, // ✅ Store binding type
         selectedAddonRule, // ✅ Store addon rule
         noOfCopies,
@@ -291,7 +303,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedBindingType,
       selectedSize,
       selectedColor: selectedOption,
-      pageCount,
+      pageCount: apiPageCount,
       addonBookCount,
     };
 
@@ -299,7 +311,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       await addToCartPaperPrint(
         dataId,
         selectedPricingRule!,
-        pageCount,
+        apiPageCount, // Use calculated page count
         noOfCopies,
         selectedBindingType,
         selectedAddonRule,
