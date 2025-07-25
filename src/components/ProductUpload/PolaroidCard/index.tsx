@@ -8,8 +8,11 @@ import { findPolaroidCardPricingRule } from "@/utils/priceFinder";
 import { addToCartPolaroidCard } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
+import ImageSection from "./imageSection";
+import type { UploadFile } from "antd/es/upload";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import CartButton from "./CartButton";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -50,7 +53,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
   const productDetails = product;//stores state from dropdown and passed to princingfrle finder
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedQuantity, setSelectedQuantity] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
@@ -60,6 +62,32 @@ const ProductUpload = ({ product }: { product: any }) => {
   const router = useRouter();
   const [selectedPricingRule, setSelectedPricingRule] = useState<PolaroidCardPricingRule | null>(null);
   const incrementCart = useCartStore((state) => state.incrementCart);
+  const [uploadedImages, setUploadedImages] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+
+  // Update selectedQuantity when fileList changes
+  useEffect(() => {
+    setSelectedQuantity(fileList.length > 0 ? fileList.length : 1);
+  }, [fileList]);
+
+  // Image navigation handlers
+  const handleNext = () => {
+    if (fileList.length > 1) {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % fileList.length);
+    }
+  };
+  const handlePrevious = () => {
+    if (fileList.length > 1) {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === 0 ? fileList.length - 1 : prevIndex - 1
+      );
+    }
+  };
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [fileList]);
 
   // Check if user is logged in
   const isLoggedIn = () => {
@@ -82,7 +110,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   useEffect(() => {
     // Check if all necessary data is available before proceeding
-    if (!productDetails || !selectedSize || !selectedQuantity) return;
+    if (!productDetails || !selectedSize) return;
 
     // Reset error message
     setErrorMessage(null);
@@ -96,14 +124,14 @@ const ProductUpload = ({ product }: { product: any }) => {
     const pricingRule = findPolaroidCardPricingRule(
       productDetails.PolaroidCardPricingRules,
       selectedSize,
-      Number(selectedQuantity),
+      selectedQuantity
     );
     setSelectedPricingRule(pricingRule);
     console.log("Matched PolaroidCard Pricing Rule:", pricingRule);
 
     // Set selected price based on the matched pricing rule
     setSelectedPrice(pricingRule ? pricingRule.Price : null);
-  }, [selectedSize, selectedQuantity, productDetails]);
+  }, [selectedSize, productDetails, fileList.length]);
 
   // Process stored cart item after login
   const processPendingCartItem = async () => {
@@ -114,7 +142,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       dataId: pendingDataId,
       selectedPricingRule: pendingPricingRule,
       selectedQuantity: pendingQuantity,
-      uploadedDocumentId: pendingDocumentId,
+      uploadedDocumentIds: pendingDocumentIds,
     } = JSON.parse(pendingCartItem);
 
     try {
@@ -122,7 +150,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         pendingDataId,
         pendingPricingRule,
         pendingQuantity as number,
-        pendingDocumentId,
+        pendingDocumentIds,
       );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
@@ -131,88 +159,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   };
 
-  const isProceedToCartDisabled = !productDetails || !selectedPricingRule || !selectedSize || !selectedQuantity || !uploadedDocumentId;
-
-  //add to cart function
-  const handleAddToCart = async () => {
-    const missing = [];
-    if (!selectedSize) missing.push("size");
-    if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      return;
-    }
-    if (!isLoggedIn()) {
-      const pendingItem = {
-        productType: "polaroidCard",
-        dataId,
-        selectedPricingRule,
-        selectedQuantity,
-        uploadedDocumentId,
-      };
-      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      toast.success("Product added to cart!");
-      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
-      return;
-    }
-
-    try {
-      await addToCartPolaroidCard(
-        dataId,
-        selectedPricingRule!,
-        Number(selectedQuantity),
-        uploadedDocumentId ?? undefined 
-      );
-      sessionStorage.removeItem("pendingCartItem");
-      incrementCart();
-      toast.success("Product added to cart!");
-      router.push("/");
-    } catch (error) {
-      alert("Failed to add to cart. Please try again.");
-    }
-  };
-
-// Utility to check if all required options are selected
-
-const handleProceedToCart = async () => {
-  const missing = [];
-  if (!selectedSize) missing.push("size");
-  if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
-  if (!uploadedDocumentId) missing.push("document upload");
-  if (missing.length > 0) {
-    showErrorToast("Please select: " + missing.join(", "));
-    return;
-  }
-
-  if (!isLoggedIn()) {
-    const pendingItem = {
-      productType: "polaroidCard",
-      dataId,
-      selectedPricingRule,
-      selectedQuantity,
-      uploadedDocumentId,
-    };
-    sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-    router.push(`/auth/signin?redirect=/Cart`);
-    return;
-  }
-
-  try {
-    await addToCartPolaroidCard(
-      dataId,
-      selectedPricingRule!,
-      Number(selectedQuantity),
-      uploadedDocumentId ?? undefined
-    );
-    sessionStorage.removeItem("pendingCartItem");
-    toast.success("Product added to cart!");
-    router.push("/Cart");
-  } catch (error) {
-    setErrorMessage("Failed to add to cart. Please try again.");
-  }
-};
-
   // Process pending cart item when user logs in
   useEffect(() => {
     if (isLoggedIn()) {
@@ -220,22 +166,43 @@ const handleProceedToCart = async () => {
     }
   }, []);
 
+  // Add a wrapper to allow number|null from file/image components
+  const handleSetSelectedQuantity = (quantity: number | null) => {
+    // This function is no longer needed as quantity is handled by fileList.length
+  };
+
   return (
     <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
-        <FileUploader onUploadSuccess={handleUploadSuccess} />
+        <div className="flex flex-col items-center">
+
+          <FileUploader
+            quantity={selectedQuantity}
+            uploadedImages={fileList}
+            setUploadedImages={setFileList}
+            setQuantity={setSelectedQuantity}
+            currentImageIndex={currentImageIndex}
+            handleNext={handleNext}
+            handlePrevious={handlePrevious}
+          />
+        </div>
         {/* Right Section */}
         <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
           {productDetails && (
             <DropDown
               productDetails={productDetails}
               onSizeChange={setSelectedSize}
-              onQuantityChange={setSelectedQuantity}
               onPriceCalculation={handlePriceCalculation}
+              quantity={selectedQuantity}
             />
           )}
+                    <ImageSection
+            uploadedImages={fileList}
+            setUploadedImages={setFileList}
+            setSelectedQuantity={(q) => setSelectedQuantity(q ?? 1)}
+          />
 
           {/**error message*/}
           <div className="flex w-full flex-col items-center justify-center ">
@@ -243,41 +210,13 @@ const handleProceedToCart = async () => {
             {errorMessage && <div className="text-red-500">{errorMessage}</div>}
           </div>
 
-{/** Cart & Payment Button */}
-<div className="mt-10 w-full max-w-[800px] mx-auto flex flex-col md:flex-row justify-center gap-3 md:gap-6 px-4">
-  {/* First Button */}
-  <button
-    onClick={handleAddToCart}
-    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isProceedToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-  >
-    <span className="pr-1">🛒</span>
-    <span className="text-lg font-medium">Add to Cart</span>
-  </button>
-
-  {/* Second Button */}
-  <button
-    onClick={handleProceedToCart}
-    className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isProceedToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-  >
-    <span className="pr-1">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="21"
-        viewBox="0 0 20 21"
-        fill="#242424"
-      >
-        <path
-          d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-          fill="black"
-        />
-      </svg>
-    </span>
-    <span className="font-bold">{calculatedPrice}</span>
-    <span className="pl-4 font-medium">Proceed To Cart</span>
-  </button>
-</div>
-
+<CartButton
+  selectedPricingRule={selectedPricingRule}
+  dataId={dataId}
+  uploadedImages={fileList}
+  selectedSize={selectedSize}
+  calculatedPrice={price ?? 0}
+/>
 
 
         </div>

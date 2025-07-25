@@ -84,7 +84,7 @@ export const addToCartPolaroidCard = async (
     Price: number;
   },
   selectedQuantity: number, //"NumberOfCards" as a dynamic attribute
-  documentId?: number 
+  documentIds?: number[]
 ) => {
   const cartItem: CartItems = {
     ProductID: productId, //Matches expected key format
@@ -105,8 +105,7 @@ export const addToCartPolaroidCard = async (
         AttributeValue: selectedQuantity.toString(), // Convert to string as per API format
       },
     ],
-    CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
-
+    CartItemDocumentIds: documentIds ?? [],
   };
 
   console.log("Polaroid Card Cart Data:", JSON.stringify(cartItem, null, 2));

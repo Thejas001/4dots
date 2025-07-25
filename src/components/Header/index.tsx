@@ -128,26 +128,47 @@ const Header = () => {
 
       {isOpen && (
         <div id="mobile-menu" className="sm:hidden absolute top-[60px] right-0 w-full shadow-lg py-4 z-50 bg-white">
-          <Link href="/Cart">
-          <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
+          <button
+            className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]"
+            onClick={() => {
+              const token = localStorage.getItem("jwtToken");
+              if (token) {
+                window.location.href = "/Cart";
+              } else {
+                window.location.href = "/auth/signin?redirect=/Cart";
+              }
+            }}
+          >
             Your Cart
           </button>
-          </Link>
-          
-          <Link href="/Order">
-          <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
+          <button
+            className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]"
+            onClick={() => {
+              const token = localStorage.getItem("jwtToken");
+              if (token) {
+                window.location.href = "/Order";
+              } else {
+                window.location.href = "/auth/signin?redirect=/Order";
+              }
+            }}
+          >
             Your Order
           </button>
-          </Link>
-          
-          <Link href="/auth/signin">
-          <button className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]">
-              <span>Login</span>
+          <button
+            className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]"
+            onClick={() => {
+              const token = localStorage.getItem("jwtToken");
+              if (token) {
+                window.location.href = "/profile";
+              } else {
+                window.location.href = "/auth/signin";
+              }
+            }}
+          >
+            {typeof window !== 'undefined' && localStorage.getItem("jwtToken") ? "Profile" : "Login"}
           </button>
-          </Link>
-
         </div>
-  )}
+      )}
 </header>
 
   );

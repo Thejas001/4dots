@@ -36,7 +36,6 @@ export const getUserDetails = async () => {
     const response = await API.get("/account/profile");
     return response.data; // Assuming the API returns user details directly
   } catch (error: any) {
-    console.error("Error fetching user details:", error);
     throw error.response?.data?.message || "Failed to fetch user details";
   }
 };
@@ -81,8 +80,8 @@ export const updateUserDetails = async (userDetails: any) => {
 }
 export const updateOrderStatus = async (orderId: number, status: number) => {
   try {
-    const response = await API.put(`/order/${orderId}/status`, {
-      OrderStatus: status,
+      const response = await API.put(`/order/${orderId}/status`, {
+      OrderStatus: 6,
     });
     return response.data; // Adjust as per your API's response structure
   } catch (error: any) {
