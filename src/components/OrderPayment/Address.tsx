@@ -1,7 +1,7 @@
 'use client'
-import React, { useState , useEffect } from "react";
+import React, { useState } from "react";
 import AddressModal from "../OrderPayment/AddressModal";
-import { getUserAddress } from "@/utils/api"; // Adjust the import path as necessary
+import { getUserAddress } from "@/utils/api";
 
 interface AddressProps {
   hideLabel?: boolean;
@@ -21,8 +21,15 @@ interface AddressType {
   IsPrimary: boolean;
 }
 
-
-const Address: React.FC<AddressProps> = ({ hideLabel, buttonStyle = "default", buttonAlignment = "right", address, loading, error, refreshAddresses }) => {
+const Address: React.FC<AddressProps> = ({
+  hideLabel,
+  buttonStyle = "default",
+  buttonAlignment = "right",
+  address,
+  loading,
+  error,
+  refreshAddresses
+}) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -43,7 +50,7 @@ const Address: React.FC<AddressProps> = ({ hideLabel, buttonStyle = "default", b
               "Loading address..."
             ) : error ? (
               <span className="text-red-500">{error}</span>
-            ) : address.length > 0 ? (
+            ) : Array.isArray(address) && address.length > 0 ? (
               <div className="space-y-4">
                 {address.map((addr) => (
                   <div
@@ -77,6 +84,7 @@ const Address: React.FC<AddressProps> = ({ hideLabel, buttonStyle = "default", b
           </span>
         </div>
       </div>
+
       {/* Address Button */}
       <div
         className={`mb-4 mr-[21px] mt-7.5 flex items-center ${
@@ -94,8 +102,13 @@ const Address: React.FC<AddressProps> = ({ hideLabel, buttonStyle = "default", b
           Add New Address
         </button>
       </div>
+
       {/* Address Modal */}
-      <AddressModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddressAdded={refreshAddresses} />
+      <AddressModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddressAdded={refreshAddresses}
+      />
     </div>
   );
 };
