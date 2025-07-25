@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
 import { findPricingRule, findAddonPrice } from "@/utils/priceFinder";
-import { PaperPrintingPricingRule, PaperPrintAddonRule , Addon } from "@/app/models/products";
+import { PaperPrintingPricingRule, Addon } from "@/app/models/products";
 
 interface PriceCalculatorProps {
   pricingRules: PaperPrintingPricingRule[];
   addons: Addon[];
   selectedSize: string;
-  selectedColor: "B/W" | "Color" | null
+  selectedColor: "B/W" | "Color" | null;
   pageCount: number;
   noOfCopies: number;
   selectedBindingType?: string;
   customCopies?: number;
   copySelection: string;
   onPriceUpdate: (price: number | null) => void;
-} 
+}
 
 // Identify double-sided paper sizes based on naming pattern
-const isDoubleSided = (paperSize: string): boolean => 
+const isDoubleSided = (paperSize: string): boolean =>
   paperSize.toUpperCase().includes("DOUBLE SIDE");
 
 // Function to parse addon price (e.g., "60/book" → 60)
@@ -38,79 +38,76 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
   onPriceUpdate,
 }) => {
   useEffect(() => {
-    // Input validation
-    if (!pricingRules?.length || 
-        !selectedSize || 
-        !selectedColor || 
-        pageCount <= 0 || 
-        noOfCopies <= 0) {
+    // ✅ Input validation
+    if (
+      !pricingRules?.length ||
+      !selectedSize ||
+      !selectedColor ||
+      pageCount <= 0 ||
+      noOfCopies <= 0
+    ) {
       onPriceUpdate(null);
       return;
     }
 
     const mappedColor = selectedColor === "B/W" ? "BlackAndWhite" : "Color";
+    const doubleSided = isDoubleSided(selectedSize);
 
-    // Find the pricing rule
-    const result = findPricingRule(pricingRules, selectedSize, mappedColor, pageCount);
+    // ✅ Calculate total sheets across all copies
+    const totalSheets = doubleSided
+      ? Math.ceil(pageCount / 2) * noOfCopies
+      : pageCount * noOfCopies;
+
+    // ✅ Use total sheets to find correct pricing slab
+    const result = findPricingRule(
+      pricingRules,
+      selectedSize,
+      mappedColor,
+      totalSheets
+    );
 
     if (!result) {
-      console.warn("No matching pricing rule found.");
+      console.warn("No matching pricing rule found for total sheets:", totalSheets);
       onPriceUpdate(null);
       return;
     }
 
-    // Calculate base price with double-sided adjustment
-    const doubleSided = isDoubleSided(selectedSize);
-    const sheets = doubleSided ? Math.ceil(pageCount / 2) : pageCount;
-    const basePrice = result.PricePerPage * sheets * noOfCopies;
+    // ✅ Calculate base price
+    const basePrice = result.PricePerPage * totalSheets;
 
-
-    console.log("Addonsssss:", addons);
-    console.log("Selected Binding Type:", selectedBindingType);
-
-    // Calculate addon price
+    // ✅ Calculate addon price if applicable
     let addonPrice = 0;
     if (selectedBindingType) {
-      const addonRule = findAddonPrice( // ✅ Get the full object
+      const addonRule = findAddonPrice(
         addons,
         selectedBindingType,
         selectedSize,
         mappedColor,
         pageCount
       );
-    
-      console.log("Addon Rule:", addonRule);
-    
+
       if (addonRule) {
-        const pricePerAddon = parseFloat(addonRule.Price.split("/")[0]); // ✅ Extract the numeric price
-    
+        const pricePerAddon = parseAddonPrice(addonRule.Price);
+
         if (!isNaN(pricePerAddon)) {
           let addonBookCount = 0;
-    
+
           if (copySelection === "all") {
-            // Apply addon to all copies
             addonBookCount = noOfCopies;
           } else if (!copySelection || copySelection === "") {
-            // Ensure customCopies is a valid number, default to 0 if undefined
             const validCustomCopies = customCopies && customCopies > 0 ? customCopies : 0;
             addonBookCount = validCustomCopies <= noOfCopies ? validCustomCopies : 0;
           }
-    
-          addonPrice = pricePerAddon * addonBookCount; // ✅ Update the outer addonPrice
-        } else {
-          console.warn("Invalid addon price.");
+
+          addonPrice = pricePerAddon * addonBookCount;
         }
       }
     }
-    
-    // Calculate total price
+
+    // ✅ Calculate total price and update parent
     const totalPrice = basePrice + addonPrice;
-    
-    console.log(
-      `Double-Sided: ${doubleSided}, Sheets: ${sheets}, Base Price: ${basePrice}, Addon Price: ${addonPrice}, Total Price: ${totalPrice}`
-    );
-    
     onPriceUpdate(totalPrice);
+
   }, [
     pricingRules,
     addons,
