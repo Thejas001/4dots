@@ -49,7 +49,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
       <div data-id="2" className="relative col-span-7 h-[186px] overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-5">
         <Link href={`/ProductDetails/photo-frame?dataId=2`} passHref prefetch={true}> 
           <img
-            src="/images/product/photo-frame.svg"
+            src="/images/product/photoframe.jpg"
             alt="Photo Frames"
             loading="eager"
             className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -77,7 +77,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <div className=" relative col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
           <Link href={`/ProductDetails/paper-print?dataId=1`} passHref>
             <img
-              src="/images/product/photo-frame.svg"
+              src="/images/product/bussinesscard.jpg"
               alt=""
               loading="eager"
               className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -101,7 +101,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <div data-id="3" className=" relative  col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
           <Link href={`/ProductDetails/business-card?dataId=3`}>
             <img
-              src="images/product/businesscard.svg"
+              src="images/product/bussinesscard.jpg"
               loading="eager"
               alt=""
               className="aspect-[3/2] h-full w-full  object-cover transition-transform duration-700 hover:scale-110"
@@ -127,7 +127,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
       <div data-id="5" className="relative col-span-4 h-[163.729px] overflow-hidden rounded-[6.017px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-4">
         <Link href={`/ProductDetails/offset-printing?dataId=5`}>
           <img
-            src="/images/product/first3.png"
+            src="/images/product/flyer.jpg"
             loading="eager"
             alt="Photo Frames"
             className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -154,7 +154,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <div className="relative col-span-12 h-[78.525px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-8">
           <Link href={`/ProductDetails/letter-head?dataId=4`}>
             <img
-              src="/images/product/first4.png"
+              src="/images/product/letterhead.jpg"
               loading="eager"
               alt=""
               className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -206,7 +206,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <Link href={`/ProductDetails/polaroid-card?dataId=7`} prefetch={true}>
           <img
           
-            src="/images/product/polaroid.png"
+            src="/images/product/polaroidnew.png"
             alt=""
             loading="eager"
             className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
