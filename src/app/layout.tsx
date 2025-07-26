@@ -6,6 +6,9 @@ import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { Toaster } from "react-hot-toast";
+import { processPendingCartItem } from "@/utils/processPendingCartItem";
+import { useCartStore } from "@/utils/store/cartStore";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -13,12 +16,56 @@ export default function RootLayout({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const { setCartData } = useCartStore();
 
   // const pathname = usePathname();
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, []);
+
+  // Global pending cart item processing after login
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    const pendingCartItem = sessionStorage.getItem("pendingCartItem");
+    
+    if (token && pendingCartItem) {
+      console.log("🔄 Processing pending cart item after login...");
+      processPendingCartItem(setCartData);
+    }
+
+    // Listen for custom login event
+    const handleUserLogin = () => {
+      const pendingCartItem = sessionStorage.getItem("pendingCartItem");
+      if (pendingCartItem) {
+        console.log("🔄 Processing pending cart item after login (custom event)...");
+        // Add a small delay to ensure page navigation completes
+        setTimeout(() => {
+          processPendingCartItem(setCartData);
+        }, 1000);
+      }
+    };
+
+    // Listen for storage changes (when JWT token is added from different tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "jwtToken" && e.newValue && !e.oldValue) {
+        // JWT token was just added (user logged in)
+        const pendingCartItem = sessionStorage.getItem("pendingCartItem");
+        if (pendingCartItem) {
+          console.log("🔄 Processing pending cart item after login (storage event)...");
+          processPendingCartItem(setCartData);
+        }
+      }
+    };
+
+    window.addEventListener("userLoggedIn", handleUserLogin);
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("userLoggedIn", handleUserLogin);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [setCartData]);
 
   return (
     <html lang="en">

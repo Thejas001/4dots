@@ -33,14 +33,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       // Always generate preview URL first
       const fileURL = URL.createObjectURL(file);
       setSelectedFile(fileURL);
-      
-      if (file.type === "application/pdf") {
-        setFileType("pdf");
-        return true; // Allow upload for PDFs
-      } else {
-        message.error("Unsupported file type. Please upload a PDF.");
-        return false; // Prevent upload but still show preview
-      }
+      setFileType(file.type === "application/pdf" ? "pdf" : null);
+      return true; // Allow upload for all allowed types
     },
     onChange(info) {
       if (info.file.status === "done") {

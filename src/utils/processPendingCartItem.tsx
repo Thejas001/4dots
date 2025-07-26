@@ -9,6 +9,7 @@ import {
   addToCart,
   fetchCartItems 
 } from "@/utils/cart";
+import toast from "react-hot-toast";
 
 export const processPendingCartItem = async (setCartData: (cart: any) => void) => {
   const token = localStorage.getItem("jwtToken");
@@ -34,6 +35,11 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
       noOfCopies
     } = parsedItem;
 
+    // Ensure uploadedDocumentId is properly extracted
+    if (parsedItem.uploadedDocumentId !== undefined) {
+      uploadedDocumentId = parsedItem.uploadedDocumentId;
+    }
+
     // Ensure numeric values
     selectedQuantity = selectedQuantity ? Number(selectedQuantity) : null;
     sqftRange = sqftRange ? Number(sqftRange) : null;
@@ -41,7 +47,9 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     addonBookCount = addonBookCount ? Number(addonBookCount) : 0;
 
 
-    console.log("✅ Processing pending item:", parsedItem);
+    console.log("Processing pending item:", parsedItem);
+    console.log("📄 Uploaded Document ID:", uploadedDocumentId);
+    
     if (productType === "photoFrame") {
       console.log("PhotoFrame extra fields:", {
         documentIds: parsedItem.documentIds,
@@ -90,32 +98,32 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
           dataId,
           selectedPricingRule,
           selectedQuantity,
-          parsedItem.documentIds,
+          parsedItem.documentIds || parsedItem.uploadedDocumentIds || (uploadedDocumentId ? [uploadedDocumentId] : undefined),
           parsedItem.selectedFrameColor
         );
         break;
       case "offsetPrinting":
-        await addToCartOffSetPrinting(dataId, selectedPricingRule, 2);
+        await addToCartOffSetPrinting(dataId, selectedPricingRule, selectedQuantity || 1, uploadedDocumentId);
         break;
       case "polaroidCard":
         await addToCartPolaroidCard(
           dataId,
           selectedPricingRule,
           selectedQuantity,
-          parsedItem.uploadedDocumentIds // Pass the uploaded document IDs
+          parsedItem.uploadedDocumentIds || parsedItem.documentIds || (uploadedDocumentId ? [uploadedDocumentId] : undefined)
         );
         break;
       case "nameslip":
-        await addToCartNameSlip(dataId, selectedPricingRule, selectedQuantity);
+        await addToCartNameSlip(dataId, selectedPricingRule, selectedQuantity, uploadedDocumentId);
         break;
       case "canvasprinting":
-        await addToCartCanvasPrinting(dataId, selectedPricingRule, sqftRange);
+        await addToCartCanvasPrinting(dataId, selectedPricingRule, sqftRange, uploadedDocumentId);
         break;
       case "letterhead":
-        await addToCart(dataId, selectedPricingRule);
+        await addToCart(dataId, selectedPricingRule, uploadedDocumentId);
         break;
       case "bussinesscard":
-        await addToCartBusinessCard(dataId, selectedPricingRule);
+        await addToCartBusinessCard(dataId, selectedPricingRule, uploadedDocumentId);
         break;
       case "paperprinting": // ✅ NEW CASE FOR PAPER PRINTING
         await addToCartPaperPrint(
@@ -137,8 +145,12 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     // ✅ Fetch updated cart after API call
     const updatedCart = await fetchCartItems();
     setCartData(updatedCart);
+    
+    // Show success message
+    toast.success("Product added to cart after login!");
   } catch (error) {
     console.error("❌ Failed to process pending cart item:", error);
+    toast.error("❌ Failed to add product to cart after login");
   }
 };
 

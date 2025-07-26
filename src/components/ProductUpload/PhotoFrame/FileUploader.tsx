@@ -51,33 +51,19 @@ const FileUploader = ({
     accept:
       ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
     showUploadList: false,
-    beforeUpload: (file, newFileList) => {
-      if (quantity === null || quantity === 0) {
-        message.error("Please select a quantity first.");
+    beforeUpload: (file) => {
+      const allowedExtensions = [
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
         return false;
       }
-      if (uploadedImages.length >= quantity) {
-        message.error(`You can only upload up to  ${quantity}. To add more images, please increase the quantity.`);
-        return false;
-      }
-
-      if (uploadedImages.length + newFileList.length > quantity) {
-        message.error(`You can only upload up to ${quantity} files.`);
-        return false;
-      }
-
-      const previewUrl = URL.createObjectURL(file);
-      const newFile: UploadFile = {
-        uid: file.uid || file.name + Date.now(),
-        name: file.name,
-        url: previewUrl,
-        status: "done" as UploadFile["status"],
-        originFileObj: file,
-      };
-
-      setUploadedImages((prev) => [...prev, newFile]);
-
-      return false; // Prevent auto upload
+      const fileURL = URL.createObjectURL(file);
+      setSelectedFile(fileURL);
+      setFileType(file.type === "application/pdf" ? "pdf" : null);
+      return true; // Allow upload for all allowed types
     },
     fileList: uploadedImages,
     maxCount: quantity ?? undefined,

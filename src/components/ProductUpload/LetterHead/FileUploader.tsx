@@ -21,16 +21,18 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
-      const fileURL = URL.createObjectURL(file);
-      setSelectedFile(fileURL);
-  
-      if (file.type === "application/pdf") {
-        setFileType("pdf");
-        return true;
-      } else {
-        message.error("Unsupported file type. Please upload a PDF.");
+      const allowedExtensions = [
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
         return false;
       }
+      const fileURL = URL.createObjectURL(file);
+      setSelectedFile(fileURL);
+      setFileType(file.type === "application/pdf" ? "pdf" : null);
+      return true; // Allow upload for all allowed types
     },
     onChange(info) {
       if (info.file.status === "done") {
