@@ -173,7 +173,7 @@ const AddOnService = ({
                   )}
                 </div>
               ) : (
-                <div className="text-red-500 font-medium">No binding available for this Page Count.</div>
+                <div className="text-gray-500 font-medium">No binding available for this Page Count.</div>
               )}
             </div>
           </div>

@@ -18,8 +18,16 @@ const findAddonPageRange = (
   const matchingRule = rules.find((rule) => {
     if (!rule.PageRange) return false; // Safe check for missing values
 
-    const [min, max] = rule.PageRange.split("-").map(Number); // Convert "101-500" → [101, 500]
-
+    const pageRangeStr = rule.PageRange;
+    
+    // Handle "501-above" format
+    if (pageRangeStr.includes("above")) {
+      const min = parseInt(pageRangeStr.split("-")[0]);
+      return pageCount >= min;
+    }
+    
+    // Handle regular range format like "101-500"
+    const [min, max] = pageRangeStr.split("-").map(Number);
     return pageCount >= min && pageCount <= max;
   });
 
@@ -35,8 +43,16 @@ const findPageRange = (
   const matchingRule = pricingRules.find((rule) => {
     if (!rule.PageRange?.ValueName) return false; // Safe check for missing values
 
-    const [min, max] = rule.PageRange.ValueName.split("-").map(Number); // Convert "101-500" → [101, 500]
-
+    const pageRangeStr = rule.PageRange.ValueName;
+    
+    // Handle "501-above" format
+    if (pageRangeStr.includes("above")) {
+      const min = parseInt(pageRangeStr.split("-")[0]);
+      return pageCount >= min;
+    }
+    
+    // Handle regular range format like "101-500"
+    const [min, max] = pageRangeStr.split("-").map(Number);
     return pageCount >= min && pageCount <= max;
   });
 
