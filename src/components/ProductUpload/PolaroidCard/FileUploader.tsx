@@ -61,7 +61,7 @@ const FileUploader = ({
     showUploadList: false,
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+        ".jpg", ".jpeg",".png",".pdf", ".psd"
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {

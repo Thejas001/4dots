@@ -23,7 +23,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     },
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".png", ".pdf", ".psd", ".eps"
+        ".jpg", ".jpeg", ".png", ".pdf", ".psd",
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {

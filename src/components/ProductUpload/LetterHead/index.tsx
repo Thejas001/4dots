@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import Loader from "@/components/common/Loader";
 
 
 const showErrorToast = (message: string) => {
@@ -59,7 +60,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] = useState<LetterHeadPricingRule | null>(null);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
+  const [isLoading, setIsLoading] = useState(false);
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId || isLoading;
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
 
@@ -159,11 +161,13 @@ useEffect(() => {
 
 
   const handleAddToCart = async () => {
+    setIsLoading(true);
     const missing = [];
     if (!selectedPricingRule) missing.push("pricing rule");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
+      setIsLoading(false);
       return;
     }
     if (!isLoggedIn()) {
@@ -176,6 +180,7 @@ useEffect(() => {
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
     try {
@@ -186,14 +191,17 @@ useEffect(() => {
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
     }
+    setIsLoading(false);
   };
 
   const handleProceedToCart = async () => {
+    setIsLoading(true);
     const missing = [];
     if (!selectedPricingRule) missing.push("pricing rule");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
+      setIsLoading(false);
       return;
     }
     if (!isLoggedIn()) {
@@ -205,6 +213,7 @@ useEffect(() => {
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
     try {
@@ -214,6 +223,7 @@ useEffect(() => {
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -224,6 +234,11 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+          <Loader />
+        </div>
+      )}
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
@@ -283,6 +298,7 @@ useEffect(() => {
             {/* First Button */}
             <button 
               onClick={handleAddToCart}
+              disabled={isAddToCartDisabled}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">🛒</span>
@@ -292,6 +308,7 @@ useEffect(() => {
             {/* Second Button */}
             <button
               onClick={handleProceedToCart}
+              disabled={isAddToCartDisabled}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">
