@@ -17,13 +17,13 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     name: "document",  // Important: match backend's expected form field name
     action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
-    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
+    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd",
     headers: {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd"
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {
@@ -91,7 +91,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-3 relative w-full max-w-[280px] sm:max-w-[300px] h-[320px] sm:h-[400px] flex items-center justify-center border rounded-md bg-white">
+      <div className="mt-3 relative w-full max-w-[280px] sm:max-w-[300px] h-[320px] sm:h-[400px] flex items-center justify-center ">
         {selectedFile ? (
           fileType === "pdf" ? (
             <iframe
@@ -102,7 +102,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
               title="PDF Preview"
             />
           ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
+            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
           )
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />

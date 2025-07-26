@@ -15,7 +15,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
 
   const props: UploadProps = {
     name: "document",
-    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
+    accept: ".jpg,.jpeg,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd",
 
     action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
@@ -24,7 +24,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     },
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd"
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {
@@ -93,7 +93,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
+      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center">
         {selectedFile ? (
           fileType === "pdf" ? (
             <iframe
@@ -104,7 +104,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
               title="PDF Preview"
             />
           ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
+            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
           )
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />

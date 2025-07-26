@@ -49,21 +49,31 @@ const FileUploader = ({
     name: "document",
     multiple: true,
     accept:
-      ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
+      ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.svg,.webp,.pdf,.psd",
     showUploadList: false,
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",".svg", ".webp", ".pdf", ".psd"
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {
         message.error("Unsupported file type. Please upload a supported format.");
         return false;
       }
-      const fileURL = URL.createObjectURL(file);
-      setSelectedFile(fileURL);
-      setFileType(file.type === "application/pdf" ? "pdf" : null);
       return true; // Allow upload for all allowed types
+    },
+    onChange: (info) => {
+      // Create preview URLs for uploaded files
+      const updatedFileList = info.fileList.map(file => {
+        if (file.originFileObj && !file.url) {
+          // Create preview URL for local files
+          file.url = URL.createObjectURL(file.originFileObj);
+        }
+        return file;
+      });
+      
+      // Update the uploadedImages state when files are added/removed
+      setUploadedImages(updatedFileList);
     },
     fileList: uploadedImages,
     maxCount: quantity ?? undefined,
@@ -153,7 +163,7 @@ const FileUploader = ({
         </div>
       )}
     <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-      Supported file formats: JPG, JPEG, PNG, GIF, HEIC, SVG, WEBP, PDF, PSD, AI, EPS.
+      Supported file formats: JPG, JPEG, PNG, GIF, SVG, WEBP, PDF, PSD.
     </div>
     </div>
   );

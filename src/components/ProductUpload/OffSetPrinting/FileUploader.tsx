@@ -91,18 +91,18 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
+      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center  rounded-md ">
         {selectedFile ? (
           fileType === "pdf" ? (
             <iframe
               src={`${selectedFile}#toolbar=0`}
               width="100%"
               height="100%"
-              className="rounded-md border"
+              className=" rounded-md border"
               title="PDF Preview"
             />
           ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
+            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
           )
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
