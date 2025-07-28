@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import React, { useState } from "react";
 import AddressModal from "../OrderPayment/AddressModal";
 
 export interface AddressType {
@@ -12,7 +12,7 @@ export interface AddressType {
 }
 
 interface AddressProps {
-  address?: AddressType[]; // made it optional to prevent crash
+  address?: AddressType[];
   loading: boolean;
   error?: boolean;
   refreshAddresses: () => Promise<void>;
@@ -22,7 +22,7 @@ interface AddressProps {
 }
 
 const Address: React.FC<AddressProps> = ({
-  address = [], // fallback to empty array if undefined
+  address = [],
   loading,
   error,
   refreshAddresses,
@@ -30,7 +30,13 @@ const Address: React.FC<AddressProps> = ({
   buttonStyle = "default",
   buttonAlignment = "right",
 }) => {
-  const [selectedOption, setSelectedOption] = React.useState("");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAddressAdded = async () => {
+    setIsModalOpen(false);
+    await refreshAddresses(); // re-fetch updated address list
+  };
 
   return (
     <div className="ml-5 flex flex-1 flex-col">
@@ -49,7 +55,7 @@ const Address: React.FC<AddressProps> = ({
               "Loading address..."
             ) : error ? (
               <span className="text-red-500">Error loading addresses</span>
-            ) : address && address.length > 0 ? (
+            ) : address.length > 0 ? (
               <div className="space-y-4">
                 {address.map((addr) => (
                   <div
@@ -82,7 +88,7 @@ const Address: React.FC<AddressProps> = ({
         </div>
       </div>
 
-      {/* Button */}
+      {/* Add New Address Button */}
       <div
         className={`mb-4 mr-[21px] mt-7.5 flex items-center ${
           buttonAlignment === "left" ? "justify-start" : "justify-end"
@@ -94,7 +100,7 @@ const Address: React.FC<AddressProps> = ({
               ? "bg-black text-white border-black hover:bg-gray-800"
               : "bg-[#FCFCFC] text-[#242424] border-[#242424] hover:bg-gray-200"
           }`}
-          onClick={refreshAddresses}
+          onClick={() => setIsModalOpen(true)}
         >
           Add New Address
         </button>
@@ -102,9 +108,9 @@ const Address: React.FC<AddressProps> = ({
 
       {/* Modal */}
       <AddressModal
-        isOpen={false}
-        onClose={() => {}}
-        onAddressAdded={refreshAddresses}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddressAdded={handleAddressAdded}
       />
     </div>
   );
