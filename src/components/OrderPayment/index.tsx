@@ -42,6 +42,8 @@ const OrderPayment = () => {
   const [address, setAddress] = useState([]);
   const [loadingAddress, setLoadingAddress] = useState(true);
   const [errorAddress, setErrorAddress] = useState("");
+ 
+
 
   const userId = 2; // Replace with actual user ID
 
@@ -150,7 +152,7 @@ const OrderPayment = () => {
                 <Address
                   address={address}
                   loading={loadingAddress}
-                  error={errorAddress}
+                  error={!!errorAddress}
                   refreshAddresses={fetchAddress}
                 />
               </div>

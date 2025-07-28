@@ -8,17 +8,17 @@ const AboutUsComponent = () => {
   // Animation variants
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
   };
 
   const slideInUp = {
     hidden: { opacity: 0, y: 100 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.6, -0.05, 0.01, 0.99] } },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.6, -0.05, 0.01, 0.99] as [number, number, number, number] } },
   };
 
   const lineExpand = {
     hidden: { width: 0 },
-    visible: { width: "100%", transition: { duration: 0.8, ease: "easeOut" } },
+    visible: { width: "100%", transition: { duration: 0.8,ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
   };
 
   const staggerContainer = {
@@ -126,13 +126,13 @@ const AboutUsComponent = () => {
               className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-6 font-medium px-2"
               variants={slideInUp}
             >
-              4Dots.in is your comprehensive online printing solution. Whether you're a student, a professional, an artist, or a business owner, we offer a seamless and reliable platform for all your printing needs.
+              4Dots.in is your comprehensive online printing solution. Whether you&apos;re a student, a professional, an artist, or a business owner, we offer a seamless and reliable platform for all your printing needs.
             </motion.p>
             <motion.p
               className="text-lg sm:text-xl text-gray-600 leading-relaxed font-medium px-2"
               variants={slideInUp}
             >
-              From academic documents to personalized photo products, from business essentials to creative projects—if it can be printed, you'll find it here.
+              From academic documents to personalized photo products, from business essentials to creative projects—if it can be printed, you&apos;ll find it here.
             </motion.p>
             <motion.div
               className="mt-12 w-full h-0.5 bg-gradient-to-r from-transparent via-gray-800 to-transparent"
