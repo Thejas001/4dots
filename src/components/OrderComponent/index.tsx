@@ -241,7 +241,7 @@ const handleCancelOrder = async (orderId: number) => {
                             strokeWidth="0.5"
                           />
                         </svg>
-                        <div className={`absolute top-8 sm:top-10 w-16 sm:w-24 lg:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD" || order.OrderStatus === "Completed"  || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-8 sm:top-10 w-20 sm:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD" || order.OrderStatus === "Completed"  || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           Order Placed
                         </div>
                       </div>
@@ -282,7 +282,7 @@ const handleCancelOrder = async (orderId: number) => {
                             fill={order.OrderStatus === "InProgress" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" || order.OrderStatus === "Shipped" ? "black" : "#B5B5B5"}
                           />
                         </svg>
-                        <div className={`absolute top-8 sm:top-10 w-16 sm:w-24 lg:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" ||order.OrderStatus === "Printing" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-8 sm:top-10 w-20 sm:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" ||order.OrderStatus === "Printing" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           Printing Started
                         </div>
                       </div>
@@ -316,7 +316,7 @@ const handleCancelOrder = async (orderId: number) => {
                             strokeLinejoin="round"
                           />
                         </svg>
-                        <div className={`absolute top-8 sm:top-10 w-16 sm:w-24 lg:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-8 sm:top-10 w-20 sm:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           {order.DeliveryType === "Pickup" ? "Order Ready to Pick" : "Order Shipped"}
                         </div>
                       </div>

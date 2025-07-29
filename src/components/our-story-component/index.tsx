@@ -110,20 +110,7 @@ const fadeInUp = {
         >
           From a Local Print Shop to a Nationwide Vision
         </motion.p>
-        <motion.div
-          className="mt-12 sm:mt-16 w-4 h-4 rounded-full bg-black mx-auto relative"
-          variants={timelineDot}
-          initial="hidden"
-          animate="visible"
-          whileHover="hover"
-        >
-          <motion.div 
-            className="absolute inset-0 rounded-full bg-black/10 animate-ping"
-            initial={{ scale: 0.5 }}
-            animate={{ scale: 1.5, opacity: 0 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-          />
-        </motion.div>
+
       </motion.section>
 
       {/* Full-width timeline section */}
