@@ -6,7 +6,8 @@ import Link from "next/link";
 import ProfileModal from "@/components/ProfileModal";
 import Address from "@/components/OrderPayment/Address";
 import UserProfileOrder from "./UserProfileOrder";
-import { getUserDetails } from "@/utils/api";
+import { getUserDetails, getUserAddress } from "@/utils/api";
+import { AddressType } from "@/components/OrderPayment/Address";
 
 interface UserDetails {
   Name: string;
@@ -18,15 +19,20 @@ const ProfileComponent = () => {
   const [userName, setUserName] = useState("");
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [loadingAddress, setLoadingAddress] = useState(false); // ✅ Added
+  const [addresses, setAddresses] = useState<AddressType[]>([]);
+  const [addressError, setAddressError] = useState(false);
   const router = useRouter();
 
   // ✅ Dummy fetchAddress function just to fulfill props requirement
   const fetchAddress = async () => {
     setLoadingAddress(true);
+    setAddressError(false);
     try {
-      // No actual logic for now (preserve original structure)
-      await new Promise((res) => setTimeout(res, 300));
+      const data = await getUserAddress();
+      setAddresses(Array.isArray(data) ? data : []);
     } catch (error) {
+      setAddressError(true);
+      setAddresses([]);
       console.error("Failed to fetch address:", error);
     } finally {
       setLoadingAddress(false);
@@ -51,6 +57,7 @@ const ProfileComponent = () => {
 
   useEffect(() => {
     refreshUser();
+    fetchAddress(); // Fetch addresses on mount
   }, []);
 
   const handleLogout = () => {
@@ -166,6 +173,8 @@ const ProfileComponent = () => {
             buttonAlignment="left"
             buttonStyle="black"
             loading={loadingAddress}
+            error={addressError}
+            address={addresses}
             refreshAddresses={fetchAddress}
           />
         </div>
