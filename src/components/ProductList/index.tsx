@@ -127,7 +127,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
       <div data-id="5" className="relative col-span-4 h-[163.729px] overflow-hidden rounded-[6.017px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-4">
         <Link href={`/ProductDetails/offset-printing?dataId=5`}>
           <img
-            src="/images/product/flyer.jpg"
+            src="/images/product/Flyer.jpg"
             loading="eager"
             alt="Photo Frames"
             className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
