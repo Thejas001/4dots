@@ -8,7 +8,7 @@ const AboutUsComponent = () => {
   // Animation variants
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: ["easeOut"] } },
   };
 
   const slideInUp = {
@@ -18,7 +18,7 @@ const AboutUsComponent = () => {
 
   const lineExpand = {
     hidden: { width: 0 },
-    visible: { width: "100%", transition: { duration: 0.8, ease: "easeOut" } },
+    visible: { width: "100%", transition: { duration: 0.8, ease: ["easeOut"] } },
   };
 
   const staggerContainer = {
