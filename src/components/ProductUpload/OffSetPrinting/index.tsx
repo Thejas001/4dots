@@ -11,6 +11,7 @@ import FileUploader from "./FileUploader";
 import { findOffsetPrintingPricingRule1, calculateOffsetPrintingPrice} from "./PriceCalculator";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import Loader from "@/components/common/Loader";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -59,7 +60,8 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   const [selectedPricingRule, setSelectedPricingRule] = useState<OffsetPrintingPricingRule | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
+  const [isLoading, setIsLoading] = useState(false);
+  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId || isLoading;
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
   
@@ -70,7 +72,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     };
 
     const handleUploadSuccess = (documentId: number) => {
-      console.log("Received Document ID from child:", documentId);
       setUploadedDocumentId(documentId);
     };
 
@@ -78,7 +79,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
 useEffect(() => {
   if (!productDetails || !selectedSize || !selectedQuantity || !selectedQuality) {
-    console.warn("Missing required fields. Resetting price and pricing rule.");
     setCalculatedPrice(null); // Reset price
     setSelectedPricingRule(null); // Reset pricing rule
     return;
@@ -86,20 +86,17 @@ useEffect(() => {
 
   // Handle invalid quantity
   if (selectedQuantity === null || selectedQuantity <= 0) {
-    console.warn("Quantity is zero or invalid. Resetting price and pricing rule.");
     setCalculatedPrice(null); // Reset price
     setSelectedPricingRule(null); // Reset pricing rule
     return;
   }
 
   if (errorMessage) {
-    console.warn("Pricing rule not fetched due to validation error.");
     setCalculatedPrice(null); // Reset price
     setSelectedPricingRule(null); // Reset pricing rule
     return;
   }
 
-  console.log("Extracted OffsetPrintingPricingRules:", productDetails?.OffsetPrintingPricingRules);
 
   const pricingrule = findOffsetPrintingPricingRule(
     productDetails.OffsetPrintingPricingRules,
@@ -118,7 +115,6 @@ useEffect(() => {
   );
   setCalculatedPrice(price);
 
-  console.log("Matched Pricing Rule:", pricingrule);
   setSelectedPrice(pricingrule ? pricingrule.Price : null); // Store selected price
 }, [selectedSize, selectedQuantity, selectedQuality, productDetails, errorMessage]);
 
@@ -148,12 +144,14 @@ useEffect(() => {
       }
     };
        const handleAddToCart = async () => {
+          setIsLoading(true);
           const missing = [];
-          if (!selectedPricingRule) missing.push("pricing rule");
+          if (!selectedSize) missing.push("size");
           if (!uploadedDocumentId) missing.push("document upload");
           if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
           if (missing.length > 0) {
             showErrorToast("Please select: " + missing.join(", "));
+            setIsLoading(false);
             return;
           }
           if (!isLoggedIn()) {
@@ -166,6 +164,7 @@ useEffect(() => {
             sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
             router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
             toast.success("Product added to cart!");
+            setIsLoading(false);
             return;
           }
           try{
@@ -180,16 +179,19 @@ useEffect(() => {
            router.push("/");
           }  catch (error) {
             alert("Failed to add to cart. Please try again.");
+            setIsLoading(false);
           }
         };
 
         const handleProceedToCart = async () => {
+          setIsLoading(true);
           const missing = [];
-          if (!selectedPricingRule) missing.push("pricing rule");
+          if (!selectedSize) missing.push("size");
           if (!uploadedDocumentId) missing.push("document upload");
           if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
           if (missing.length > 0) {
             showErrorToast("Please select: " + missing.join(", "));
+            setIsLoading(false);
             return;
           }
           if (!isLoggedIn()) {
@@ -201,6 +203,7 @@ useEffect(() => {
             };
             sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
             router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
+            setIsLoading(false);
             return;
           }
           try{
@@ -213,7 +216,8 @@ useEffect(() => {
            toast.success("Product added to cart!");
             router.push("/Cart");
           }  catch (error) {
-            alert("Failed to add to cart. Please try again.");
+            toast.error("Failed to add to cart. Please try again.");
+            setIsLoading(false);
           }
         };
 
@@ -226,6 +230,11 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col pt-[31px] bg-white px-4 md:px-20 pb-[79px] py-20">
+      {isLoading && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+    <Loader />
+  </div>
+)}
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
@@ -248,7 +257,18 @@ useEffect(() => {
           <div className="flex-1 flex flex-col md:flex-row justify-center gap-2 md:gap-19 mt-19">
             {/* First Button */}
             <button
-              onClick={handleAddToCart}
+              onClick={() => {
+                const missing = [];
+                if (!selectedSize) missing.push("size");
+                if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+                if (!selectedQuality) missing.push("quality");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleAddToCart();
+              }}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">🛒</span>
@@ -257,7 +277,18 @@ useEffect(() => {
 
             {/* Second Button */}
             <button
-              onClick={handleProceedToCart}
+              onClick={() => {
+                const missing = [];
+                if (!selectedSize) missing.push("size");
+                if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+                if (!selectedQuality) missing.push("quality");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleProceedToCart();
+              }}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">

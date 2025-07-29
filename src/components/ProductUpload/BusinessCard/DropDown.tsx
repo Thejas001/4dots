@@ -98,7 +98,7 @@ const DropDown = ({
 
 
         {/* Right DropDown Section */}
-        <div className="flex flex-col gap-4 w-full md:w-1/2">
+        <div className="flex flex-col w-full md:w-1/2">
             <div className="h-auto">
             <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
                  Card Type

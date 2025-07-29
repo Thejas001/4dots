@@ -189,7 +189,7 @@ const ProductUpload = ({ product }: { product: any }) => {
           />
         </div>
         {/* Right Section */}
-        <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
+        <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] min-h-[450px] shadow md:px-7">
           {productDetails && (
             <DropDown
               productDetails={productDetails}
@@ -198,27 +198,34 @@ const ProductUpload = ({ product }: { product: any }) => {
               quantity={selectedQuantity}
             />
           )}
-                    <ImageSection
-            uploadedImages={fileList}
-            setUploadedImages={setFileList}
-            setSelectedQuantity={(q) => setSelectedQuantity(q ?? 1)}
-          />
+          <div className="mt-8 sm:mt-10 flex-1 flex-col">
+            <div className="">
+              <label className="mb-2.5 block text-base sm:text-lg font-medium leading-6 tracking-[-0.2px] text-[#242424]">
+                File Selection
+              </label>
+            </div>
+            <ImageSection
+              uploadedImages={fileList}
+              setUploadedImages={setFileList}
+              setSelectedQuantity={(q) => setSelectedQuantity(q ?? 1)}
+            />
 
-          {/**error message*/}
-          <div className="flex w-full flex-col items-center justify-center ">
-            {error && <div className="text-red-500">{error}</div>}
-            {errorMessage && <div className="text-red-500">{errorMessage}</div>}
+            {/**error message*/}
+            <div className="flex w-full flex-col items-center justify-center ">
+              {error && <div className="text-red-500">{error}</div>}
+              {errorMessage && <div className="text-red-500">{errorMessage}</div>}
+            </div>
+
+            <div className="flex mt-15">
+              <CartButton
+                selectedPricingRule={selectedPricingRule}
+                dataId={dataId}
+                uploadedImages={fileList}
+                selectedSize={selectedSize}
+                calculatedPrice={price ?? 0}
+              />
+            </div>
           </div>
-
-<CartButton
-  selectedPricingRule={selectedPricingRule}
-  dataId={dataId}
-  uploadedImages={fileList}
-  selectedSize={selectedSize}
-  calculatedPrice={price ?? 0}
-/>
-
-
         </div>
       </div>
     </div>

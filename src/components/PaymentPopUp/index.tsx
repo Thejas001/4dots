@@ -1,6 +1,6 @@
 // PaymentPopUp/index.tsx
 
-import React from "react";
+import React, {useState} from "react";
 import Link from "next/link";
 
 interface PaymentPopUpProps {
@@ -17,15 +17,22 @@ interface PaymentPopUpProps {
 
 const PaymentPopUp: React.FC<PaymentPopUpProps> = ({ status, onClose, product }) => {
   const isSuccess = status === "success";
+  const [showDesignModal, setShowDesignModal] = useState(false);
+
+  const handleViewDesign = (item: {
+    Documents?: { ContentType: string; DocumentUrl: string }[];
+    ProductName: string;
+  }) => {
+    if (item.Documents && item.Documents.length > 0) {
+      setShowDesignModal(true);
+    } else {
+      alert("No uploaded design available for this item.");
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
       <div className="bg-white rounded-2xl shadow-xl p-6 w-[320px] text-center relative">
-        {/* Close Button */}
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-black text-lg">
-          &times;
-        </button>
-
         {/* Status Icon (PURE PATH SVGs) */}
         <div className="flex justify-center mb-4">
           {isSuccess ? (
@@ -63,34 +70,44 @@ const PaymentPopUp: React.FC<PaymentPopUpProps> = ({ status, onClose, product })
         <div className="text-sm mb-1">
           Quantity: <span className="font-medium">{product.quantity} pcs</span>
         </div>
-        <div className="text-sm mb-4">
-          Color:{" "}
-          <span
-            className="inline-block w-4 h-4 rounded-full align-middle mr-1"
-            style={{ backgroundColor: product.color }}
-          />
-          <a href={product.designLink} className="text-blue-600 underline ml-1">
-            Uploaded Design
-          </a>
-        </div>
+
 
         {/* Action Buttons */}
         {isSuccess ? (
-          <Link href="/orders" className="block w-full bg-black text-white py-2 rounded-full font-semibold">
-            View Your Order
-          </Link>
+          <div className="flex flex-col gap-2">
+            <Link href="/Order" className="block w-full bg-black text-white py-2 rounded-full font-semibold">
+              View Your Order
+            </Link>
+            <Link href="/" className="block w-full bg-gray-200 text-black py-2 rounded-full font-semibold">
+              Go to Home
+            </Link>
+          </div>
         ) : (
           <>
-            <button
-              className="w-full bg-black text-white py-2 rounded-full font-semibold mb-2"
-              onClick={() => window.location.reload()}
-            >
-              Retry
-            </button>
-            <Link href="/cart" className="text-sm text-black-600 underline">
-              Go to Cart
+            <Link href="/Order" className="block w-full bg-black text-white py-2 rounded-full font-semibold">
+              Go to Order
+            </Link>
+            <Link href="/" className="block w-full bg-gray-200 text-black py-2 rounded-full font-semibold">
+              Go to Home
             </Link>
           </>
+        )}
+        {showDesignModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-4 rounded shadow-lg max-w-lg w-full relative">
+              <button
+                onClick={() => setShowDesignModal(false)}
+                className="absolute top-2 right-2 text-lg"
+              >
+                &times;
+              </button>
+              {product.designLink.endsWith(".pdf") ? (
+                <embed src={product.designLink} type="application/pdf" width="100%" height="500px" />
+              ) : (
+                <img src={product.designLink} alt="Uploaded Design" className="max-w-full max-h-[500px] mx-auto" />
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

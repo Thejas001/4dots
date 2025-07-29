@@ -70,6 +70,9 @@ function OTPInputComponent() {
 
       console.log("OTP verified successfully! Logging in..."); // Example success message
 
+      // Dispatch custom event for login success
+      window.dispatchEvent(new CustomEvent("userLoggedIn", { detail: { token } }));
+
       //Redirect user after successful login
       router.push(redirectPath); // Redirect to the landing page
       

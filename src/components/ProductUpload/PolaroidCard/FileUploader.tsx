@@ -57,34 +57,34 @@ const FileUploader = ({
     name: "document",
     multiple: true,
     accept:
-      ".jpg,.jpeg,.jfif,.bmp,.png,.pdf,.psd",
+      ".jpg,.jpeg,.png,.pdf,.psd",
     showUploadList: false,
-    beforeUpload: (file, newFileList) => {
-      // Remove quantity check, set quantity based on selected files
-      const totalFiles = uploadedImages.length + newFileList.length;
-      setQuantity(totalFiles);
-
-      // Only allow new files that don't exceed the new total
-      const previewUrl = URL.createObjectURL(file);
-      const newFile: UploadFile = {
-        uid: file.uid || file.name + Date.now(),
-        name: file.name,
-        url: previewUrl,
-        status: "done" as UploadFile["status"],
-        originFileObj: file,
-      };
-
-      setUploadedImages((prev) => [...prev, newFile]);
-
-      return false; // Prevent auto upload
+    beforeUpload: (file) => {
+      const allowedExtensions = [
+        ".jpg", ".jpeg",".png",".pdf", ".psd"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
+        return false;
+      }
+      return true; // Allow upload for all allowed types
+    },
+    onChange: (info) => {
+      // Create preview URLs for uploaded files
+      const updatedFileList = info.fileList.map(file => {
+        if (file.originFileObj && !file.url) {
+          // Create preview URL for local files
+          file.url = URL.createObjectURL(file.originFileObj);
+        }
+        return file;
+      });
+      
+      // Update the uploadedImages state when files are added/removed
+      setUploadedImages(updatedFileList);
     },
     fileList: uploadedImages,
-    maxCount: quantity ?? undefined,
   };
-
-  useEffect(() => {
-    setQuantity(uploadedImages.length > 0 ? uploadedImages.length : 1);
-}, [uploadedImages]);
 
 
   return (
@@ -109,10 +109,12 @@ const FileUploader = ({
               onError={(e) => (e.currentTarget.src = "https://placehold.co/200")}
             />
           ) : isPdfFile(uploadedImages[currentImageIndex]?.name) ? (
-            <embed
-              src={uploadedImages[currentImageIndex]?.url}
-              type="application/pdf"
-              className="w-full max-w-[320px] h-[400px] rounded-md"
+            <iframe
+              src={uploadedImages[currentImageIndex]?.url + '#toolbar=0'}
+              width="100%"
+              height="400px"
+              className="w-full max-w-[320px] rounded-md border"
+              title="PDF Preview"
             />
           ) : (
             <div className="flex flex-col items-center justify-center w-full max-w-[320px] h-[200px] bg-gray-100 rounded-md">

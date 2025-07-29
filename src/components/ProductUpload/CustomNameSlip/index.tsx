@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import FileUploader from "./FileUploader";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import Loader from "@/components/common/Loader";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -55,7 +56,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] =  useState<NameSlipPricingRule | null>(null);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
+  const [isLoading, setIsLoading] = useState(false);
+  const isAddToCartDisabled = !selectedSize || !selectedQuantity || !uploadedDocumentId || isLoading;
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
   
@@ -136,12 +138,14 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   //add to cart function
   const handleAddToCart = async () => {
+    setIsLoading(true);
     const missing = [];
     if (!selectedSize) missing.push("size");
     if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
+      setIsLoading(false);
       return;
     }
 
@@ -156,6 +160,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
 
@@ -172,15 +177,18 @@ const ProductUpload = ({ product }: { product: any }) => {
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
     }
+    setIsLoading(false);
   };
 
   const handleProceddToCart = async () => {
+    setIsLoading(true);
     const missing = [];
     if (!selectedSize) missing.push("size");
     if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
+      setIsLoading(false);
       return;
     }
 
@@ -194,6 +202,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
 
@@ -207,8 +216,9 @@ const ProductUpload = ({ product }: { product: any }) => {
       toast.success("Product added to cart!");
       router.push("/Cart"); // ✅ Redirect to Cart page after adding
     } catch (error) {
-      alert("Failed to add to cart. Please try again.");
+      toast.error("Failed to add to cart. Please try again.");
     }
+    setIsLoading(false);
   };
 
 
@@ -223,6 +233,11 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   return (
     <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+          <Loader />
+        </div>
+      )}
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
@@ -246,7 +261,17 @@ const ProductUpload = ({ product }: { product: any }) => {
           <div className="mt-10 flex w-full max-w-[800px] flex-col md:flex-row justify-center gap-3 md:gap-6 px-4 mx-auto">
   {/* First Button */}
   <button
-    onClick={handleAddToCart}
+    onClick={() => {
+      const missing = [];
+      if (!selectedSize) missing.push("size");
+      if (!selectedQuantity) missing.push("quantity");
+      if (!uploadedDocumentId) missing.push("document upload");
+      if (missing.length > 0) {
+        showErrorToast("Please select: " + missing.join(", "));
+        return;
+      }
+      handleAddToCart();
+    }}
     className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
   >
     <span className="pr-1">🛒</span>
@@ -255,7 +280,17 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   {/* Second Button */}
   <button
-    onClick={handleProceddToCart}
+    onClick={() => {
+      const missing = [];
+      if (!selectedSize) missing.push("size");
+      if (!selectedQuantity) missing.push("quantity");
+      if (!uploadedDocumentId) missing.push("document upload");
+      if (missing.length > 0) {
+        showErrorToast("Please select: " + missing.join(", "));
+        return;
+      }
+      handleProceddToCart();
+    }}
     className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
   >
     <span className="pr-1">

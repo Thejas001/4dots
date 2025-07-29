@@ -39,26 +39,8 @@ interface Order {
 const OrderPayment = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [address, setAddress] = useState([]);
-  const [loadingAddress, setLoadingAddress] = useState(true);
-  const [errorAddress, setErrorAddress] = useState("");
- 
-
 
   const userId = 2; // Replace with actual user ID
-
-  const fetchAddress = async () => {
-    try {
-      setLoadingAddress(true);
-      setErrorAddress("");
-      const addressData = await getUserAddress();
-      setAddress(addressData);
-    } catch (err) {
-      setErrorAddress((err as any)?.message || "Failed to fetch address");
-    } finally {
-      setLoadingAddress(false);
-    }
-  };
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -73,7 +55,6 @@ const OrderPayment = () => {
     };
 
     loadOrders();
-    fetchAddress();
   }, [userId]);
 
   if (loading) {
@@ -149,12 +130,7 @@ const OrderPayment = () => {
 
               {/* Address Section */}
               <div className="bg-lightgray relative col-span-12 mt-6 flex rounded-[20px] border border-[#ECECEC] bg-cover bg-center bg-no-repeat xl:col-span-1">
-                <Address
-                  address={address}
-                  loading={loadingAddress}
-                  error={!!errorAddress}
-                  refreshAddresses={fetchAddress}
-                />
+                <Address />
               </div>
 
               {/* Estimated Delivery Section */}

@@ -16,21 +16,23 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     name: "document",  // Important: match backend's expected form field name
     action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
-    accept: ".pdf",
+    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.pdf,.psd",
     headers: {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
-      const fileURL = URL.createObjectURL(file);
-      setSelectedFile(fileURL);
-  
-      if (file.type === "application/pdf") {
-        setFileType("pdf");
-        return true;
-      } else {
-        message.error("Unsupported file type. Please upload a PDF.");
+      const allowedExtensions = [
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".pdf", ".psd"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
         return false;
       }
+      const fileURL = URL.createObjectURL(file);
+      setSelectedFile(fileURL);
+      setFileType(file.type === "application/pdf" ? "pdf" : null);
+      return true; // Allow upload for all allowed types
     },
     onChange(info) {
       if (info.file.status === "done") {
@@ -89,7 +91,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
+      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center ">
         {selectedFile ? (
           fileType === "pdf" ? (
             <iframe
@@ -100,7 +102,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
               title="PDF Preview"
             />
           ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
+            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
           )
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />

@@ -49,35 +49,31 @@ const FileUploader = ({
     name: "document",
     multiple: true,
     accept:
-      ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
+      "image/*,.pdf,.psd",
     showUploadList: false,
-    beforeUpload: (file, newFileList) => {
-      if (quantity === null || quantity === 0) {
-        message.error("Please select a quantity first.");
+    beforeUpload: (file) => {
+      const allowedExtensions = [
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",".svg", ".webp", ".pdf", ".psd"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
         return false;
       }
-      if (uploadedImages.length >= quantity) {
-        message.error(`You can only upload up to  ${quantity}. To add more images, please increase the quantity.`);
-        return false;
-      }
-
-      if (uploadedImages.length + newFileList.length > quantity) {
-        message.error(`You can only upload up to ${quantity} files.`);
-        return false;
-      }
-
-      const previewUrl = URL.createObjectURL(file);
-      const newFile: UploadFile = {
-        uid: file.uid || file.name + Date.now(),
-        name: file.name,
-        url: previewUrl,
-        status: "done" as UploadFile["status"],
-        originFileObj: file,
-      };
-
-      setUploadedImages((prev) => [...prev, newFile]);
-
-      return false; // Prevent auto upload
+      return true; // Allow upload for all allowed types
+    },
+    onChange: (info) => {
+      // Create preview URLs for uploaded files
+      const updatedFileList = info.fileList.map(file => {
+        if (file.originFileObj && !file.url) {
+          // Create preview URL for local files
+          file.url = URL.createObjectURL(file.originFileObj);
+        }
+        return file;
+      });
+      
+      // Update the uploadedImages state when files are added/removed
+      setUploadedImages(updatedFileList);
     },
     fileList: uploadedImages,
     maxCount: quantity ?? undefined,
@@ -167,7 +163,7 @@ const FileUploader = ({
         </div>
       )}
     <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-      Supported file formats: JPG, JPEG, PNG, GIF, HEIC, SVG, WEBP, PDF, PSD, AI, EPS.
+      Supported file formats: JPG, JPEG, PNG, GIF, SVG, WEBP, PDF.
     </div>
     </div>
   );

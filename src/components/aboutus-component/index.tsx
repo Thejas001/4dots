@@ -46,7 +46,7 @@ const AboutUsComponent = () => {
         >
           <a className="inline-flex items-center space-x-2">
             <motion.span
-              className="inline-block w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center group-hover:border-black"
+              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center group-hover:border-black"
               whileHover={{ x: -4 }}
             >
               <svg
@@ -126,13 +126,13 @@ const AboutUsComponent = () => {
               className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-6 font-medium px-2"
               variants={slideInUp}
             >
-              4Dots.in is your comprehensive online printing solution. Whether you&apos;re a student, a professional, an artist, or a business owner, we offer a seamless and reliable platform for all your printing needs.
+              4Dots.in is your comprehensive online printing solution. Whether you&#39;re a student, a professional, an artist, or a business owner, we offer a seamless and reliable platform for all your printing needs.
             </motion.p>
             <motion.p
               className="text-lg sm:text-xl text-gray-600 leading-relaxed font-medium px-2"
               variants={slideInUp}
             >
-              From academic documents to personalized photo products, from business essentials to creative projects—if it can be printed, you&apos;ll find it here.
+              From academic documents to personalized photo products, from business essentials to creative projects—if it can be printed, you&#39;ll find it here.
             </motion.p>
             <motion.div
               className="mt-12 w-full h-0.5 bg-gradient-to-r from-transparent via-gray-800 to-transparent"

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import FileUploader from "./Fileuploader";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import Loader from "@/components/common/Loader";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -55,7 +56,8 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] = useState<BusinessCardPricingRule | null>(null);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
+  const [isLoading, setIsLoading] = useState(false);
+  const isAddToCartDisabled = !selectedCard || !selectedSurface || !uploadedDocumentId || isLoading;
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
   
@@ -120,12 +122,14 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
   const handleProceedToCart = async () => {
+    setIsLoading(true);
     const missing = [];
     if (!selectedCard) missing.push("card type");
     if (!selectedSurface) missing.push("finish");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
+      setIsLoading(false);
       return;
     }
 
@@ -138,6 +142,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
 
@@ -146,18 +151,21 @@ const ProductUpload = ({ product }: { product: any }) => {
       toast.success("Product added to cart!");
       router.push("/Cart");
     } catch (error) {
-      alert("Failed to add to cart. Please try again.");
+      toast.error("Failed to add to cart. Please try again.");
     }
+    setIsLoading(false);
   };
 
   
   const handleAddToCart = async () => {
+    setIsLoading(true);
     const missing = [];
     if (!selectedCard) missing.push("card type");
     if (!selectedSurface) missing.push("finish");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
+      setIsLoading(false);
       return;
     }
 
@@ -171,6 +179,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
        toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
 
@@ -180,8 +189,9 @@ const ProductUpload = ({ product }: { product: any }) => {
       toast.success("Product added to cart!");
       router.push("/");
     } catch (error) {
-      alert("Failed to add to cart. Please try again.");
+      toast.error("Failed to add to cart. Please try again.");
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -192,6 +202,11 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   return (
     <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+          <Loader />
+        </div>
+      )}
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
       <FileUploader onUploadSuccess={handleUploadSuccess} />
@@ -208,7 +223,17 @@ const ProductUpload = ({ product }: { product: any }) => {
           <div className="mt-[400px] flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-19">
             {/* First Button */}
             <button
-              onClick={handleAddToCart}
+              onClick={() => {
+                const missing = [];
+                if (!selectedCard) missing.push("card type");
+                if (!selectedSurface) missing.push("surface type");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleAddToCart();
+              }}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">🛒</span>
@@ -217,7 +242,17 @@ const ProductUpload = ({ product }: { product: any }) => {
 
             {/* Second Button */}
             <button
-              onClick={handleProceedToCart}
+              onClick={() => {
+                const missing = [];
+                if (!selectedCard) missing.push("card type");
+                if (!selectedSurface) missing.push("surface type");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleProceedToCart();
+              }}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">

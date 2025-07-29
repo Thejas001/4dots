@@ -100,7 +100,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       //add to cart function
       const handleAddToCart = async () => {
         const missing = [];
-        if (!selectedPricingRule) missing.push("pricing rule");
+        if (!sqftRange) missing.push("height and  width");
         if (!uploadedDocumentId) missing.push("document upload");
         if (missing.length > 0) {
           showErrorToast("Please select: " + missing.join(", "));
@@ -128,7 +128,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
       const handleProceedToCart = async () => {
         const missing = [];
-        if (!selectedPricingRule) missing.push("pricing rule");
+        if (!sqftRange) missing.push("height and  width");
         if (!uploadedDocumentId) missing.push("document upload");
         if (missing.length > 0) {
           showErrorToast("Please select: " + missing.join(", "));

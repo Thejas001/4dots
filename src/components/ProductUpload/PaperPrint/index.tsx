@@ -17,6 +17,7 @@ import { addToCartPaperPrint } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import Loader from "@/components/common/Loader";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -68,7 +69,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const [copySelection, setCopySelection] = useState<string>("");
   const [customCopies, setCustomCopies] = useState<number>(0);
   const [selectedPricingRule, setSelectedPricingRule] = useState<PaperPrintingPricingRule | null>(null);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedAddonRule, setSelectedAddonRule] = useState<Addon | null>(
     null,
   );
@@ -198,22 +199,25 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   //add to cart
 
-  const handleAddToCart = async () => {
-    const missing = [];
-    if (!selectedPricingRule) missing.push("pricing rule");
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      return;
+  const getApiPageCount = () => {
+    // Use the same logic as PriceCalculator
+    if (selectedSize && selectedSize.toUpperCase().includes("DOUBLE SIDE")) {
+      return Math.ceil(pageCount / 2);
     }
+    return pageCount;
+  };
+
+  const handleAddToCart = async () => {
+    setIsLoading(true);
+
+    const apiPageCount = getApiPageCount();
 
     if (!isLoggedIn()) {
       const pendingItem = {
         dataId, // <-- add this line
         productType: "paperprinting",
         selectedPricingRule,
-        pageCount, // ✅ Store page count
+        pageCount: apiPageCount, // Use calculated page count
         selectedBindingType, // ✅ Store binding type
         selectedAddonRule, // ✅ Store addon rule
         addonBookCount:
@@ -223,6 +227,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
 
@@ -233,7 +238,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedBindingType,
       selectedSize,
       selectedColor: selectedOption,
-      pageCount,
+      pageCount: apiPageCount,
       addonBookCount,
     };
 
@@ -241,7 +246,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       await addToCartPaperPrint(
         dataId,
         selectedPricingRule!,
-        pageCount,
+        apiPageCount, // Use calculated page count
         noOfCopies,
         selectedBindingType,
         selectedAddonRule,
@@ -254,23 +259,20 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     } catch (error) {
       console.error("Failed to add to cart:", error);
     }
+    setIsLoading(false);
   };
 
   const handleProceedToCart = async () => {
-    const missing = [];
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      return;
-    }
+    setIsLoading(true);
+
+    const apiPageCount = getApiPageCount();
 
     if (!isLoggedIn()) {
       const pendingItem = {
         dataId, // <-- add this line
         productType: "paperprinting",
         selectedPricingRule,
-        pageCount, // ✅ Store page count
+        pageCount: apiPageCount, // Use calculated page count
         selectedBindingType, // ✅ Store binding type
         selectedAddonRule, // ✅ Store addon rule
         noOfCopies,
@@ -280,6 +282,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
+      setIsLoading(false);
       return;
     }
 
@@ -291,7 +294,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedBindingType,
       selectedSize,
       selectedColor: selectedOption,
-      pageCount,
+      pageCount: apiPageCount,
       addonBookCount,
     };
 
@@ -299,7 +302,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       await addToCartPaperPrint(
         dataId,
         selectedPricingRule!,
-        pageCount,
+        apiPageCount, // Use calculated page count
         noOfCopies,
         selectedBindingType,
         selectedAddonRule,
@@ -311,6 +314,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     } catch (error) {
       console.error("Failed to add to cart:", error);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -319,8 +323,15 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     }
   }, []);
 
+  const isAddToCartDisabled = !uploadedDocumentId || !selectedSize || !selectedOption || !noOfCopies || isLoading;
+
   return (
     <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+          <Loader />
+        </div>
+      )}
       {/* First Row */}
       <div className="flex flex-col md:flex-row">
         {/* Left Section */}
@@ -406,7 +417,18 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
             <div className="mt-19 flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-19">
               {/* First Button */}
               <button
-                onClick={handleAddToCart}
+                onClick={() => {
+                  const missing = [];
+                  if (!uploadedDocumentId) missing.push("document upload");
+                  if (!selectedSize) missing.push("paper size");
+                  if (!selectedOption) missing.push("color type");
+                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
+                  if (missing.length > 0) {
+                    showErrorToast("Please select: " + missing.join(", "));
+                    return;
+                  }
+                  handleAddToCart();
+                }}
                 className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <span className="pr-1">🛒</span>
@@ -415,7 +437,18 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
               {/* Second Button */}
               <button
-                onClick={handleProceedToCart}
+                onClick={() => {
+                  const missing = [];
+                  if (!uploadedDocumentId) missing.push("document upload");
+                  if (!selectedSize) missing.push("paper size");
+                  if (!selectedOption) missing.push("color type");
+                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
+                  if (missing.length > 0) {
+                    showErrorToast("Please select: " + missing.join(", "));
+                    return;
+                  }
+                  handleProceedToCart();
+                }}
                 className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <span className="pr-1">

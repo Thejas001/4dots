@@ -6,15 +6,43 @@ import { placeOrder } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import PaymentPopUp from "@/components/PaymentPopUp";
+import { useState } from "react";
 
   
 const PaymentCal: React.FC<PaymentCalProps> = ({cartItemIds, totalPrice, deliveryOption ,paymentOption}) => {
     const router = useRouter(); // if you're using Next.js router
   const incrementOrderBadge = useCartStore((state) => state.incrementOrderBadge);
+  const [showPaymentPopUp, setShowPaymentPopUp] = useState<null | { status: 'success' | 'failed' }>(null);
+
+  // Placeholder product info (replace with real data as needed)
+  const product = {
+    name: "Product Name",
+    size: "A4",
+    quantity: 1,
+    color: "#000000",
+    designLink: "#",
+  };
+
+  const isOrderEnabled = paymentOption && deliveryOption;
 
 const handlePlaceOrder = async () => {
 
+  if (!paymentOption) {
+    toast.error("Please select a payment method.");
+    return;
+  }
+  if (!deliveryOption) {
+    toast.error("Please select a delivery type.");
+    return;
+  }
   const paymentMethod = paymentOption === "CashOnDelivery" ? "cash" : "razorpay";
+
+  // Prevent COD if totalPrice > 150
+  if (paymentMethod === "cash" && totalPrice > 150) {
+    toast.error("Cash on Delivery is only available for orders up to ₹150.");
+    return;
+  }
 
   try {
     const response = await placeOrder(cartItemIds ,deliveryOption, paymentOption);
@@ -24,12 +52,12 @@ const handlePlaceOrder = async () => {
     if (paymentMethod === "cash") {
       // ✅ Skip Razorpay, redirect or show success
       incrementOrderBadge(); // Increment order badge count
-      toast.success(" Cash on Delivery selected! Your order will be processed.");
-      router.push("/"); // or your desired confirmation page
+      setShowPaymentPopUp({ status: "success" });
       return;
     }
 
     if (!response || !response.RazorpayOrderId) {
+      setShowPaymentPopUp({ status: "failed" });
       return;
     }
 
@@ -52,9 +80,8 @@ const handlePlaceOrder = async () => {
         // });
 
         // ✅ Redirect after success
-        toast.success("✅ Payment successful! Thank you for your order.");
         incrementOrderBadge(); // Increment order badge count
-        router.push("/"); // or use window.location.href = "/thank-you";
+        setShowPaymentPopUp({ status: "success" });
         console.log("✅ Payment successful:", razorpayResponse);
 
       },
@@ -68,8 +95,8 @@ const handlePlaceOrder = async () => {
       },
       modal: {
         ondismiss: function () {
+          setShowPaymentPopUp({ status: "failed" });
           console.log("❌ Payment popup closed by user.");
-          router.push("/Order");  // Redirect to orders page
         }
       }
     };
@@ -77,12 +104,20 @@ const handlePlaceOrder = async () => {
     const razorpay = new (window as any).Razorpay(options);
     razorpay.open();
   } catch (error) {
+    setShowPaymentPopUp({ status: "failed" });
     console.error("Order placement or Razorpay failed:", error);
   }
 };
 
       return (
         <div>
+          {showPaymentPopUp && (
+            <PaymentPopUp
+              status={showPaymentPopUp.status}
+              onClose={() => setShowPaymentPopUp(null)}
+              product={product}
+            />
+          )}
           <div className="flex flex-col rounded-[20px] w-full max-w-[468px] border border-[#ECECEC] pt-5 px-2 sm:px-4">
             {/* Header */}
             <div className="flex items-center justify-center">

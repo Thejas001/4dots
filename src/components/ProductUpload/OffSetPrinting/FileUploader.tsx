@@ -31,14 +31,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       }
       const fileURL = URL.createObjectURL(file);
       setSelectedFile(fileURL);
-  
-      if (file.type === "application/pdf") {
-        setFileType("pdf");
-        return true;
-      } else {
-        message.error("Unsupported file type. Please upload a PDF.");
-        return false;
-      }
+      setFileType(file.type === "application/pdf" ? "pdf" : null);
+      return true; // Allow upload for all allowed types
     },
     onChange(info) {
       if (info.file.status === "done") {
@@ -97,18 +91,18 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
+      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center  rounded-md ">
         {selectedFile ? (
           fileType === "pdf" ? (
             <iframe
               src={`${selectedFile}#toolbar=0`}
               width="100%"
               height="100%"
-              className="rounded-md border"
+              className=" rounded-md border"
               title="PDF Preview"
             />
           ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
+            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
           )
         ) : (
           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
