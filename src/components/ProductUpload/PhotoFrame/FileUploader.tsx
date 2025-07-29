@@ -49,7 +49,7 @@ const FileUploader = ({
     name: "document",
     multiple: true,
     accept:
-      ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.svg,.webp,.pdf,.psd",
+      "image/*,.pdf,.psd",
     showUploadList: false,
     beforeUpload: (file) => {
       const allowedExtensions = [

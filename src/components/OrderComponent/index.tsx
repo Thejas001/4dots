@@ -224,7 +224,7 @@ const handleCancelOrder = async (orderId: number) => {
                   <div className=" flex items-center ">
                     {/* Order Placed */}
                     <div className=" ml-2 xl:ml-7 mr-1.5 flex flex-col items-center">
-                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "COD" || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
+                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Completed" || order.OrderStatus === "COD" || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="18"

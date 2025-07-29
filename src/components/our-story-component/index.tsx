@@ -60,7 +60,7 @@ const OurStoryComponent = () => {
           className="inline-flex items-center space-x-2 text-gray-700 hover:text-black transition-all duration-300 font-medium text-lg group"
         >
           <motion.span 
-            className="inline-block w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200"
+            className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200"
             whileHover={{ rotate: -45 }}
             transition={{ type: "spring" }}
           >
@@ -154,7 +154,7 @@ const OurStoryComponent = () => {
             </div>
             <div className="pl-12 sm:pl-16 md:pl-20 w-full">
               <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-normal">
-                <span className="font-bold text-black">4Dots</span> began with a simple observation: printing shouldn't be complicated or expensive—especially for students. As we interacted with hundreds of students who came in daily with notes, assignments, and project work, one thing became clear—there was no dedicated platform that made printing affordable, accessible, and easy for them.
+                <span className="font-bold text-black">4Dots</span> began with a simple observation: printing shouldn&#39;t be complicated or expensive—especially for students. As we interacted with hundreds of students who came in daily with notes, assignments, and project work, one thing became clear—there was no dedicated platform that made printing affordable, accessible, and easy for them.
               </p>
             </div>
           </motion.div>
@@ -199,7 +199,7 @@ const OurStoryComponent = () => {
             <div className="pl-12 sm:pl-16 md:pl-20 w-full">
               <div className="space-y-6">
                 <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-normal">
-                  We listened, learned, and realized that what we were building wasn't just for our neighborhood. The need was far greater. Students across the country deserved this convenience.
+                    We listened, learned, and realized that what we were building wasn&#39;t just for our neighborhood. The need was far greater. Students across the country deserved this convenience.
                 </p>
                 <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-normal">
                   While managing the shop, we began developing a larger vision: an online platform that could serve students across India.
@@ -229,7 +229,7 @@ const OurStoryComponent = () => {
                 A Bigger Discovery
               </motion.h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-normal">
-                As we grew, we discovered something even bigger—printing needs aren't limited to students. Parents printing school projects, professionals printing presentations, entrepreneurs printing marketing materials, designers printing art—everyone needed a reliable, simple, and quality printing solution.
+                As we grew, we discovered something even bigger—printing needs aren&#39;t limited to students. Parents printing school projects, professionals printing presentations, entrepreneurs printing marketing materials, designers printing art—everyone needed a reliable, simple, and quality printing solution.
               </p>
             </div>
           </motion.div>
@@ -246,14 +246,14 @@ const OurStoryComponent = () => {
               </motion.div>
             </div>
             <div className="pl-12 sm:pl-16 md:pl-20 w-full">
-              <motion.h2 
-                className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                That's how <span className="font-extrabold">4Dots.in</span> was born.
-              </motion.h2>
+                <motion.h2 
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  That&#39;s how <span className="font-extrabold">4Dots.in</span> was born.
+                </motion.h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-normal">
                 A platform for everyone—from kids to college students, from small businesses to large enterprises. Whether you need one print or a thousand, 4Dots is ready to serve with care, quality, and commitment.
               </p>
@@ -294,7 +294,7 @@ const OurStoryComponent = () => {
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <span className="font-medium text-gray-800 text-sm sm:text-base">This is our story. And it's just getting started.</span>
+                <span className="font-medium text-gray-800 text-sm sm:text-base">This is our story. And it&#39;s just getting started.</span>
               </motion.div>
             </div>
           </motion.div>

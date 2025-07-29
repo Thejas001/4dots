@@ -209,16 +209,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   const handleAddToCart = async () => {
     setIsLoading(true);
-    const missing = [];
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (!selectedSize) missing.push("paper size");
-    if (!selectedOption) missing.push("color type");
-    if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      setIsLoading(false);
-      return;
-    }
 
     const apiPageCount = getApiPageCount();
 
@@ -274,16 +264,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   const handleProceedToCart = async () => {
     setIsLoading(true);
-    const missing = [];
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (!selectedSize) missing.push("paper size");
-    if (!selectedOption) missing.push("color type");
-    if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      setIsLoading(false);
-      return;
-    }
 
     const apiPageCount = getApiPageCount();
 
@@ -437,8 +417,18 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
             <div className="mt-19 flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-19">
               {/* First Button */}
               <button
-                onClick={handleAddToCart}
-                disabled={isAddToCartDisabled}
+                onClick={() => {
+                  const missing = [];
+                  if (!uploadedDocumentId) missing.push("document upload");
+                  if (!selectedSize) missing.push("paper size");
+                  if (!selectedOption) missing.push("color type");
+                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
+                  if (missing.length > 0) {
+                    showErrorToast("Please select: " + missing.join(", "));
+                    return;
+                  }
+                  handleAddToCart();
+                }}
                 className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <span className="pr-1">🛒</span>
@@ -447,8 +437,18 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
               {/* Second Button */}
               <button
-                onClick={handleProceedToCart}
-                disabled={isAddToCartDisabled}
+                onClick={() => {
+                  const missing = [];
+                  if (!uploadedDocumentId) missing.push("document upload");
+                  if (!selectedSize) missing.push("paper size");
+                  if (!selectedOption) missing.push("color type");
+                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
+                  if (missing.length > 0) {
+                    showErrorToast("Please select: " + missing.join(", "));
+                    return;
+                  }
+                  handleProceedToCart();
+                }}
                 className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <span className="pr-1">

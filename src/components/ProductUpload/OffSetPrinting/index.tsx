@@ -216,7 +216,7 @@ useEffect(() => {
            toast.success("Product added to cart!");
             router.push("/Cart");
           }  catch (error) {
-            alert("Failed to add to cart. Please try again.");
+            toast.error("Failed to add to cart. Please try again.");
             setIsLoading(false);
           }
         };
@@ -257,8 +257,18 @@ useEffect(() => {
           <div className="flex-1 flex flex-col md:flex-row justify-center gap-2 md:gap-19 mt-19">
             {/* First Button */}
             <button
-              onClick={handleAddToCart}
-              disabled={isAddToCartDisabled}
+              onClick={() => {
+                const missing = [];
+                if (!selectedSize) missing.push("size");
+                if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+                if (!selectedQuality) missing.push("quality");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleAddToCart();
+              }}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">🛒</span>
@@ -267,8 +277,18 @@ useEffect(() => {
 
             {/* Second Button */}
             <button
-              onClick={handleProceedToCart}
-              disabled={isAddToCartDisabled}
+              onClick={() => {
+                const missing = [];
+                if (!selectedSize) missing.push("size");
+                if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+                if (!selectedQuality) missing.push("quality");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleProceedToCart();
+              }}
               className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">
