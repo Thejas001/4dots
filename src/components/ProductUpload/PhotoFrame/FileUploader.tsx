@@ -163,7 +163,7 @@ const FileUploader = ({
         </div>
       )}
     <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-      Supported file formats: JPG, JPEG, PNG, GIF, SVG, WEBP, PDF, PSD.
+      Supported file formats: JPG, JPEG, PNG, GIF, SVG, WEBP, PDF.
     </div>
     </div>
   );
