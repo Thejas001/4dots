@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from "next/link";
 import PaymentCal from "../YourCart/PaymentCal";
-import Address from "./Address";
+import Address, { AddressType } from "./Address";
 import { fetchUserOrder, getUserAddress } from "@/utils/api";
 
 interface Attribute {
@@ -39,8 +39,26 @@ interface Order {
 const OrderPayment = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [addresses, setAddresses] = useState<AddressType[]>([]);
+  const [loadingAddress, setLoadingAddress] = useState(false);
+  const [addressError, setAddressError] = useState(false);
 
   const userId = 2; // Replace with actual user ID
+
+  const fetchAddress = async () => {
+    setLoadingAddress(true);
+    setAddressError(false);
+    try {
+      const data = await getUserAddress();
+      setAddresses(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setAddressError(true);
+      setAddresses([]);
+      console.error("Failed to fetch address:", error);
+    } finally {
+      setLoadingAddress(false);
+    }
+  };
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -55,6 +73,7 @@ const OrderPayment = () => {
     };
 
     loadOrders();
+    fetchAddress();
   }, [userId]);
 
   if (loading) {
@@ -130,7 +149,12 @@ const OrderPayment = () => {
 
               {/* Address Section */}
               <div className="bg-lightgray relative col-span-12 mt-6 flex rounded-[20px] border border-[#ECECEC] bg-cover bg-center bg-no-repeat xl:col-span-1">
-                <Address />
+                <Address
+                  loading={loadingAddress}
+                  error={addressError}
+                  address={addresses}
+                  refreshAddresses={fetchAddress}
+                />
               </div>
 
               {/* Estimated Delivery Section */}

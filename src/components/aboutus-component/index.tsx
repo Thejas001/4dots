@@ -8,17 +8,18 @@ const AboutUsComponent = () => {
   // Animation variants
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: ["easeOut"] } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
   };
 
   const slideInUp = {
     hidden: { opacity: 0, y: 100 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.6, -0.05, 0.01, 0.99] } },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.6, -0.05, 0.01, 0.99] as [number, number, number, number] } },
   };
 
   const lineExpand = {
     hidden: { width: 0 },
-    visible: { width: "100%", transition: { duration: 0.8, ease: ["easeOut"] } },
+
+    visible: { width: "100%", transition: { duration: 0.8,ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
   };
 
   const staggerContainer = {

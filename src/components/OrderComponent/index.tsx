@@ -160,35 +160,35 @@ const handleCancelOrder = async (orderId: number) => {
   }
 
   return (
-    <div className="w-full grid h-auto  grid-rows-[auto,1fr] bg-[#fff]">
+    <div className="w-full grid h-auto grid-rows-[auto,1fr] bg-[#fff]">
       {/* Top Section */}
-      <div className=" my-2 ml-10 flex flex-row">
+      <div className="my-2 ml-4 sm:ml-6 md:ml-8 lg:ml-10 flex flex-row items-center">
         <img
           src={"/images/login/back-arrow.svg"}
           alt={"SignIn Cover"}
-          className="cursor-pointer"
+          className="cursor-pointer w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6"
           onClick={() => router.back()}
         />
         {/* Your Cart Text */}
-        <span className="ml-9 text-[22px] font-normal leading-[26px] text-[#000]">
+        <span className="ml-4 sm:ml-6 md:ml-8 lg:ml-9 text-base sm:text-lg md:text-xl lg:text-[22px] font-normal leading-tight sm:leading-normal lg:leading-[26px] text-[#000]">
           Your Order
         </span>
       </div>
       {/* Bottom Section */}
-      <div className=" w-[100%] mb-4 mt-4 grid h-auto grid-cols-1 px-4  ml-[20px] xl:pl-36  xl:pr-39">
+      <div className="w-full mb-4 mt-4 grid h-auto grid-cols-1 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 xl:pl-36 xl:pr-39">
         {orders.length > 0 ? (
-          <div className="flex flex-col ">
+          <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
             {orders.map((order) => ( (
               //  <div key={order.OrderId}>
               //  {order.Items.map(item => (
               <div
                 key={order.OrderId}
-                className="bg-lightgray col-span-12 mb-4 flex flex-col rounded-[10px] border border-[#E9E9E9] bg-white p-5 shadow-[0px_4px_16px_0px_rgba(91,91,91,0.20)] xl:w-[1243px]"
+                className="bg-lightgray col-span-12 mb-4 flex flex-col rounded-[8px] sm:rounded-[10px] border border-[#E9E9E9] bg-white p-3 sm:p-4 md:p-5 shadow-[0px_4px_16px_0px_rgba(91,91,91,0.20)] w-full xl:w-[1243px]"
               >
 
                                 {/* Payment Failed Banner */}
             {(order.Payment?.PaymentStatus === "Failed" || order.Payment?.PaymentStatus === "Pending") && order.OrderStatus !== "CancelledByUser" && (
-                  <div className="mb-3 rounded-md bg-red-100 p-3 text-sm text-red-700">
+                  <div className="mb-3 rounded-md bg-red-100 p-2 sm:p-3 text-xs sm:text-sm text-red-700">
                     ⚠ Payment for this order failed. Please try again or contact
                     support.
                     <div className="mt-2">
@@ -196,7 +196,7 @@ const handleCancelOrder = async (orderId: number) => {
                         onClick={() =>
                           handleRetryPayment(order.OrderId)
                         }
-                        className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                        className="rounded-md bg-red-600 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white hover:bg-red-700"
                       >
                         Retry Payment
                       </button>
@@ -205,12 +205,12 @@ const handleCancelOrder = async (orderId: number) => {
                 )}
 
                 {order.Payment?.PaymentStatus === "InProgress" && order.OrderStatus !== "CancelledByUser" && (
-                    <div className="mb-3 rounded-md bg-yellow-100 p-3 text-sm text-yellow-800">
+                    <div className="mb-3 rounded-md bg-yellow-100 p-2 sm:p-3 text-xs sm:text-sm text-yellow-800">
                       ⏳ Payment for this order is pending. Please complete the payment to proceed.
                       <div className="mt-2">
                         <button
                           onClick={() => handleRetryPayment(order.OrderId)}
-                          className="rounded-md bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
+                          className="rounded-md bg-yellow-500 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white hover:bg-yellow-600"
                         >
                           Complete Payment
                         </button>
@@ -219,16 +219,15 @@ const handleCancelOrder = async (orderId: number) => {
                   )}
 
                 {/* Centered Heading */}
-                <div className="w-[125%] xl:w-[1243px] text-center ">
+                <div className="w-full xl:w-[1243px] text-center">
                   {/* Progress Bar */}
-                  <div className=" flex items-center ">
+                  <div className="flex items-center justify-center xl:justify-start flex-wrap lg:flex-nowrap gap-2 lg:gap-0">
                     {/* Order Placed */}
-                    <div className=" ml-2 xl:ml-7 mr-1.5 flex flex-col items-center">
-                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Completed" || order.OrderStatus === "COD" || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
+                    <div className="ml-1 sm:ml-2 xl:ml-7 mr-1 sm:mr-1.5 flex flex-col items-center">
+                      <div className={`relative flex h-[24px] w-[24px] sm:h-[30px] sm:w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Completed" || order.OrderStatus === "COD" || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
+                          className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5"
                           viewBox="0 0 18 18"
                           fill="none"
                         >
@@ -242,22 +241,21 @@ const handleCancelOrder = async (orderId: number) => {
                             strokeWidth="0.5"
                           />
                         </svg>
-                        <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD" || order.OrderStatus === "Completed"  || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-8 sm:top-10 w-20 sm:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "COD" || order.OrderStatus === "Completed"  || order.OrderStatus === "PaymentSuccessful" || order.OrderStatus === "Shipped" || order.OrderStatus === "InProgress"  || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           Order Placed
                         </div>
                       </div>
                     </div>
 
                     {/* Divider */}
-                    <div className={`w-[190px]  md:w-[190px] lg:w-[200px] border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
+                    <div className={`w-[20px] sm:w-[40px] md:w-[80px] lg:w-[120px] xl:w-[190px] border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
 
                     {/* Printing Started */}
-                    <div className=" ml-3 xl:ml-1.5 mr-1.5 flex flex-col items-center">
-                      <div className={` relative flex h-[30px] w-[30px]  items-center justify-center rounded-full border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" ||order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
+                    <div className="ml-1 sm:ml-3 xl:ml-1.5 mr-1 sm:mr-1.5 flex flex-col items-center">
+                      <div className={` relative flex h-[24px] w-[24px] sm:h-[30px] sm:w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" ||order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="19"
-                          height="19"
+                          className="w-4 h-4 sm:w-5 sm:h-5"
                           viewBox="0 0 19 19"
                           fill="none"
                         >
@@ -284,23 +282,22 @@ const handleCancelOrder = async (orderId: number) => {
                             fill={order.OrderStatus === "InProgress" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" || order.OrderStatus === "Shipped" ? "black" : "#B5B5B5"}
                           />
                         </svg>
-                        <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" ||order.OrderStatus === "Printing" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-8 sm:top-10 w-20 sm:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" ||order.OrderStatus === "Printing" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           Printing Started
                         </div>
                       </div>
                     </div>
 
                     {/* Divider */}
-                    <div className={`w-[181px] border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
+                    <div className={`w-[20px] sm:w-[40px] md:w-[80px] lg:w-[120px] xl:w-[181px] border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "InProgress" || order.OrderStatus === "Delivered" ? "border-[#242424]" : "border-gray-300"}`}></div>
 
                     {/* Order Shipped */}
-                    <div className=" ml-1.5 mr-1.5 flex flex-col items-center">
-                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border
+                    <div className=" ml-1 sm:ml-1.5 mr-1 sm:mr-1.5 flex flex-col items-center">
+                      <div className={`relative flex h-[24px] w-[24px] sm:h-[30px] sm:w-[30px] items-center justify-center rounded-full border
                         ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" ?"border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="19"
-                          height="19"
+                          className="w-4 h-4 sm:w-5 sm:h-5"
                           viewBox="0 0 19 19"
                           fill="none"
                         >
@@ -319,52 +316,20 @@ const handleCancelOrder = async (orderId: number) => {
                             strokeLinejoin="round"
                           />
                         </svg>
-                        <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
+                        <div className={`absolute top-8 sm:top-10 w-20 sm:w-32 text-center text-[8px] sm:text-[10px] xl:text-[14px] font-normal leading-tight sm:leading-6 tracking-[-0.2px] ${order.OrderStatus === "Shipped" || order.OrderStatus === "Completed" || order.OrderStatus === "Delivered" ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
                           {order.DeliveryType === "Pickup" ? "Order Ready to Pick" : "Order Shipped"}
                         </div>
                       </div>
                     </div>
-
-                    {/* Divider 
-                    <div className={`w-[181px] border ${order.OrderStatus === "Shipped" || order.OrderStatus === "Delivered"  ? "border-[#242424]" : "border-gray-300"}`}></div>
-                    */}
-                    {/* Out For Delivery 
-                    <div className=" ml-1.5 flex flex-col items-center">
-                      <div className={`relative flex h-[30px] w-[30px] items-center justify-center rounded-full border ${order.OrderStatus === "Delivered" ? "border-[#000]" : "border-gray-300"} transition duration-500 ease-in-out`}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 18 18"
-                          fill="none"
-                        >
-                          <path
-                            d="M15.3673 5.12158V8.77992M2.19727 5.12158V12.556C2.19727 13.5679 3.62109 14.1694 6.468 15.3715C7.6116 15.8551 8.18376 16.0966 8.78227 16.0966V8.30799M10.9773 13.9016C10.9773 13.9016 11.6175 13.9016 12.2577 15.3649C12.2577 15.3649 14.2917 11.7066 16.0989 10.9749"
-                            stroke={ order.OrderStatus === "Delivered" ? "black" : "#B5B5B5"}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <path
-                            d="M4.39227 8.78005L5.8556 9.51171M12.4406 2.92671L5.12393 6.58505M6.09412 7.09063L3.95692 6.05678C2.78406 5.48901 2.19727 5.20512 2.19727 4.75588C2.19727 4.30664 2.78406 4.02275 3.95692 3.45498L6.09339 2.42113C7.41405 1.78239 8.07255 1.46338 8.78227 1.46338C9.49198 1.46338 10.1512 1.78239 11.4704 2.42113L13.6076 3.45498C14.7805 4.02275 15.3673 4.30664 15.3673 4.75588C15.3673 5.20512 14.7805 5.48901 13.6076 6.05678L11.4711 7.09063C10.1505 7.72937 9.49198 8.04838 8.78227 8.04838C8.07255 8.04838 7.41332 7.72937 6.09412 7.09063Z"
-                            stroke={ order.OrderStatus === "Delivered" ? "black" : "#B5B5B5"}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        <div className={`absolute top-10 w-32 text-center text-[10px] xl:text-[14px] font-normal leading-6 tracking-[-0.2px] ${order.OrderStatus === "Delivered"  ? "text-[#242424]" : "text-[#B5B5B5]"}`}>
-                          Out For Delivery
-                        </div>
-                      </div>
-                    </div>*/}
 
                     {/**divider*/}
                  </div>
                 </div>
 
 
-<div className="flex items-center justify-center gap-4 mt-15 xl:mt-[-30px] xl:ml-[800px] ">
+<div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-8 sm:mt-12 lg:mt-15 xl:mt-[-30px] xl:ml-[800px]">
   {/* Order ID */}
-  <div className=" flex items-center justify-center rounded-[21px] bg-[#f7f7f7] text-sm font-normal leading-6 tracking-[-0.2px] text-[#272727] px-3 py-2 xl:w-[154px]">
+  <div className="flex items-center justify-center rounded-[21px] bg-[#f7f7f7] text-xs sm:text-sm font-normal leading-tight sm:leading-6 tracking-[-0.2px] text-[#272727] px-2 sm:px-3 py-1.5 sm:py-2 w-full sm:w-auto xl:w-[154px]">
     <span className="mr-1">Order Id :</span>
     <span>{order.OrderId}</span>
   </div>
@@ -372,7 +337,7 @@ const handleCancelOrder = async (orderId: number) => {
 
 
   {/* Date of Order */}
-  <div className="flex items-center justify-center rounded-[21px] bg-[#f7f7f7] text-sm font-normal leading-6 tracking-[-0.2px] text-[#272727] px-3 py-2 w-[204px] xl:w-56">
+  <div className="flex items-center justify-center rounded-[21px] bg-[#f7f7f7] text-xs sm:text-sm font-normal leading-tight sm:leading-6 tracking-[-0.2px] text-[#272727] px-2 sm:px-3 py-1.5 sm:py-2 w-full sm:w-auto xl:w-56">
     <span className="mr-1">Date of Order :</span>
     <span>{formatDate(order.CreatedAt)}</span>
   </div>
@@ -380,20 +345,20 @@ const handleCancelOrder = async (orderId: number) => {
 
 
                 {/**Second row */}
-                <div className="mt-15 flex">
+                <div className="mt-8 sm:mt-12 lg:mt-15 flex flex-col sm:flex-row">
                   <img
                     src="/images/product/Rectangle4597.svg"
                     alt="Product Image"
-                    className="bg-lightgray h-[113px] w-[107px] rounded-md border border-[#ECECEC] bg-cover bg-center bg-no-repeat object-cover"
+                    className="bg-lightgray h-[80px] w-[80px] sm:h-[100px] sm:w-[100px] md:h-[113px] md:w-[107px] rounded-md border border-[#ECECEC] bg-cover bg-center bg-no-repeat object-cover self-center sm:self-start"
                   />
 
                   {/**Right Section */}
-                  <div className="ml-4 mt-2 flex flex-1 flex-col">
-                    <div className=" flex items-center justify-between">
-                      <div className="">
+                  <div className="ml-0 sm:ml-4 mt-2 sm:mt-2 flex flex-1 flex-col">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                      <div className="flex-1">
                         {order.Items.length > 1 ? (
                           <Link href={`/Order/${order.OrderId}`}>
-                            <span className="text-md flex-grow  font-semibold text-[#000] xl:text-xl">
+                            <span className="text-sm sm:text-md lg:text-xl font-semibold text-[#000] break-words">
                               {order.Items.slice(0, 2)
                                 .map((item) => item.ProductName)
                                 .join(", ")}
@@ -404,12 +369,12 @@ const handleCancelOrder = async (orderId: number) => {
                             </span>
                           </Link>
                         ) : (
-                          <span className="text-md flex-grow  font-semibold text-[#000] xl:text-xl">
+                          <span className="text-sm sm:text-md lg:text-xl font-semibold text-[#000] break-words">
                             {order.Items.map((item) => item.ProductName)}
                           </span>
                         )}
                       </div>
-                        <div className="text-[12px] xl:text-[18px] font-normal leading-[24px] tracking-[-0.2px] text-[#E50000] cursor-pointer">
+                        <div className="text-[10px] sm:text-[12px] lg:text-[18px] font-normal leading-tight sm:leading-[24px] tracking-[-0.2px] text-[#E50000] cursor-pointer self-start sm:self-auto">
                         <button
                             onClick={() => handleCancelOrder(order.OrderId)}
                             disabled={
@@ -439,40 +404,39 @@ const handleCancelOrder = async (orderId: number) => {
                     {/*Address*/}
                     {/*Address*/}
 
-                    <div className="mb-0 mt-3 flex items-start">
+                    <div className="mb-0 mt-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-0">
                       <div className="flex-shrink-0">
-                        <label className="text-sm font-medium text-[#000] xl:text-base ">
+                        <label className="text-xs sm:text-sm lg:text-base font-medium text-[#000]">
                           Address :
                         </label>
                       </div>
-                      <div className="ml-2">
+                      <div className="sm:ml-2 flex-1">
                         {loadingAddresses ? (
-                          <span className="text-sm font-medium text-[#000] xl:text-base">
+                          <span className="text-xs sm:text-sm lg:text-base font-medium text-[#000]">
                             Loading...
                           </span>
                         ) : address.length > 0 ? (
-                          <span className="h-auto text-sm font-medium text-[#000] xl:text-base">
+                          <span className="h-auto text-xs sm:text-sm lg:text-base font-medium text-[#000] break-words">
                             {address[0].Address}, {address[0].City},{" "}
                             {address[0].Country} - {address[0].PinCode}
                           </span>
                         ) : (
-                          <span className="text-sm font-medium text-[#000] xl:text-base">
+                          <span className="text-xs sm:text-sm lg:text-base font-medium text-[#000]">
                             No address found
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between">
+                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
                       <div className="flex items-center space-x-1">
-                        <span className="text-sm font-semibold text-[#000]">
+                        <span className="text-xs sm:text-sm font-semibold text-[#000]">
                            Amount :
                         </span>
                         <span className="flex items-center">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="15"
+                            className="w-3 h-3 sm:w-3.5 sm:h-3.5"
                             viewBox="0 0 14 15"
                             fill="none"
                           >
@@ -481,7 +445,7 @@ const handleCancelOrder = async (orderId: number) => {
                               fill="#242424"
                             />
                           </svg>
-                          <span className="text-sm font-semibold text-[#000]">
+                          <span className="text-xs sm:text-sm font-semibold text-[#000]">
                             {order.TotalAmount}
                           </span>
                         </span>
@@ -490,7 +454,7 @@ const handleCancelOrder = async (orderId: number) => {
        
                           <div
                             onClick={() => handleToggle(order.OrderId)}
-                            className="decoration-skip-ink-none cursor-pointer text-[18px] font-normal leading-[24px] tracking-[-0.2px] text-primary underline decoration-solid decoration-auto underline-offset-auto"
+                            className="decoration-skip-ink-none cursor-pointer text-[14px] sm:text-[18px] font-normal leading-tight sm:leading-[24px] tracking-[-0.2px] text-primary underline decoration-solid decoration-auto underline-offset-auto self-start sm:self-auto"
                           >
                             {expandedItems[order.OrderId]
                               ? "Hide Detail"
@@ -512,12 +476,12 @@ const handleCancelOrder = async (orderId: number) => {
                               {order.Items[0]?.Attributes?.map((attr) => (
                                 <div
                                   key={attr.OrderItemAttributeId}
-                                  className="text-sm font-semibold text-[#000]"
+                                  className="text-xs sm:text-sm font-semibold text-[#000]"
                                 >
-                                  <span className="text-sm font-semibold text-[#000]">
+                                  <span className="text-xs sm:text-sm font-semibold text-[#000]">
                                     {attr.AttributeName}:
                                   </span>{" "}
-                                  <span className="text-sm font-semibold text-[#000]">
+                                  <span className="text-xs sm:text-sm font-semibold text-[#000]">
                                     {attr.AttributeValue}
                                   </span>
                                 </div>
@@ -526,7 +490,7 @@ const handleCancelOrder = async (orderId: number) => {
                           </motion.div>
                           {/* ✅ Conditionally show comment info */}
                         {order.Comments && order.Comments.length > 0 && order.Comments[0].CommentText && (
-                          <div className="mt-2 text-sm text-blue-600 font-medium">
+                          <div className="mt-2 text-xs sm:text-sm text-blue-600 font-medium">
                             Comment: {order.Comments[0].CommentText}
                           </div>
                         )}
