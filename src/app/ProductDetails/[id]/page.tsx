@@ -58,8 +58,14 @@ export default async function PageDetails({
   return (
     <DefaultLayout>
       <Suspense fallback={<Loader />}>
-      {/* ✅ Pass fetched product details to ProductDescription */}
-      <ProductDescription product={product} />
+      {/* ✅*/}
+             {(() => {
+         console.log("Product ID:", product?.id);
+         console.log("Product Name:", product?.name);
+         console.log("Condition check:", product?.id === 1 && product?.name === "Paper Printing");
+         console.log("Should show description:", !(product?.id === 1 && product?.name === "Paper Printing"));
+         return !(product?.id === 1 && product?.name === "Paper Printing") && <ProductDescription product={product} />;
+       })()}
 
       {/* ✅ Pass product data to the specific product component */}
       <SpecificProductComponent product={product} />

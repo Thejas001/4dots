@@ -56,7 +56,7 @@ const showErrorToast = (message: string) => {
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
-  const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
+const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const productDetails = product;
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [noOfCopies, setNoOfCopies] = useState<number>(0);
@@ -309,7 +309,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     const addonBookCount =
       copySelection === "all" ? noOfCopies : customCopies || 0;
    
-    const addonDetails = {
+      const addonDetails = {
       addons: productDetails?.Addons || [],
       selectedBindingType,
       selectedSize,
@@ -502,8 +502,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                              <span className="text-gray-600">Binding Copies:</span>
                              <span className="font-medium text-gray-900">
                                {copySelection === "all" ? "All Copies" : `Custom (${customCopies})`}
-                             </span>
-                           </div>
+                </span>
+              </div>
                          )}
                          {calculatedPrice && (
                            <div className="flex justify-between border-t pt-2">
@@ -562,7 +562,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
                        <div
                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                           selectedOption === "Color"
+                    selectedOption === "Color"
                              ? "border-black bg-gray-100"
                              : "border-gray-200 bg-white hover:border-gray-300"
                          }`}
@@ -621,7 +621,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                        >
                          <span className="text-gray-700 font-medium">
                            {selectedSize || "Click to select paper size"}
-                         </span>
+                </span>
                          <svg
                            className="w-5 h-5 text-gray-400"
                            fill="none"
@@ -702,8 +702,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                              </div>
                            );
                          })}
-                       </div>
-                                          </div>
+              </div>
+            </div>
                    )}
 
                    {/* Step 4: Binding Question - Only show after size selection */}
@@ -769,18 +769,18 @@ const ProductUpload = ({ product }: { product: any }) => {
                        </div>
                        <p className="text-sm text-gray-600 mb-4">Optional binding and finishing options</p>
                        
-                       <AddOnService
-                         productDetails={productDetails}
-                         onBindingTypeChange={handleBindingTypeChange}
-                         onBinderColorChange={handleBinderColorChange}
-                         onCopySelectionChange={handleCopySelectionChange}
-                         onCustomCopiesChange={handleCustomCopiesChange}
-                         pageCount={pageCount}
-                         paperSize={selectedSize}
-                         colorType={selectedOption}
+              <AddOnService
+                productDetails={productDetails}
+                onBindingTypeChange={handleBindingTypeChange}
+                onBinderColorChange={handleBinderColorChange}
+                onCopySelectionChange={handleCopySelectionChange}
+                onCustomCopiesChange={handleCustomCopiesChange}
+                pageCount={pageCount}
+                paperSize={selectedSize}
+                colorType={selectedOption}
                          noOfCopies={noOfCopies}
-                       />
-                     </div>
+              />
+            </div>
                    )}
 
                    {/* Error Message */}
@@ -794,37 +794,37 @@ const ProductUpload = ({ product }: { product: any }) => {
                    {selectedOption && selectedSize && noOfCopies > 0 && !showSizeOptions && bindingChoice !== null && (
                      <div className="bg-gray-50 rounded-xl p-6">
                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Price Summary</h3>
-                       <PriceCalculator
-                         pricingRules={productDetails.PaperPrintingPricingRules || []}
-                         addons={productDetails.Addons || []}
-                         selectedSize={selectedSize}
+            <PriceCalculator
+              pricingRules={productDetails.PaperPrintingPricingRules || []}
+              addons={productDetails.Addons || []}
+              selectedSize={selectedSize}
                          selectedColor={selectedOption || "B/W"}
-                         pageCount={pageCount}
-                         noOfCopies={noOfCopies}
-                         copySelection={copySelection}
+              pageCount={pageCount}
+              noOfCopies={noOfCopies}
+              copySelection={copySelection}
                          customCopies={customCopies}
-                         selectedBindingType={selectedBindingType}
-                         onPriceUpdate={(price) => setCalculatedPrice(price)}
-                       />
+              selectedBindingType={selectedBindingType}
+              onPriceUpdate={(price) => setCalculatedPrice(price)}
+            />
                      </div>
                    )}
                  </div>
 
                 {/* Action Buttons */}
                 <div className="mt-8 space-y-3">
-                  <button
-                    onClick={() => {
-                      const missing = [];
-                      if (!uploadedDocumentId) missing.push("document upload");
-                      if (!selectedSize) missing.push("paper size");
-                      if (!selectedOption) missing.push("color type");
-                      if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-                      if (missing.length > 0) {
-                        showErrorToast("Please select: " + missing.join(", "));
-                        return;
-                      }
-                      handleAddToCart();
-                    }}
+              <button
+                onClick={() => {
+                  const missing = [];
+                  if (!uploadedDocumentId) missing.push("document upload");
+                  if (!selectedSize) missing.push("paper size");
+                  if (!selectedOption) missing.push("color type");
+                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
+                  if (missing.length > 0) {
+                    showErrorToast("Please select: " + missing.join(", "));
+                    return;
+                  }
+                  handleAddToCart();
+                }}
                     disabled={isAddToCartDisabled}
                     className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
                       isAddToCartDisabled
@@ -833,21 +833,21 @@ const ProductUpload = ({ product }: { product: any }) => {
                     }`}
                   >
                     Add to Cart
-                  </button>
+              </button>
 
-                  <button
-                    onClick={() => {
-                      const missing = [];
-                      if (!uploadedDocumentId) missing.push("document upload");
-                      if (!selectedSize) missing.push("paper size");
-                      if (!selectedOption) missing.push("color type");
-                      if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-                      if (missing.length > 0) {
-                        showErrorToast("Please select: " + missing.join(", "));
-                        return;
-                      }
-                      handleProceedToCart();
-                    }}
+              <button
+                onClick={() => {
+                  const missing = [];
+                  if (!uploadedDocumentId) missing.push("document upload");
+                  if (!selectedSize) missing.push("paper size");
+                  if (!selectedOption) missing.push("color type");
+                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
+                  if (missing.length > 0) {
+                    showErrorToast("Please select: " + missing.join(", "));
+                    return;
+                  }
+                  handleProceedToCart();
+                }}
                     disabled={isAddToCartDisabled}
                     className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
                       isAddToCartDisabled
@@ -856,7 +856,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                     }`}
                   >
                     {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
-                  </button>
+              </button>
                 </div>
               </div>
             </div>
