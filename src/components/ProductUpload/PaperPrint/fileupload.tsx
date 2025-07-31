@@ -6,7 +6,7 @@ import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
 interface FileUploaderProps {
-  onUploadSuccess: (documentId: number) => void;
+  onUploadSuccess: (documentId: number, file?: File, name?: string) => void;
   pageCount: number;
   setPageCount: (count: number) => void;
 }
@@ -15,6 +15,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<"pdf" | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState<string>("");
 
   const props: UploadProps = {
     name: "document",
@@ -27,6 +29,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
     beforeUpload: (file) => {
       const fileURL = URL.createObjectURL(file);
       setSelectedFile(fileURL);
+      setUploadedFile(file);
+      setFileName(file.name);
 
       if (file.type === "application/pdf") {
         setFileType("pdf");
@@ -45,7 +49,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
           const pages = response.Data?.PageCount;
 
           sessionStorage.setItem("uploadedDocumentId", documentId);
-          onUploadSuccess(documentId);
+          onUploadSuccess(documentId, uploadedFile || undefined, fileName);
 
           if (pages !== undefined) {
             setPageCount(pages);
@@ -106,7 +110,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
         {selectedFile ? (
           fileType === "pdf" ? (
           <iframe
-            key={currentPage} // 🔁 This forces it to reload when page changes
+            key={currentPage}
             src={`${selectedFile}#toolbar=0&page=${currentPage}`}
             width="100%"
             height="100%"
