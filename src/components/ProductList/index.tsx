@@ -41,7 +41,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
 
   return (
     <>
-      {/* Mobile Wall Decoratives Section */}
+      {/* Mobile view Section */}
       <div className="md:hidden bg-[#fcfcfc] px-4 py-6">
         <div className="text-center text-xl font-bold text-[#242424] mb-6">
           Our Product
@@ -70,7 +70,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
-                  src="/images/product/bussinesscard.jpg"
+                  src="/images/product/paperprint.jpg"
                   alt="Paper Print"
                   className="w-full h-32 object-cover"
                 />
@@ -172,7 +172,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
-                  src="/images/product/polaroid.png"
+                  src="/images/product/nameslip.jpg"
                   alt="Name Slip"
                   className="w-full h-32 object-cover"
                 />
@@ -224,7 +224,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           <div className=" relative col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
             <Link href={`/ProductDetails/paper-print?dataId=1`} passHref>
               <img
-                src="/images/product/bussinesscard.jpg"
+                src="/images/product/paperprint.jpg"
                 alt=""
                 loading="eager"
                 className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -378,7 +378,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <div data-id="8" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
           <Link href={`ProductDetails/custom-name-slip?dataId=8`} prefetch={true}>
             <img
-              src="/images/product/polaroid.png"
+              src="/images/product/nameslip.jpg"
               alt=""
               loading="eager"
               className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
