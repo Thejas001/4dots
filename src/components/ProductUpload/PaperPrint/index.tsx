@@ -92,11 +92,33 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   const handleCopySelectionChange = (value: string) => {
     setCopySelection(value);
+    // Automatically set binding choice to "yes" when copy selection is made
+    if (value === "all" || (value === "custom" && customCopies > 0)) {
+      setBindingChoice("yes");
+      // Auto scroll to addon section after a short delay
+      setTimeout(() => {
+        const addonSection = document.getElementById('addon-section');
+        if (addonSection) {
+          addonSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
   };
 
   const handleCustomCopiesChange = (value: string) => {
     const parsedValue = parseInt(value, 10);
     setCustomCopies(isNaN(parsedValue) ? 0 : parsedValue);
+    // Automatically set binding choice to "yes" when custom copies are entered
+    if (parsedValue > 0) {
+      setBindingChoice("yes");
+      // Auto scroll to addon section after a short delay
+      setTimeout(() => {
+        const addonSection = document.getElementById('addon-section');
+        if (addonSection) {
+          addonSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
   };
 
   const handleBindingTypeChange = (bindingType: string) => {
@@ -362,6 +384,13 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   useEffect(() => {
     if (selectedOption) {
       setShowCopiesInput(true);
+      // Auto scroll to copies input after a short delay
+      setTimeout(() => {
+        const copiesSection = document.getElementById('copies-section');
+        if (copiesSection) {
+          copiesSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
     } else {
       setShowCopiesInput(false);
       setShowSizeButton(false);
@@ -372,6 +401,13 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   useEffect(() => {
     if (noOfCopies > 0) {
       setShowSizeButton(true);
+      // Auto scroll to size button after a short delay
+      setTimeout(() => {
+        const sizeSection = document.getElementById('size-section');
+        if (sizeSection) {
+          sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
     } else {
       setShowSizeButton(false);
       setShowSizeOptions(false);
@@ -380,14 +416,21 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     }
   }, [noOfCopies]);
 
-  // Show binding question after size selection
+  // Show binding question after size selection (only if no copy selection has been made)
   useEffect(() => {
-    if (selectedSize && noOfCopies > 0 && !showSizeOptions) {
+    if (selectedSize && noOfCopies > 0 && !showSizeOptions && !copySelection && customCopies === 0) {
       setShowBindingQuestion(true);
+      // Auto scroll to binding question after a short delay
+      setTimeout(() => {
+        const bindingSection = document.getElementById('binding-section');
+        if (bindingSection) {
+          bindingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
     } else {
       setShowBindingQuestion(false);
     }
-  }, [selectedSize, noOfCopies, showSizeOptions]);
+  }, [selectedSize, noOfCopies, showSizeOptions, copySelection, customCopies]);
 
   const isAddToCartDisabled = !uploadedDocumentId || !selectedSize || !selectedOption || !noOfCopies || isLoading;
 
@@ -399,20 +442,20 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         </div>
       )}
       
-             <div className="max-w-[1400px] mx-auto px-4 py-8">
+             <div className="max-w-[97vw] mx-auto px-3 py-4">
          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
+           <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
              
              {/* Left Section - Static PDF Preview */}
-             <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto">
+             <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
                <div className="text-center mb-6">
                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
                  <p className="text-gray-600">Upload your PDF to see a preview</p>
                </div>
                
                {/* Upload Area */}
-               {!uploadedFile ? (
-                 <div className="flex-1 flex flex-col items-center justify-center">
+               <div className="flex-1 flex flex-col items-center justify-center w-full">
+                 {!uploadedFile ? (
                    <div className="w-full max-w-md">
                      <FileUploader 
                        onUploadSuccess={handleUploadSuccess} 
@@ -420,107 +463,107 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                        setPageCount={setPageCount} 
                      />
                    </div>
-                 </div>
-               ) : (
-                 <div className="flex-1 flex flex-col">
-                   {/* File Info */}
-                   <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-                     <div className="flex items-center justify-between">
-                       <div>
-                         <h3 className="font-semibold text-gray-900">{fileName}</h3>
-                         <p className="text-sm text-gray-600">{pageCount} pages</p>
-                       </div>
-                       <div className="text-right">
-                         <p className="text-sm font-medium text-gray-900">Document ID</p>
-                         <p className="text-xs text-gray-500">#{uploadedDocumentId}</p>
+                 ) : (
+                   <div className="w-full max-w-md">
+                     {/* File Info */}
+                     <div className="bg-white rounded-lg p-4 mb-4 shadow-sm w-full">
+                       <div className="flex items-center justify-between">
+                         <div>
+                           <h3 className="font-semibold text-gray-900">{fileName}</h3>
+                           <p className="text-sm text-gray-600">{pageCount} pages</p>
+                         </div>
+                         <div className="text-right">
+                           <p className="text-sm font-medium text-gray-900">Document ID</p>
+                           <p className="text-xs text-gray-500">#{uploadedDocumentId}</p>
+                         </div>
                        </div>
                      </div>
-                   </div>
-                   
-                   {/* PDF Preview */}
-                   <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden mb-6 min-h-0">
-                     <div className="relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white mx-auto">
-                       {pdfUrl ? (
-                         <iframe
-                           src={`${pdfUrl}#toolbar=0&page=1`}
-                           width="100%"
-                           height="100%"
-                           className="rounded-md border"
-                           title="PDF Preview"
-                         />
-                       ) : (
-                         <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
-                       )}
+                     
+                     {/* PDF Preview */}
+                     <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6 w-full">
+                       <div className="relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white mx-auto">
+                         {pdfUrl ? (
+                           <iframe
+                             src={`${pdfUrl}#toolbar=0&page=1`}
+                             width="100%"
+                             height="100%"
+                             className="rounded-md border"
+                             title="PDF Preview"
+                           />
+                         ) : (
+                           <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
+                         )}
+                       </div>
                      </div>
-                   </div>
 
-                   {/* Selected Details */}
-                   {(selectedOption || selectedSize || noOfCopies > 0 || bindingChoice) && (
-                     <div className="bg-white rounded-lg p-4 shadow-sm mt-4">
-                       <h3 className="font-semibold text-gray-900 mb-3">Selected Details</h3>
-                       <div className="space-y-2 text-sm">
-                         {selectedOption && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Print Type:</span>
-                             <span className="font-medium text-gray-900">{selectedOption}</span>
-                           </div>
-                         )}
-                         {noOfCopies > 0 && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Copies:</span>
-                             <span className="font-medium text-gray-900">{noOfCopies}</span>
-                           </div>
-                         )}
-                         {selectedSize && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Paper Size:</span>
-                             <span className="font-medium text-gray-900">{selectedSize}</span>
-                           </div>
-                         )}
-                         {bindingChoice && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Binding:</span>
-                             <span className="font-medium text-gray-900">
-                               {bindingChoice === "yes" ? "Yes" : "No"}
-                             </span>
-                           </div>
-                         )}
-                         {bindingChoice === "yes" && selectedBindingType && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Binding Type:</span>
-                             <span className="font-medium text-gray-900">{selectedBindingType}</span>
-                           </div>
-                         )}
-                         {bindingChoice === "yes" && selectedBindingType === "Hard Binding" && selectedBinderColor && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Binder Color:</span>
-                             <span className="font-medium text-gray-900">{selectedBinderColor}</span>
-                           </div>
-                         )}
-                         {bindingChoice === "yes" && copySelection && (
-                           <div className="flex justify-between">
-                             <span className="text-gray-600">Binding Copies:</span>
-                             <span className="font-medium text-gray-900">
-                               {copySelection === "all" ? "All Copies" : `Custom (${customCopies})`}
-                </span>
-              </div>
-                         )}
-                         {calculatedPrice && (
-                           <div className="flex justify-between border-t pt-2">
-                             <span className="text-gray-600 font-semibold">Total Price:</span>
-                             <span className="font-bold text-black">₹{calculatedPrice.toFixed(2)}</span>
-                           </div>
-                         )}
+                     {/* Selected Details */}
+                     {(selectedOption || selectedSize || noOfCopies > 0 || bindingChoice) && (
+                       <div className="bg-white rounded-lg p-4 shadow-sm mt-4 w-full">
+                         <h3 className="font-semibold text-gray-900 mb-3">Selected Details</h3>
+                         <div className="space-y-2 text-sm">
+                           {selectedOption && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Print Type:</span>
+                               <span className="font-medium text-gray-900">{selectedOption}</span>
+                             </div>
+                           )}
+                           {noOfCopies > 0 && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Copies:</span>
+                               <span className="font-medium text-gray-900">{noOfCopies}</span>
+                             </div>
+                           )}
+                           {selectedSize && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Paper Size:</span>
+                               <span className="font-medium text-gray-900">{selectedSize}</span>
+                             </div>
+                           )}
+                           {bindingChoice && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Binding:</span>
+                               <span className="font-medium text-gray-900">
+                                 {bindingChoice === "yes" ? "Yes" : "No"}
+                               </span>
+                             </div>
+                           )}
+                           {bindingChoice === "yes" && selectedBindingType && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Binding Type:</span>
+                               <span className="font-medium text-gray-900">{selectedBindingType}</span>
+                             </div>
+                           )}
+                           {bindingChoice === "yes" && selectedBindingType === "Hard Binding" && selectedBinderColor && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Binder Color:</span>
+                               <span className="font-medium text-gray-900">{selectedBinderColor}</span>
+                             </div>
+                           )}
+                           {bindingChoice === "yes" && copySelection && (
+                             <div className="flex justify-between">
+                               <span className="text-gray-600">Binding Copies:</span>
+                               <span className="font-medium text-gray-900">
+                                 {copySelection === "all" ? "All Copies" : `Custom (${customCopies})`}
+                               </span>
+                             </div>
+                           )}
+                           {calculatedPrice && (
+                             <div className="flex justify-between border-t pt-2">
+                               <span className="text-gray-600 font-semibold">Total Price:</span>
+                               <span className="font-bold text-black">₹{calculatedPrice.toFixed(2)}</span>
+                             </div>
+                           )}
+                         </div>
                        </div>
-                     </div>
-                   )}
-                 </div>
-               )}
+                     )}
+                   </div>
+                 )}
+               </div>
              </div>
 
                          {/* Right Section - Dynamic Configuration */}
-             <div className="p-8 bg-white overflow-y-auto h-screen">
-               <div className="max-w-md mx-auto">
+             <div className="p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
+               <div className="max-w-5xl mx-auto">
                  <div className="text-center mb-8">
                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Paper Print</h1>
                    <p className="text-gray-600">Configure your print settings</p>
@@ -589,7 +632,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
                    {/* Step 2: Number of Copies - Only show after color selection */}
                    {showCopiesInput && (
-                     <div className="bg-gray-50 rounded-xl p-6">
+                     <div id="copies-section" className="bg-gray-50 rounded-xl p-6">
                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Number of Copies</h3>
                        <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
                        
@@ -611,7 +654,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
                    {/* Step 3: Size Selection Button - Only show after copies are entered */}
                    {showSizeButton && !showSizeOptions && (
-                     <div className="bg-gray-50 rounded-xl p-6">
+                     <div id="size-section" className="bg-gray-50 rounded-xl p-6">
                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Size</h3>
                        <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
                        
@@ -708,13 +751,22 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
                    {/* Step 4: Binding Question - Only show after size selection */}
                    {showBindingQuestion && bindingChoice === null && (
-                     <div className="bg-gray-50 rounded-xl p-6">
+                     <div id="binding-section" className="bg-gray-50 rounded-xl p-6">
                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Binding Feature</h3>
                        <p className="text-sm text-gray-600 mb-6">Do you want binding feature in your printing?</p>
                        
                        <div className="space-y-3">
                          <button
-                           onClick={() => setBindingChoice("yes")}
+                           onClick={() => {
+                             setBindingChoice("yes");
+                             // Auto scroll to addon section after a short delay
+                             setTimeout(() => {
+                               const addonSection = document.getElementById('addon-section');
+                               if (addonSection) {
+                                 addonSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                               }
+                             }, 300);
+                           }}
                            className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 text-left"
                          >
                            <div className="flex items-center justify-between">
@@ -748,7 +800,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
                    {/* Step 5: Add-on Services - Only show after user chooses "Yes" for binding */}
                    {selectedOption && selectedSize && noOfCopies > 0 && !showSizeOptions && bindingChoice === "yes" && (
-                     <div className="bg-gray-50 rounded-xl p-6">
+                     <div id="addon-section" className="bg-gray-50 rounded-xl p-6">
                        <div className="flex items-center justify-between mb-4">
                          <h3 className="text-lg font-semibold text-gray-900">Add-on Services</h3>
                          <button
