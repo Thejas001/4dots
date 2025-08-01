@@ -40,55 +40,253 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-[7px] bg-[#fcfcfc] px-[25px] md:gap-6 md:px-20">
-      <div className="col-span-12 flex items-center justify-center pb-1 pt-[27px] text-xl font-medium  text-[#242424]">
-        Our Product
-      </div>
+    <>
+      {/* Mobile Wall Decoratives Section */}
+      <div className="md:hidden bg-[#fcfcfc] px-4 py-6">
+        <div className="text-center text-xl font-bold text-[#242424] mb-6">
+          Our Product
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          {/* Photo Frame */}
+          <Link href={`/ProductDetails/photo-frame?dataId=2`} passHref prefetch={true}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/photoframe.jpg"
+                  alt="Photo Frames"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(2)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
 
-      {/**Photo Frame */}
-      <div data-id="2" className="relative col-span-7 h-[186px] overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-5">
-        <Link href={`/ProductDetails/photo-frame?dataId=2`} passHref prefetch={true}> 
-          <img
-            src="/images/product/photoframe.jpg"
-            alt="Photo Frames"
-            loading="eager"
-            className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
-          />
-          <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-2 py-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:text-xl">
-          {getProductDetails(2)?.name || "Loading..."}
-
-          </div>
-
-          <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-              <span className="flex items-center">
-                Starting From @
-                <span className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                    <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                  </svg>1000
-                </span>
-              </span>
-          </button>
-        </Link>
-      </div>
-
-      {/**paper print & Business Card*/}
-      <div data-id="1" className="col-span-5 grid h-[186px] grid-rows-2 gap-2 overflow-hidden md:h-[522px] md:gap-6 lg:col-span-3">
-        <div className=" relative col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
+          {/* Paper Print */}
           <Link href={`/ProductDetails/paper-print?dataId=1`} passHref>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/bussinesscard.jpg"
+                  alt="Paper Print"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(1)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Business Card */}
+          <Link href={`/ProductDetails/business-card?dataId=3`}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/bussinesscard.jpg"
+                  alt="Business Card"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(3)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Letter Head */}
+          <Link href={`/ProductDetails/letter-head?dataId=4`}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/letterhead.jpg"
+                  alt="Letter Head"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(4)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Offset Printing */}
+          <Link href={`/ProductDetails/offset-printing?dataId=5`}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/Flyer.jpg"
+                  alt="Offset Printing"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(5) ? "Bulk Flyers" : "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Canvas Printing */}
+          <Link href={`/ProductDetails/canvas-printing?dataId=6`}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/first5.png"
+                  alt="Canvas Printing"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(6)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Polaroid Cards */}
+          <Link href={`/ProductDetails/polaroid-card?dataId=7`} prefetch={true}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/polaroidnew.png"
+                  alt="Polaroid Cards"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(7)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+
+          {/* Name Slip */}
+          <Link href={`/ProductDetails/custom-name-slip?dataId=8`} prefetch={true}>
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/polaroid.png"
+                  alt="Name Slip"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(8)?.name || "Loading..."}</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Desktop Product List */}
+      <div className="hidden md:grid grid-cols-12 gap-[7px] bg-[#fcfcfc] px-[25px] md:gap-6 md:px-20">
+        <div className="col-span-12 flex items-center justify-center pb-1 pt-[27px] text-xl font-medium  text-[#242424]">
+          Our Product
+        </div>
+
+        {/**Photo Frame */}
+        <div data-id="2" className="relative col-span-7 h-[186px] overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-5">
+          <Link href={`/ProductDetails/photo-frame?dataId=2`} passHref prefetch={true}> 
             <img
-              src="/images/product/bussinesscard.jpg"
-              alt=""
+              src="/images/product/photoframe.jpg"
+              alt="Photo Frames"
               loading="eager"
               className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
             />
-            <div className="absolute left-[10px] top-[10px] rounded-full bg-[#242424] px-0.5 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-            {getProductDetails(1)?.name || "Loading..."}
+            <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-2 py-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:text-xl">
+            {getProductDetails(2)?.name || "Loading..."}
+
             </div>
-            <button onClick={(e) => e.stopPropagation()} className="absolute bottom-0 right-0 flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
+
+            <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
+                <span className="flex items-center">
+                  Starting From @
+                  <span className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                    </svg>1000
+                  </span>
+                </span>
+            </button>
+          </Link>
+        </div>
+
+        {/**paper print & Business Card*/}
+        <div data-id="1" className="col-span-5 grid h-[186px] grid-rows-2 gap-2 overflow-hidden md:h-[522px] md:gap-6 lg:col-span-3">
+          <div className=" relative col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
+            <Link href={`/ProductDetails/paper-print?dataId=1`} passHref>
+              <img
+                src="/images/product/bussinesscard.jpg"
+                alt=""
+                loading="eager"
+                className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+              />
+              <div className="absolute left-[10px] top-[10px] rounded-full bg-[#242424] px-0.5 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
+              {getProductDetails(1)?.name || "Loading..."}
+              </div>
+              <button onClick={(e) => e.stopPropagation()} className="absolute bottom-0 right-0 flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
+                    <span className="flex items-center">
+                      Starting From @
+                       <span className="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                          <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                        </svg>1000
+                      </span>
+                    </span>
+                </button>
+            </Link>
+          </div>
+
+          <div data-id="3" className=" relative  col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
+            <Link href={`/ProductDetails/business-card?dataId=3`}>
+              <img
+                src="images/product/bussinesscard.jpg"
+                loading="eager"
+                alt=""
+                className="aspect-[3/2] h-full w-full  object-cover transition-transform duration-700 hover:scale-110"
+              />
+              <div className="absolute left-[10px] top-[10px] rounded-full bg-[#242424] px-0.5 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
+              {getProductDetails(3)?.name || "Loading..."}
+              </div>
+              <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
                   <span className="flex items-center">
                     Starting From @
-                     <span className="flex items-center">
+                    <span className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                        <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                      </svg>1000
+                    </span>
+                  </span>
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/**Offset Printing*/}
+        <div data-id="5" className="relative col-span-4 h-[163.729px] overflow-hidden rounded-[6.017px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-4">
+          <Link href={`/ProductDetails/offset-printing?dataId=5`}>
+            <img
+              src="/images/product/Flyer.jpg"
+              loading="eager"
+              alt="Photo Frames"
+              className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+            />
+            <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
+            {getProductDetails(5) ? "Bulk Flyers" : "Loading..."}
+
+            </div>
+              <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
+                  <span className="flex items-center">
+                    Starting From @
+                    <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
                       </svg>1000
@@ -98,160 +296,110 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </Link>
         </div>
 
-        <div data-id="3" className=" relative  col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
-          <Link href={`/ProductDetails/business-card?dataId=3`}>
-            <img
-              src="images/product/bussinesscard.jpg"
-              loading="eager"
-              alt=""
-              className="aspect-[3/2] h-full w-full  object-cover transition-transform duration-700 hover:scale-110"
-            />
-            <div className="absolute left-[10px] top-[10px] rounded-full bg-[#242424] px-0.5 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-            {getProductDetails(3)?.name || "Loading..."}
-            </div>
-            <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-                <span className="flex items-center">
-                  Starting From @
+        {/**Letter Head & Canvas printing*/}
+        <div data-id="4" className="col-span-8 grid grid-cols-12 gap-2 md:gap-6 lg:col-span-12">
+          <div className="relative col-span-12 h-[78.525px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-8">
+            <Link href={`/ProductDetails/letter-head?dataId=4`}>
+              <img
+                src="/images/product/letterhead.jpg"
+                loading="eager"
+                alt=""
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+              />
+              <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
+              {getProductDetails(4)?.name || "Loading..."}
+              </div>
+                <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
                   <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
+                    Starting From @
+                    <span className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                        <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                      </svg>1000
+                    </span>
                   </span>
-                </span>
-            </button>
-          </Link>
-        </div>
-      </div>
-
-      {/**Offset Printing*/}
-      <div data-id="5" className="relative col-span-4 h-[163.729px] overflow-hidden rounded-[6.017px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-4">
-        <Link href={`/ProductDetails/offset-printing?dataId=5`}>
-          <img
-            src="/images/product/Flyer.jpg"
-            loading="eager"
-            alt="Photo Frames"
-            className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
-          />
-          <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-          {getProductDetails(5) ? "Bulk Flyers" : "Loading..."}
-
+              </button>
+            </Link>
           </div>
-            <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-                <span className="flex items-center">
-                  Starting From @
-                  <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
-                  </span>
-                </span>
-            </button>
-        </Link>
-      </div>
 
-      {/**Letter Head & Canvas printing*/}
-      <div data-id="4" className="col-span-8 grid grid-cols-12 gap-2 md:gap-6 lg:col-span-12">
-        <div className="relative col-span-12 h-[78.525px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-8">
-          <Link href={`/ProductDetails/letter-head?dataId=4`}>
+          {/**Canvas Printing */}
+          <div data-id="6" className="relative col-span-12 h-[79px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-4">
+            <Link href={`/ProductDetails/canvas-printing?dataId=6`}>
+              <img
+                src="/images/product/first5.png"
+                loading="eager"
+                alt="Photo Frames"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+              />
+              <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
+              {getProductDetails(6)?.name || "Loading..."}
+              </div>
+                <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
+                  <span className="flex items-center">
+                    Starting From @
+                    <span className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                        <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                      </svg>1000
+                    </span>
+                  </span>
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/**Polaroid cards & NameSlip*/}
+        <div data-id="7" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
+          <Link href={`/ProductDetails/polaroid-card?dataId=7`} prefetch={true}>
             <img
-              src="/images/product/letterhead.jpg"
-              loading="eager"
+            
+              src="/images/product/polaroidnew.png"
               alt=""
+              loading="eager"
               className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
             />
             <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-            {getProductDetails(4)?.name || "Loading..."}
+            {getProductDetails(7)?.name || "Loading..."}
             </div>
               <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-                <span className="flex items-center">
-                  Starting From @
                   <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
+                    Starting From @
+                    <span className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                        <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                      </svg>1000
+                    </span>
                   </span>
-                </span>
-            </button>
+              </button>
           </Link>
         </div>
 
-        {/**Canvas Printing */}
-        <div data-id="6" className="relative col-span-12 h-[79px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-4">
-          <Link href={`/ProductDetails/canvas-printing?dataId=6`}>
+        {/**Name Slip*/}
+        <div data-id="8" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
+          <Link href={`ProductDetails/custom-name-slip?dataId=8`} prefetch={true}>
             <img
-              src="/images/product/first5.png"
+              src="/images/product/polaroid.png"
+              alt=""
               loading="eager"
-              alt="Photo Frames"
-              className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+              className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
             />
             <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-            {getProductDetails(6)?.name || "Loading..."}
+            {getProductDetails(8)?.name || "Loading..."}
             </div>
               <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-                <span className="flex items-center">
-                  Starting From @
                   <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
+                    Starting From @
+                    <span className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                        <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                      </svg>1000
+                    </span>
                   </span>
-                </span>
-            </button>
+              </button>
           </Link>
         </div>
       </div>
-
-      {/**Polaroid cards & NameSlip*/}
-      <div data-id="7" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
-        <Link href={`/ProductDetails/polaroid-card?dataId=7`} prefetch={true}>
-          <img
-          
-            src="/images/product/polaroidnew.png"
-            alt=""
-            loading="eager"
-            className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
-          />
-          <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-          {getProductDetails(7)?.name || "Loading..."}
-          </div>
-            <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-                <span className="flex items-center">
-                  Starting From @
-                  <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
-                  </span>
-                </span>
-            </button>
-        </Link>
-      </div>
-
-      {/**Name Slip*/}
-      <div data-id="8" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
-        <Link href={`ProductDetails/custom-name-slip?dataId=8`} prefetch={true}>
-          <img
-            src="/images/product/polaroid.png"
-            alt=""
-            loading="eager"
-            className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
-          />
-          <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-          {getProductDetails(8)?.name || "Loading..."}
-          </div>
-            <button onClick={(e) => e.stopPropagation()} className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base">
-                <span className="flex items-center">
-                  Starting From @
-                  <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
-                  </span>
-                </span>
-            </button>
-        </Link>
-      </div>
-    </div>
+    </>
   );
 };
 
