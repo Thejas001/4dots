@@ -442,7 +442,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         </div>
       )}
       
-             <div className="max-w-[97vw] mx-auto px-3 py-4">
+      <div className="w-[99vw] py-4">
          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
            <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
              

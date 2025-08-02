@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { fetchProducts } from "@/utils/api";
 
+
 export const metadata: Metadata = {
   title: "4 Dots",
   description: "This is a Printing Website",
@@ -13,6 +14,7 @@ export default async  function Home() {
   return (
     <>
       <DefaultLayout>
+       
         <ECommerce products={products} />
       </DefaultLayout>
     </>
