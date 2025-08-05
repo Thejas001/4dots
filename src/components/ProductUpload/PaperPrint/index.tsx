@@ -578,6 +578,17 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     
     // Filter sizes based on conditions
     const filteredSizes = allSizes.filter((size: string) => {
+      // For 13*19 single side: hide when print type is B/W
+      if (size.toLowerCase().includes('13') && !size.toLowerCase().includes('double') && selectedOption === "B/W") {
+        if (process.env.NODE_ENV === 'development') {
+          console.log("🔍 13*19 single side B/W: hiding (not available for B/W)", {
+            size,
+            selectedOption
+          });
+        }
+        return false; // Hide 13*19 single side for B/W
+      }
+      
       // Check if this is a double-sided option
       const isDoubleSided = size.toUpperCase().includes("DOUBLE SIDE");
       

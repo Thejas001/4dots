@@ -206,6 +206,17 @@ export const isDoubleSidedAvailable = (
     }
   }
   
+  // For 13*19 single side: not available for B/W
+  if (selectedSize.toLowerCase().includes('13') && !selectedSize.toLowerCase().includes('double') && selectedColor === "BlackAndWhite") {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("❌ 13*19 single side not available for B/W", {
+        selectedSize,
+        selectedColor
+      });
+    }
+    return false;
+  }
+  
   // For double-sided availability check, we need to consider that quantity will be multiplied
   // Check if there's any quantity that would make the total sheets fall within a pricing range
   // We'll check with a minimum quantity of 1 to see if the base sheet count has any pricing rule
