@@ -7,8 +7,13 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Loader from "../common/Loader";
+import toast from "react-hot-toast";
 
-function OTPInputComponent() {
+interface OTPInputComponentProps {
+  onLoginSuccess?: () => void;
+}
+
+function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -73,8 +78,16 @@ function OTPInputComponent() {
       // Dispatch custom event for login success
       window.dispatchEvent(new CustomEvent("userLoggedIn", { detail: { token } }));
 
-      //Redirect user after successful login
-      router.push(redirectPath); // Redirect to the landing page
+      // Show success message
+      toast.success("Login successful!");
+
+      // Call the callback if provided, otherwise redirect
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      } else {
+        // Fallback to redirect if no callback provided
+        router.push(redirectPath);
+      }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err)); // Handle OTP verification errors

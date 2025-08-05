@@ -60,7 +60,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(2)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹90</p>
               </div>
             </div>
           </Link>
@@ -77,7 +77,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(1)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹2</p>
               </div>
             </div>
           </Link>
@@ -94,7 +94,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(3)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹405</p>
               </div>
             </div>
           </Link>
@@ -111,7 +111,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(4)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹400</p>
               </div>
             </div>
           </Link>
@@ -128,7 +128,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(5) ? "Bulk Flyers" : "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1350</p>
               </div>
             </div>
           </Link>
@@ -138,14 +138,14 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
-                  src="/images/product/first5.png"
+                  src="/images/product/canvas.jpg"
                   alt="Canvas Printing"
                   className="w-full h-32 object-cover"
                 />
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(6)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹250</p>
               </div>
             </div>
           </Link>
@@ -162,7 +162,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(7)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹8</p>
               </div>
             </div>
           </Link>
@@ -172,14 +172,14 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
-                  src="/images/product/nameslip.jpg"
+                  src="/images/product/nameslip1.jpg"
                   alt="Name Slip"
                   className="w-full h-32 object-cover"
                 />
               </div>
               <div className="p-3">
                 <h3 className="font-bold text-sm text-[#242424] mb-1">{getProductDetails(8)?.name || "Loading..."}</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹1000</p>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹8</p>
               </div>
             </div>
           </Link>
@@ -212,7 +212,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                   <span className="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                       <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                    </svg>1000
+                    </svg>90
                   </span>
                 </span>
             </button>
@@ -238,7 +238,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                        <span className="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                           <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                        </svg>1000
+                        </svg>2
                       </span>
                     </span>
                 </button>
@@ -262,7 +262,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                      </svg>1000
+                      </svg>405
                     </span>
                   </span>
               </button>
@@ -289,7 +289,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                      </svg>1000
+                      </svg>400
                     </span>
                   </span>
               </button>
@@ -315,7 +315,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                      </svg>1000
+                      </svg>1350
                     </span>
                   </span>
               </button>
@@ -326,7 +326,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           <div data-id="6" className="relative col-span-12 h-[79px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-4">
             <Link href={`/ProductDetails/canvas-printing?dataId=6`}>
               <img
-                src="/images/product/first5.png"
+                src="/images/product/canvas.jpg"
                 loading="eager"
                 alt="Photo Frames"
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -367,7 +367,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                      </svg>1000
+                      </svg>8
                     </span>
                   </span>
               </button>
@@ -378,7 +378,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <div data-id="8" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
           <Link href={`ProductDetails/custom-name-slip?dataId=8`} prefetch={true}>
             <img
-              src="/images/product/nameslip.jpg"
+              src="/images/product/nameslip1.jpg"
               alt=""
               loading="eager"
               className="aspect-[3/2] h-full w-full object-cover transition-transform duration-700 hover:scale-110"
@@ -392,7 +392,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                     <span className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
                         <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                      </svg>1000
+                      </svg>8
                     </span>
                   </span>
               </button>

@@ -13,6 +13,7 @@ import { Metadata } from "next";
 import NetworkErrorPage from "@/components/NetworkErrorPage";
 import { Suspense } from "react";
 import Loader from "@/components/common/Loader";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "4 Dots",
@@ -58,17 +59,30 @@ export default async function PageDetails({
   return (
     <DefaultLayout>
       <Suspense fallback={<Loader />}>
-      {/* ✅*/}
-             {(() => {
+      {/* Back Button - Moved to top */}
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20 py-6">
+        <Link href="/" passHref>
+          <div className="flex items-center cursor-pointer">
+            <img
+              src="/images/login/back-arrow.svg"
+              alt="Back"
+              className="w-5 h-5 sm:w-6 sm:h-6"
+            />
+          </div>
+        </Link>
+      </div>
+      
+      {/* ✅ Pass product data to the specific product component */}
+      <SpecificProductComponent product={product} />
+      
+      {/* ✅ Description part moved below the upload section */}
+      {(() => {
          console.log("Product ID:", product?.id);
          console.log("Product Name:", product?.name);
          console.log("Condition check:", product?.id === 1 && product?.name === "Paper Printing");
          console.log("Should show description:", !(product?.id === 1 && product?.name === "Paper Printing"));
          return !(product?.id === 1 && product?.name === "Paper Printing") && <ProductDescription product={product} />;
        })()}
-
-      {/* ✅ Pass product data to the specific product component */}
-      <SpecificProductComponent product={product} />
       </Suspense>
     </DefaultLayout>
   );

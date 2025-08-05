@@ -435,6 +435,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const isAddToCartDisabled = !uploadedDocumentId || !selectedSize || !selectedOption || !noOfCopies || isLoading;
 
   return (
+
+    
     <div className="min-h-screen bg-gray-50">
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">

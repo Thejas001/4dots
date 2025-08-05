@@ -58,19 +58,6 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
 
   return (
     <div className="px-4 sm:px-6 md:px-12 lg:px-20 py-6">
-    {/* Back Button */}
-    <div className="mb-4">
-      <Link href="/" passHref>
-        <div className="flex items-center cursor-pointer">
-          <img
-            src="/images/login/back-arrow.svg"
-            alt="Back"
-            className="w-5 h-5 sm:w-6 sm:h-6"
-          />
-        </div>
-      </Link>
-    </div>
-  
     {/* Main Content */}
     <div className="flex flex-col-reverse lg:flex-row items-start lg:items-center gap-6 lg:gap-16">
       {/* Left Section (Text) */}
