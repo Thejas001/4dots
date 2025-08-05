@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import OTPInputComponent from "../OTPInput/OTPInput";
-import Loader from "../common/Loader";
 
 interface SigininComponentProps {
   isOpen?: boolean;
@@ -11,13 +10,7 @@ interface SigininComponentProps {
 }
 
 const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onClose }) => {
-  const [isLoading, setIsLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timeout);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,18 +21,19 @@ const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onCl
     }
   }, [isOpen]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <Loader />
-      </div>
-    );
-  }
+  // Remove the loading state since it's handled by the layout
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center bg-white">
+  //       <Loader />
+  //     </div>
+  //   );
+  // }
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
       <div 
         className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
@@ -48,22 +42,23 @@ const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onCl
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className={`relative mx-4 w-full max-w-md transform transition-all duration-300 ${
-        isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-      }`}>
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute -top-4 -right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 transition-all duration-200 hover:scale-110"
-        >
-          <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+             {/* Modal */}
+       <div className={`relative mx-4 w-full max-w-md transform transition-all duration-300 ${
+         isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+       }`}>
+                  {/* Close Button - Full Circle Clickable */}
+          <button
+            onClick={onClose}
+            className="absolute -top-6 -right-6 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 transition-all duration-200 hover:scale-110 cursor-pointer"
+            aria-label="Close modal"
+          >
+            <svg className="h-6 w-6 text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-                 {/* Modal Content */}
-         <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl border border-gray-200">
+                  {/* Modal Content */}
+          <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl border border-gray-200">
            
                        {/* Content */}
             <div className="relative z-10 p-8">
@@ -83,7 +78,7 @@ const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onCl
                 {/* Title */}
                 <div className="mt-4">
                   <h2 className="mb-3 text-2xl font-bold text-gray-900">
-                    Welcome Back
+                    LOGIN
                   </h2>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     Enter your mobile number to receive a verification code

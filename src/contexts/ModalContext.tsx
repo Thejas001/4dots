@@ -31,6 +31,10 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const closeLoginModal = useCallback(() => {
     setIsLoginModalOpen(false);
+    // Redirect to home page when modal is closed without login
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/');
+    }
   }, []);
 
   return (
