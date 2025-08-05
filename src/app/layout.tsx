@@ -8,7 +8,7 @@ import Loader from "@/components/common/Loader";
 import { Toaster } from "react-hot-toast";
 import { processPendingCartItem } from "@/utils/processPendingCartItem";
 import { useCartStore } from "@/utils/store/cartStore";
-import { ModalProvider } from "@/contexts/ModalContext";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export default function RootLayout({
   children,
@@ -71,10 +71,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <ModalProvider>
-          <div className="dark:bg-boxdark-2 dark:text-bodydark">
-            {loading ? <Loader /> : children}
-          </div>
+        <div className="dark:bg-boxdark-2 dark:text-bodydark">
+          {loading ? <Loader /> : children}
+        </div>
+        <FloatingWhatsApp />
           <Toaster
             position="bottom-right"
             toastOptions={{

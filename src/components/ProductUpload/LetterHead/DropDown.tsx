@@ -17,6 +17,15 @@ interface Props {
   onQuantityChange: (quantity: number) => void;
   onQualityChange: (quality: string) => void;
   selectedOption: string;
+  showQualityButton: boolean;
+  showQualityOptions: boolean;
+  showQuantityInput: boolean;
+  showSizeButton: boolean;
+  showSizeOptions: boolean;
+  onShowQualityOptions: (show: boolean) => void;
+  onShowQuantityInput: (show: boolean) => void;
+  onShowSizeButton: (show: boolean) => void;
+  onShowSizeOptions: (show: boolean) => void;
 }
 
 const DropDown = ({
@@ -25,12 +34,18 @@ const DropDown = ({
   onQuantityChange,
   onQualityChange,
   selectedOption,
+  showQualityButton,
+  showQualityOptions,
+  showQuantityInput,
+  showSizeButton,
+  showSizeOptions,
+  onShowQualityOptions,
+  onShowQuantityInput,
+  onShowSizeButton,
+  onShowSizeOptions,
 }: Props) => {
-  const [isOpenSize, setIsOpenSize] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
-  const [isOpenQuantity, setIsOpenQuantity] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
-  const [isOpenQuality, setIsOpenQuality] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState("");
 
   const sizeOptions = productDetails.sizes || [];
@@ -69,180 +84,316 @@ const DropDown = ({
     return sizes;
   }, [selectedOption, selectedQuality, selectedQuantity]);
 
-  // Reset dependent selections when quality or quantity changes
+  // Handle quality selection with progressive disclosure
   const handleQualityChange = (quality: string) => {
     setSelectedQuality(quality);
     onQualityChange(quality);
     setSelectedQuantity(null); // Reset quantity
     setSelectedSize(""); // Reset size
-    setIsOpenQuality(false);
+    onShowQualityOptions(false); // Close quality options
+    onShowQuantityInput(true); // Show quantity input
+    onShowSizeButton(false); // Hide size button
+    onShowSizeOptions(false); // Hide size options
   };
 
+  // Handle quantity selection with progressive disclosure
   const handleQuantityChange = (quantity: number) => {
     setSelectedQuantity(quantity);
     onQuantityChange(quantity);
     setSelectedSize(""); // Reset size
-    setIsOpenQuantity(false);
+    onShowSizeButton(true); // Show size button
+    onShowSizeOptions(false); // Hide size options
+  };
+
+  // Handle size selection with progressive disclosure
+  const handleSizeChange = (size: string) => {
+    setSelectedSize(size);
+    onSizeChange(size);
+    onShowSizeOptions(false); // Close size options
   };
 
   return (
     <div className="flex flex-col md:flex-row gap-6 md:gap-[45px] w-full">
-      {/* Left DropDown Section */}
-      <div className="flex flex-col gap-5 md:gap-10 w-full md:w-1/2">
-        {/* Quality Dropdown */}
-        <div className="h-auto">
-          <label
-            htmlFor="quality-select"
-            className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5"
-          >
-            Quality
-          </label>
-          <div
-            id="quality-select"
-            role="combobox"
-            aria-expanded={isOpenQuality}
-            className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
-            onClick={() => setIsOpenQuality(!isOpenQuality)}
-          >
-            <div className="text-sm font-normal text-gray-700">
-              {selectedQuality || "Quality"}
+      {/* Mobile Layout: Progressive disclosure */}
+      <div className="flex flex-col gap-5 md:gap-10 w-full md:hidden">
+        {/* Quality Section */}
+        {showQualityButton && !showQualityOptions && selectedOption && (
+          <div className="h-auto">
+            <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+              Quality
+            </label>
+            <button
+              onClick={() => onShowQualityOptions(true)}
+              className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+            >
+              <span className="text-gray-700 font-medium">
+                {selectedQuality || "Click to select quality"}
+              </span>
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Quality Options */}
+        {showQualityOptions && (
+          <div className="h-auto">
+            <div className="flex items-center justify-between mb-2.5">
+              <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px]">
+                Quality
+              </label>
+              <button
+                onClick={() => onShowQualityOptions(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-              ▼
-            </span>
-          </div>
-          {isOpenQuality && (
-            <ul
-              className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg"
-              role="listbox"
-            >
-             {qualityOptions
-                .filter((option) => availableQualities.includes(option)) // ✅ only available
+            <div className="border rounded-md bg-white">
+              {qualityOptions
+                .filter((option) => availableQualities.includes(option))
                 .map((option, index) => (
-                    <li
-                        key={index}
-                        role="option"
-                        aria-selected={selectedQuality === option}
-                        className={`px-5 py-3 text-sm cursor-pointer ${
-                            selectedQuality === option
-                                ? "bg-[#242424] text-white"
-                                : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
-                        }`}
-                        onClick={() => {
-                            handleQualityChange(option);
-                        }}
-                    >
-                        {option}
-                    </li>
-            ))}
-
-            </ul>
-          )}
-        </div>
-
-        {/* Size Dropdown */}
-        <div className="h-auto">
-          <label
-            htmlFor="size-select"
-            className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5"
-          >
-            Size
-          </label>
-          <div
-            id="size-select"
-            role="combobox"
-            aria-expanded={isOpenSize}
-            className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
-            onClick={() => setIsOpenSize(!isOpenSize)}
-          >
-            <div className="text-sm font-normal text-gray-700">{selectedSize || "Size"}</div>
-            <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-              ▼
-            </span>
+                  <div
+                    key={index}
+                    className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                      selectedQuality === option
+                        ? "bg-[#242424] text-white"
+                        : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                    }`}
+                    onClick={() => handleQualityChange(option)}
+                  >
+                    {option}
+                  </div>
+                ))}
+            </div>
           </div>
-          {isOpenSize && (
-            <ul
-              className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg"
-              role="listbox"
-            >
-            {sizeOptions
-                .filter((option) => availableSizes.includes(option)) // ✅ Filter only available
-                .map((option, index) => (
-                    <li
-                        key={index}
-                        role="option"
-                        aria-selected={selectedSize === option}
-                        className={`px-5 py-3 text-sm cursor-pointer ${
-                            selectedSize === option
-                                ? "bg-[#242424] text-white"
-                                : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
-                        }`}
-                        onClick={() => {
-                            setSelectedSize(option);
-                            onSizeChange(option);
-                            setIsOpenSize(false);
-                        }}
-                    >
-                        {option}
-                    </li>
-            ))}
+        )}
 
-            </ul>
-          )}
-        </div>
+        {/* Quantity Section */}
+        {showQuantityInput && selectedQuality && (
+          <div className="h-auto">
+            <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+              Quantity
+            </label>
+            <select
+              value={selectedQuantity || ""}
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                handleQuantityChange(value);
+              }}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
+            >
+              <option value="">Select quantity</option>
+              {availableQuantities.map((quantity) => (
+                <option key={quantity} value={quantity}>
+                  {quantity} copies
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Size Section */}
+        {showSizeButton && !showSizeOptions && selectedQuantity && (
+          <div className="h-auto">
+            <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+              Size
+            </label>
+            <button
+              onClick={() => onShowSizeOptions(true)}
+              className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+            >
+              <span className="text-gray-700 font-medium">
+                {selectedSize || "Click to select size"}
+              </span>
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Size Options */}
+        {showSizeOptions && (
+          <div className="h-auto">
+            <div className="flex items-center justify-between mb-2.5">
+              <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px]">
+                Size
+              </label>
+              <button
+                onClick={() => onShowSizeOptions(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="border rounded-md bg-white">
+              {sizeOptions
+                .filter((option) => availableSizes.includes(option))
+                .map((option, index) => (
+                  <div
+                    key={index}
+                    className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                      selectedSize === option
+                        ? "bg-[#242424] text-white"
+                        : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                    }`}
+                    onClick={() => handleSizeChange(option)}
+                  >
+                    {option}
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Right DropDown Section */}
-      <div className="flex flex-col gap-4 w-full md:w-1/2">
-        {/* Quantity Dropdown */}
-        <div className="h-auto">
-          <label
-            htmlFor="quantity-select"
-            className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5"
-          >
-            Quantity
-          </label>
-          <div
-            id="quantity-select"
-            role="combobox"
-            aria-expanded={isOpenQuantity}
-            className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
-            onClick={() => setIsOpenQuantity(!isOpenQuantity)}
-          >
-            <div className="text-sm font-normal text-gray-700">
-              {selectedQuantity || "Quantity"}
+      {/* Desktop Layout: Progressive disclosure */}
+      <div className="hidden md:flex md:flex-row gap-6 md:gap-[45px] w-full">
+        {/* Left Section */}
+        <div className="flex flex-col gap-5 md:gap-10 w-full md:w-1/2">
+          {/* Quality Section */}
+          {showQualityButton && !showQualityOptions && selectedOption && (
+            <div className="h-auto">
+              <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+                Quality
+              </label>
+              <button
+                onClick={() => onShowQualityOptions(true)}
+                className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+              >
+                <span className="text-gray-700 font-medium">
+                  {selectedQuality || "Click to select quality"}
+                </span>
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             </div>
-            <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-              ▼
-            </span>
-          </div>
-          {isOpenQuantity && (
-            <ul
-              className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg"
-              role="listbox"
-            >
-            {quantityOptions
-                .map(Number) // ensure numbers
-                .filter((option) => availableQuantities.includes(option)) // ✅ show only available
-                .map((option, index) => (
-                    <li
-                        key={index}
-                        role="option"
-                        aria-selected={selectedQuantity === option}
-                        className={`px-5 py-3 text-sm cursor-pointer ${
-                            selectedQuantity === option
-                                ? "bg-[#242424] text-white"
-                                : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
-                        }`}
-                        onClick={() => {
-                            handleQuantityChange(option);
-                        }}
-                    >
-                        {option}
-                    </li>
-            ))}
+          )}
 
-            </ul>
+          {/* Quality Options */}
+          {showQualityOptions && (
+            <div className="h-auto">
+              <div className="flex items-center justify-between mb-2.5">
+                <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px]">
+                  Quality
+                </label>
+                <button
+                  onClick={() => onShowQualityOptions(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="border rounded-md bg-white">
+                {qualityOptions
+                  .filter((option) => availableQualities.includes(option))
+                  .map((option, index) => (
+                    <div
+                      key={index}
+                      className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                        selectedQuality === option
+                          ? "bg-[#242424] text-white"
+                          : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                      }`}
+                      onClick={() => handleQualityChange(option)}
+                    >
+                      {option}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Size Section */}
+          {showSizeButton && !showSizeOptions && selectedQuantity && (
+            <div className="h-auto">
+              <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+                Size
+              </label>
+              <button
+                onClick={() => onShowSizeOptions(true)}
+                className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+              >
+                <span className="text-gray-700 font-medium">
+                  {selectedSize || "Click to select size"}
+                </span>
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Size Options */}
+          {showSizeOptions && (
+            <div className="h-auto">
+              <div className="flex items-center justify-between mb-2.5">
+                <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px]">
+                  Size
+                </label>
+                <button
+                  onClick={() => onShowSizeOptions(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="border rounded-md bg-white">
+                {sizeOptions
+                  .filter((option) => availableSizes.includes(option))
+                  .map((option, index) => (
+                    <div
+                      key={index}
+                      className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                        selectedSize === option
+                          ? "bg-[#242424] text-white"
+                          : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                      }`}
+                      onClick={() => handleSizeChange(option)}
+                    >
+                      {option}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Section */}
+        <div className="flex flex-col gap-4 w-full md:w-1/2">
+          {/* Quantity Section */}
+          {showQuantityInput && selectedQuality && (
+            <div className="h-auto">
+              <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
+                Quantity
+              </label>
+              <select
+                value={selectedQuantity || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  handleQuantityChange(value);
+                }}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
+              >
+                <option value="">Select quantity</option>
+                {availableQuantities.map((quantity) => (
+                  <option key={quantity} value={quantity}>
+                    {quantity} copies
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </div>
       </div>

@@ -1,20 +1,60 @@
 "use client";
 import React, { useState } from "react";
 import { Product } from "@/app/models/products";
+import { isDoubleSidedAvailable } from "@/utils/priceFinder";
 
 const DropDown = ({
   productDetails,
   onSizeChange,
   onCopiesChange,
+  pageCount,
+  selectedColor,
 }: {
   productDetails: Product;
   onSizeChange: (size: string) => void;
   onCopiesChange: (copies: number) => void;
+  pageCount?: number;
+  selectedColor?: string;
 }) => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedCopies, setSelectedCopies] = useState("");
 
-  const sizeOptions = productDetails.sizes || [];
+  const allSizeOptions = productDetails.sizes || [];
+  
+  // Filter double-sided options based on pricing availability
+  const sizeOptions = allSizeOptions.filter(option => {
+    // If it's not a double-sided option, always show it
+    if (!option.toLowerCase().includes("double side")) {
+      return true;
+    }
+    
+    // If we don't have page count or color selected, show all options
+    if (!pageCount || !selectedColor) {
+      return true;
+    }
+    
+    // For double-sided options, check if pricing is available
+    const mappedColor = selectedColor === "B/W" ? "BlackAndWhite" : "Color";
+    const isAvailable = isDoubleSidedAvailable(
+      productDetails.PaperPrintingPricingRules,
+      option,
+      mappedColor,
+      pageCount,
+      parseInt(selectedCopies) || 1
+    );
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔍 Checking double-sided availability for ${option}:`, isAvailable);
+    }
+    
+    return isAvailable;
+  });
+  
+  // Debug logging for available sizes
+  if (process.env.NODE_ENV === 'development') {
+    console.log("📋 All size options:", allSizeOptions);
+    console.log("📋 Filtered size options:", sizeOptions);
+  }
   const copiesOptions = ["1", "2", "3", "4", "5"];
 
   const [isOpenSize, setIsOpenSize] = useState(false);
@@ -53,6 +93,11 @@ const DropDown = ({
                   setSelectedSize(option);
                   onSizeChange(option); // ✅ Pass to parent
                   setIsOpenSize(false);
+                  
+                  // Debug logging for selected size
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log("🎯 Selected size:", option);
+                  }
                 }}
               >
                 {option}
