@@ -40,10 +40,259 @@ const findPageRange = (
   pageCount: number,
   pricingRules: PaperPrintingPricingRule[],
 ) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 findPageRange called with:", {
+      pageCount,
+      pricingRulesLength: pricingRules.length,
+      availableRanges: pricingRules.map(r => r.PageRange?.ValueName).filter(Boolean)
+    });
+  }
+  
+
+  
   const matchingRule = pricingRules.find((rule) => {
     if (!rule.PageRange?.ValueName) return false; // Safe check for missing values
 
     const pageRangeStr = rule.PageRange.ValueName;
+    
+    // Handle "501-above" format
+    if (pageRangeStr.includes("above")) {
+      const min = parseInt(pageRangeStr.split("-")[0]);
+      const matches = pageCount >= min;
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔍 Checking range "${pageRangeStr}": ${pageCount} >= ${min} = ${matches}`);
+      }
+      return matches;
+    }
+    
+    // Handle regular range format like "101-500"
+    const [min, max] = pageRangeStr.split("-").map(Number);
+    const matches = pageCount >= min && pageCount <= max;
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔍 Checking range "${pageRangeStr}": ${pageCount} >= ${min} && ${pageCount} <= ${max} = ${matches}`);
+    }
+    return matches;
+  });
+
+  const result = matchingRule ? matchingRule.PageRange.ValueName : null;
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 findPageRange result:", result);
+  }
+  return result;
+};
+
+
+// ✅ Function to get valid page ranges for a given size and color
+export const getValidPageRanges = (
+  pricingRules: PaperPrintingPricingRule[] | undefined,
+  selectedSize: string,
+  selectedColor: string
+): string[] => {
+  if (!pricingRules || pricingRules.length === 0) {
+    return [];
+  }
+
+  // Normalize size names for better matching
+  const normalizeSizeName = (size: string) => {
+    return size
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/single sided/g, 'single side')
+      .replace(/double sided/g, 'double side')
+      .replace(/13\*19/g, '13x19')
+      .replace(/13x19/g, '13x19')
+      .replace(/13 \* 19/g, '13x19')
+      .replace(/13\*19 double side/g, '13x19 double side')
+      .replace(/13 \* 19 double side/g, '13x19 double side');
+  };
+
+  const normalizedSelectedSize = normalizeSizeName(selectedSize);
+  
+  // Find all rules that match the size and color
+  const matchingRules = pricingRules.filter(rule => {
+    const ruleSize = normalizeSizeName(rule.PaperSize?.ValueName || "");
+    const ruleColor = rule.ColorType?.ValueName || "";
+    
+    return ruleSize === normalizedSelectedSize && ruleColor === selectedColor;
+  });
+
+  // Extract unique page ranges
+  const validPageRanges = [...new Set(
+    matchingRules.map(rule => rule.PageRange?.ValueName).filter(Boolean)
+  )];
+
+  return validPageRanges;
+};
+
+// ✅ Function to check if double-sided option should be available for a given page count
+export const isDoubleSidedAvailable = (
+  pricingRules: PaperPrintingPricingRule[] | undefined,
+  selectedSize: string,
+  selectedColor: string,
+  pageCount: number,
+  noOfCopies: number = 1 // Default to 1 if not provided
+): boolean => {
+  if (!pricingRules || pricingRules.length === 0) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("❌ No pricing rules available - temporarily allowing all options");
+    }
+    return true; // Temporarily allow all options when no pricing rules
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 Available pricing rules:", pricingRules.map(rule => ({
+      size: rule.PaperSize?.ValueName,
+      color: rule.ColorType?.ValueName,
+      pageRange: rule.PageRange?.ValueName,
+      price: rule.PricePerPage
+    })));
+    
+    // Check specifically for 13*19 rules
+    const thirteenNineteenRules = pricingRules.filter(rule => 
+      rule.PaperSize?.ValueName?.toLowerCase().includes('13')
+    );
+    console.log("🔍 13*19 specific rules:", thirteenNineteenRules.map(rule => ({
+      size: rule.PaperSize?.ValueName,
+      color: rule.ColorType?.ValueName,
+      pageRange: rule.PageRange?.ValueName,
+      price: rule.PricePerPage
+    })));
+  }
+
+  // Normalize size names for better matching
+  const normalizeSizeName = (size: string) => {
+    return size
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/single sided/g, 'single side')
+      .replace(/double sided/g, 'double side')
+      .replace(/13\*19/g, '13x19')
+      .replace(/13x19/g, '13x19')
+      .replace(/13 \* 19/g, '13x19')
+      .replace(/13\*19 double side/g, '13x19 double side')
+      .replace(/13 \* 19 double side/g, '13x19 double side');
+  };
+
+  const normalizedSelectedSize = normalizeSizeName(selectedSize);
+  
+  // Calculate sheet count for double-sided printing
+  const sheetCount = Math.ceil(pageCount / 2);
+  const totalSheets = sheetCount * noOfCopies;
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 isDoubleSidedAvailable inputs:", {
+      selectedSize,
+      normalizedSelectedSize,
+      selectedColor,
+      pageCount,
+      sheetCount,
+      noOfCopies,
+      totalSheets
+    });
+  }
+  
+  // For 13*19 double side: check if total sheets >= 100
+  if (selectedSize.toLowerCase().includes('13') && selectedSize.toLowerCase().includes('double')) {
+    if (totalSheets < 100) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log("❌ 13*19 double side not available: total sheets < 100", {
+          totalSheets,
+          minimum: 100
+        });
+      }
+      return false;
+    }
+  }
+  
+  // For double-sided availability check, we need to consider that quantity will be multiplied
+  // Check if there's any quantity that would make the total sheets fall within a pricing range
+  // We'll check with a minimum quantity of 1 to see if the base sheet count has any pricing rule
+  // For example: 141 pages / 2 = 71 sheets, then 71 * 2 copies = 142 total sheets
+  // But for availability check, we need to check if the sheet count (71) has any pricing rule
+  const matchedPageRange = findPageRange(sheetCount, pricingRules);
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 Checking double-sided availability:", {
+      originalPageCount: pageCount,
+      sheetCount: sheetCount,
+      matchedPageRange: matchedPageRange
+    });
+  }
+  
+  if (!matchedPageRange) {
+    // No page range found for this sheet count - hide the option
+    if (process.env.NODE_ENV === 'development') {
+      console.log("❌ No page range found for sheet count:", sheetCount);
+    }
+    
+    // If no pricing rules exist at all, show the option for debugging
+    if (pricingRules.length === 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔍 No pricing rules found - showing option for debugging");
+      }
+      return true;
+    }
+    
+    return false; // Hide the option - no pricing rule exists
+  }
+  
+  // Check if there's a pricing rule that matches size, color, and page range
+  const hasPricingRule = pricingRules.some(rule => {
+    const ruleSize = normalizeSizeName(rule.PaperSize?.ValueName || "");
+    const ruleColor = rule.ColorType?.ValueName || "";
+    const rulePageRange = rule.PageRange?.ValueName || "";
+    
+    const sizeMatch = ruleSize === normalizedSelectedSize;
+    const colorMatch = ruleColor === selectedColor;
+    const pageRangeMatch = rulePageRange === matchedPageRange;
+    
+    return sizeMatch && colorMatch && pageRangeMatch;
+  });
+
+  return hasPricingRule;
+};
+
+// ✅ Function to check if a page count is valid for a given size and color
+export const isPageCountValid = (
+  pricingRules: PaperPrintingPricingRule[] | undefined,
+  selectedSize: string,
+  selectedColor: string,
+  pageCount: number
+): boolean => {
+  if (!pricingRules || pricingRules.length === 0) {
+    return false;
+  }
+
+  // Normalize size names for better matching
+  const normalizeSizeName = (size: string) => {
+    return size
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/single sided/g, 'single side')
+      .replace(/double sided/g, 'double side')
+      .replace(/13\*19/g, '13x19')
+      .replace(/13x19/g, '13x19')
+      .replace(/13 \* 19/g, '13x19')
+      .replace(/13\*19 double side/g, '13x19 double side')
+      .replace(/13 \* 19 double side/g, '13x19 double side');
+  };
+
+  const normalizedSelectedSize = normalizeSizeName(selectedSize);
+  
+  // Find all rules that match the size and color
+  const matchingRules = pricingRules.filter(rule => {
+    const ruleSize = normalizeSizeName(rule.PaperSize?.ValueName || "");
+    const ruleColor = rule.ColorType?.ValueName || "";
+    
+    return ruleSize === normalizedSelectedSize && ruleColor === selectedColor;
+  });
+
+  // Check if any rule's page range includes the given page count
+  return matchingRules.some(rule => {
+    const pageRangeStr = rule.PageRange?.ValueName || "";
     
     // Handle "501-above" format
     if (pageRangeStr.includes("above")) {
@@ -55,10 +304,7 @@ const findPageRange = (
     const [min, max] = pageRangeStr.split("-").map(Number);
     return pageCount >= min && pageCount <= max;
   });
-
-  return matchingRule ? matchingRule.PageRange.ValueName : null;
 };
-
 
 // ✅ Function to find the correct pricing rule for paper printing and addons
 export const findPricingRule = (
@@ -73,9 +319,44 @@ export const findPricingRule = (
     return null;
   }
 
+  // Normalize size names for better matching
+  const normalizeSizeName = (size: string) => {
+    return size
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/single sided/g, 'single side')
+      .replace(/double sided/g, 'double side')
+      .replace(/13\*19/g, '13x19') // Handle 13*19 variations
+      .replace(/13x19/g, '13x19') // Standardize to 13x19
+      .replace(/13 \* 19/g, '13x19') // Handle 13 * 19 variations
+      .replace(/13\*19 double side/g, '13x19 double side') // Handle 13*19 double side
+      .replace(/13 \* 19 double side/g, '13x19 double side'); // Handle 13 * 19 double side
+  };
+
+  const normalizedSelectedSize = normalizeSizeName(selectedSize);
+  
+  // Only log in development mode to improve performance
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 Searching for pricing rule:");
+    console.log("Selected Size:", selectedSize);
+    console.log("Normalized Size:", normalizedSelectedSize);
+    console.log("Selected Color:", selectedColor);
+    console.log("Page Count:", pageCount);
+    console.log("📋 Available rules:", pricingRules.map(rule => ({
+      size: rule.PaperSize?.ValueName,
+      color: rule.ColorType?.ValueName,
+      pageRange: rule.PageRange?.ValueName,
+      price: rule.PricePerPage
+    })));
+  }
+
   // Find the correct page range based on user input
   const matchedPageRange = findPageRange(pageCount, pricingRules);
-  console.log("Matched Page Range:", matchedPageRange);
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Matched Page Range:", matchedPageRange);
+  }
 
   if (!matchedPageRange) {
     console.warn(`No matching page range found for ${pageCount} pages.`);
@@ -84,18 +365,111 @@ export const findPricingRule = (
 
   // Find the pricing rule that matches size, color, and page range
   const rule = pricingRules.find(
-    (rule) =>
-      rule.PaperSize?.ValueName === selectedSize &&
-      rule.ColorType?.ValueName === selectedColor &&
-      rule.PageRange?.ValueName === matchedPageRange
+    (rule) => {
+      const ruleSize = normalizeSizeName(rule.PaperSize?.ValueName || "");
+      const ruleColor = rule.ColorType?.ValueName || "";
+      const rulePageRange = rule.PageRange?.ValueName || "";
+      
+      const sizeMatch = ruleSize === normalizedSelectedSize;
+      const colorMatch = ruleColor === selectedColor;
+      const pageRangeMatch = rulePageRange === matchedPageRange;
+      
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Rule check: ${ruleSize} === ${normalizedSelectedSize} (${sizeMatch}), ${ruleColor} === ${selectedColor} (${colorMatch}), ${rulePageRange} === ${matchedPageRange} (${pageRangeMatch})`);
+        if (!sizeMatch) {
+          console.log(`❌ Size mismatch: "${ruleSize}" vs "${normalizedSelectedSize}"`);
+        }
+        if (!colorMatch) {
+          console.log(`❌ Color mismatch: "${ruleColor}" vs "${selectedColor}"`);
+        }
+        if (!pageRangeMatch) {
+          console.log(`❌ Page range mismatch: "${rulePageRange}" vs "${matchedPageRange}"`);
+        }
+      }
+      
+      return sizeMatch && colorMatch && pageRangeMatch;
+    }
   ) || null;
 
-  console.log("Matched Pricing Rule:", rule);
+
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Matched Pricing Rule:", rule);
+  }
 
   if (!rule) {
-    console.warn("No matching pricing rule found.");
+    // Only show detailed debugging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("No matching pricing rule found.");
+    }
+    
+    // No fallback pricing - only use exact matches
+
+  // For double-sided printing, use the same process as single-sided but with sheet count
+  if (selectedSize.toLowerCase().includes("double side")) {
+    // Calculate sheet count for double-sided printing
+    const sheetCount = Math.ceil(pageCount / 2);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log("🔄 Double-sided calculation:", {
+        originalPageCount: pageCount,
+        sheetCount: sheetCount
+      });
+    }
+    
+    // Find the correct page range based on sheet count (same process as single-sided)
+    const matchedPageRange = findPageRange(sheetCount, pricingRules);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Matched Page Range for sheets:", matchedPageRange);
+    }
+
+    if (!matchedPageRange) {
+      console.warn(`No matching page range found for ${sheetCount} sheets.`);
+      return null;
+    }
+
+    // Find the pricing rule that matches size, color, and page range (same as single-sided)
+    const rule = pricingRules.find(
+      (rule) => {
+        const ruleSize = normalizeSizeName(rule.PaperSize?.ValueName || "");
+        const ruleColor = rule.ColorType?.ValueName || "";
+        const rulePageRange = rule.PageRange?.ValueName || "";
+        
+        const sizeMatch = ruleSize === normalizedSelectedSize;
+        const colorMatch = ruleColor === selectedColor;
+        const pageRangeMatch = rulePageRange === matchedPageRange;
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Double-sided rule check: ${ruleSize} === ${normalizedSelectedSize} (${sizeMatch}), ${ruleColor} === ${selectedColor} (${colorMatch}), ${rulePageRange} === ${matchedPageRange} (${pageRangeMatch})`);
+        }
+        
+        return sizeMatch && colorMatch && pageRangeMatch;
+      }
+    ) || null;
+
+    if (rule) {
+      console.log("✅ Found double-sided pricing rule:", rule);
+      return rule;
+    } else {
+      console.log("❌ No double-sided pricing rule found");
+      return null;
+    }
+  }
+
+  // No hardcoded fallbacks - only use actual pricing rules
+  if (process.env.NODE_ENV === 'development') {
+    console.log("❌ No pricing rule found for:", {
+      selectedSize,
+      selectedColor,
+      pageCount
+    });
+    }
+    
     return null;
   }
+  
   const extractedData: PaperPrintingPricingRule = {
     PricePerPage: rule.PricePerPage,
     PaperSize: { 
@@ -114,8 +488,57 @@ export const findPricingRule = (
        ValueID: rule.PageRange?.ValueID || 0,
       },
   };
-  console.log("extracted Attribute IDs & Value Names:", extractedData);
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log("extracted Attribute IDs & Value Names:", extractedData);
+  }
+  
   return extractedData;
+};
+
+// ✅ Utility function to check for missing pricing rules
+export const checkMissingPricingRules = (
+  pricingRules: PaperPrintingPricingRule[] | undefined,
+  availableSizes: string[]
+) => {
+  if (!pricingRules || !availableSizes) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Cannot check missing pricing rules - insufficient data");
+    }
+    return;
+  }
+
+  const normalizeSizeName = (size: string) => {
+    return size
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/single sided/g, 'single side')
+      .replace(/double sided/g, 'double side')
+      .replace(/13\*19/g, '13x19') // Handle 13*19 variations
+      .replace(/13x19/g, '13x19'); // Standardize to 13x19
+  };
+
+  const availableRuleSizes = new Set(
+    pricingRules.map(rule => normalizeSizeName(rule.PaperSize?.ValueName || ""))
+  );
+
+  const missingSizes = availableSizes.filter(size => {
+    const normalizedSize = normalizeSizeName(size);
+    return !availableRuleSizes.has(normalizedSize);
+  });
+
+  if (missingSizes.length > 0) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("🚨 Missing pricing rules for sizes:", missingSizes);
+    }
+  } else {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("✅ All UI sizes have corresponding pricing rules");
+    }
+  }
+
+  return missingSizes;
 };
 
 

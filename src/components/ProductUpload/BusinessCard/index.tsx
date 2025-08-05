@@ -11,6 +11,7 @@ import FileUploader from "./Fileuploader";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
+import CartProceedPopUp from "@/components/CartProceedPopUp";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -57,6 +58,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [price, setPrice] = useState<number | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] = useState<BusinessCardPricingRule | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCartPopUp, setShowCartPopUp] = useState(false);
   const isAddToCartDisabled = !selectedCard || !selectedSurface || !uploadedDocumentId || isLoading;
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
@@ -70,6 +72,23 @@ const ProductUpload = ({ product }: { product: any }) => {
   const handleUploadSuccess = (documentId: number) => {
     console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
+  };
+
+  // Handle continue shopping
+  const handleContinueShopping = () => {
+    setShowCartPopUp(false);
+    router.push("/");
+  };
+
+  // Handle proceed to payment
+  const handleProceedToPayment = () => {
+    setShowCartPopUp(false);
+    router.push("/Cart");
+  };
+
+  // Handle close popup
+  const handleClosePopUp = () => {
+    setShowCartPopUp(false);
   };
 
   useEffect(() => {
@@ -187,7 +206,9 @@ const ProductUpload = ({ product }: { product: any }) => {
       await addToCartBusinessCard(dataId, selectedPricingRule!,  uploadedDocumentId ?? undefined);
       //incrementCart();
       toast.success("Product added to cart!");
-      router.push("/");
+      
+      // Show popup for logged-in users instead of directly going to cart
+      setShowCartPopUp(true);
     } catch (error) {
       toast.error("Failed to add to cart. Please try again.");
     }
@@ -220,27 +241,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             />
           )}
 
-          <div className="mt-[400px] flex flex-1 flex-col md:flex-row justify-center gap-2 md:gap-19">
-            {/* First Button */}
-            <button
-              onClick={() => {
-                const missing = [];
-                if (!selectedCard) missing.push("card type");
-                if (!selectedSurface) missing.push("surface type");
-                if (!uploadedDocumentId) missing.push("document upload");
-                if (missing.length > 0) {
-                  showErrorToast("Please select: " + missing.join(", "));
-                  return;
-                }
-                handleAddToCart();
-              }}
-              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span className="pr-1">🛒</span>
-              <span className="text-lg font-medium">Add to Cart</span>
-            </button>
-
-            {/* Second Button */}
+          <div className="mt-[400px] flex flex-1 flex-col justify-center">
             <button
               onClick={() => {
                 const missing = [];
@@ -253,7 +254,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                 }
                 handleProceedToCart();
               }}
-              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="pr-1">
                 <svg
@@ -261,11 +262,11 @@ const ProductUpload = ({ product }: { product: any }) => {
                   width="20"
                   height="21"
                   viewBox="0 0 20 21"
-                  fill="#242424"
+                  fill="white"
                 >
                   <path
                     d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-                    fill="black"
+                    fill="white"
                   />
                 </svg>
               </span>
@@ -275,6 +276,20 @@ const ProductUpload = ({ product }: { product: any }) => {
           </div>
         </div>
       </div>
+      
+      {showCartPopUp && (
+        <CartProceedPopUp
+          onContinueShopping={handleContinueShopping}
+          onProceedToPayment={handleProceedToPayment}
+          onClose={handleClosePopUp}
+          productInfo={{
+            name: "Business Card",
+            size: selectedCard,
+            quantity: undefined,
+            price: price || undefined
+          }}
+        />
+      )}
     </div>
   );
 };

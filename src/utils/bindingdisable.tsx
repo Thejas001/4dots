@@ -5,20 +5,49 @@ export const isBindingAllowed = (
   colorType: string
 ) => {
   const normalizedPaperSize = paperSize.trim().toLowerCase();
+  
+  // Normalize size names for better matching
+  const normalizeSizeName = (size: string) => {
+    return size
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/single sided/g, 'single side')
+      .replace(/double sided/g, 'double side');
+  };
+  
+  const normalizedSize = normalizeSizeName(normalizedPaperSize);
+  
   const isA4Size = 
-    normalizedPaperSize === "a4 single side" || 
-    normalizedPaperSize === "a4 double side";
+    normalizedSize === "a4 single side" || 
+    normalizedSize === "a4 double side";
   const isA3Size = 
-    normalizedPaperSize === "a3 single side" || 
-    normalizedPaperSize === "a3 double side";
+    normalizedSize === "a3 single side" || 
+    normalizedSize === "a3 double side";
   const is12x18Size = 
-    normalizedPaperSize === "12*18 single side" || 
-    normalizedPaperSize === "12*18 double side";
+    normalizedSize === "12*18 single side" || 
+    normalizedSize === "12*18 double side";
   const is13x19Size = 
-    normalizedPaperSize === "13*19 single sided" || 
-    normalizedPaperSize === "13*19 double sided";
+    normalizedSize === "13*19 single side" || 
+    normalizedSize === "13*19 double side" ||
+    normalizedSize === "13*19 single sided" || 
+    normalizedSize === "13*19 double sided";
   const isBW = colorType === "BlackAndWhite" || colorType === "B/W";
   const isColor = colorType === "Color";
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔍 Binding check:", {
+      paperSize: normalizedPaperSize,
+      normalizedSize,
+      isA4Size,
+      isA3Size,
+      is12x18Size,
+      is13x19Size,
+      bindingName,
+      pageCount,
+      colorType
+    });
+  }
 
   // A4 rules (already present)
   if (isA4Size) {
@@ -53,14 +82,23 @@ export const isBindingAllowed = (
     }
   }
 
-  // 12*18 rules (no binding allowed for any case)
-  if (is12x18Size) {
-    return false;
-  }
-
-  // 13*19 rules (no binding allowed for any case)
-  if (is13x19Size) {
-    return false;
+  // 12*18 and 13*19 rules - now use same logic as A4
+  if (is12x18Size || is13x19Size) {
+    if (isBW) {
+      if (pageCount <= 100) {
+        return ["Spiral Binding", "Soft Binding", "Hard Binding"].includes(bindingName);
+      } else if (pageCount > 100 && pageCount <= 500) {
+        return ["Soft Binding", "Hard Binding"].includes(bindingName);
+      } else {
+        return false;
+      }
+    } else if (isColor) {
+      if (pageCount <= 100) {
+        return ["Spiral Binding", "Soft Binding", "Hard Binding"].includes(bindingName);
+      } else {
+        return false;
+      }
+    }
   }
 
   // For other paper sizes or conditions, allow binding by default

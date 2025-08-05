@@ -1,7 +1,6 @@
 'use client'
-import React, { useState, useEffect, useCallback  } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import DropDown from "./DropDown";
 import { fetchProductDetails } from "@/utils/api";
 import { OffsetPrintingPricingRule, Product } from "@/app/models/products";
 import { addToCartOffSetPrinting } from "@/utils/cart";
@@ -50,264 +49,636 @@ const showErrorToast = (message: string) => {
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
-  const productDetails = product;//stores state from dropdown and passed to princingfrle finder
+  const productDetails = product;
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
-
-  const [selectedPricingRule, setSelectedPricingRule] = useState<OffsetPrintingPricingRule | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId || isLoading;
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [showQuantityInput, setShowQuantityInput] = useState<boolean>(false);
+  const [showSizeButton, setShowSizeButton] = useState<boolean>(false);
+  const [showSizeOptions, setShowSizeOptions] = useState<boolean>(false);
+  const [showQualityButton, setShowQualityButton] = useState<boolean>(false);
+  const [showQualityOptions, setShowQualityOptions] = useState<boolean>(false);
+
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
-  
-    // Check if user is logged in
-    const isLoggedIn = () => {
-      const token = localStorage.getItem("jwtToken");
-      return !!token;
+
+  // Check if user is logged in
+  const isLoggedIn = () => {
+    const token = localStorage.getItem("jwtToken");
+    return !!token;
+  };
+
+  const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
+    setUploadedDocumentId(documentId);
+    if (file) {
+      setUploadedFile(file);
+      setFileName(name || file.name);
+      setPdfUrl(URL.createObjectURL(file));
+    }
+  };
+
+  // Memoized pricing calculation
+  const getSizePrice = useMemo(() => {
+    return (size: string, quality: string, quantity: number) => {
+      if (!size || !quality || !quantity) return 0;
+      
+      const pricingRule = findOffsetPrintingPricingRule(
+        productDetails.OffsetPrintingPricingRules || [],
+        size,
+        quantity,
+        quality
+      );
+      
+      if (pricingRule) {
+        return pricingRule.Price * quantity;
+      }
+      return 0;
     };
+  }, [productDetails.OffsetPrintingPricingRules]);
 
-    const handleUploadSuccess = (documentId: number) => {
-      setUploadedDocumentId(documentId);
-    };
+  // Handle size selection
+  const handleSizeSelection = (size: string) => {
+    setSelectedSize(size);
+    setShowSizeOptions(false);
+    setShowQualityButton(true);
+  };
 
-  // Fetch product details when component mounts
+  // Handle quality selection
+  const handleQualitySelection = (quality: string) => {
+    setSelectedQuality(quality);
+    setShowQualityOptions(false);
+  };
 
-useEffect(() => {
-  if (!productDetails || !selectedSize || !selectedQuantity || !selectedQuality) {
-    setCalculatedPrice(null); // Reset price
-    setSelectedPricingRule(null); // Reset pricing rule
-    return;
-  }
+  // Update UI states based on selections
+  useEffect(() => {
+    if (selectedSize && selectedQuantity && selectedQuality) {
+      // All selections made, calculate price
+      const price = getSizePrice(selectedSize, selectedQuality, selectedQuantity);
+      setCalculatedPrice(price);
+    } else {
+      setCalculatedPrice(null);
+    }
+  }, [selectedSize, selectedQuantity, selectedQuality, getSizePrice]);
 
-  // Handle invalid quantity
-  if (selectedQuantity === null || selectedQuantity <= 0) {
-    setCalculatedPrice(null); // Reset price
-    setSelectedPricingRule(null); // Reset pricing rule
-    return;
-  }
+  // Show quantity input immediately (first step)
+  useEffect(() => {
+    setShowQuantityInput(true);
+    // Set default quantity to 1 unit (1000 copies)
+    if (!selectedQuantity) {
+      setSelectedQuantity(1);
+    }
+    
+    // Auto scroll to quantity input after a short delay
+    setTimeout(() => {
+      const quantitySection = document.getElementById('quantity-section');
+      if (quantitySection) {
+        quantitySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+  }, []);
 
-  if (errorMessage) {
-    setCalculatedPrice(null); // Reset price
-    setSelectedPricingRule(null); // Reset pricing rule
-    return;
-  }
+  // Show size button after quantity input
+  useEffect(() => {
+    if (selectedQuantity && selectedQuantity > 0) {
+      setShowSizeButton(true);
+      
+      // Auto scroll to size button after a short delay
+      setTimeout(() => {
+        const sizeSection = document.getElementById('size-section');
+        if (sizeSection) {
+          sizeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  }, [selectedQuantity]);
 
+  // Show quality button after size selection
+  useEffect(() => {
+    if (selectedSize) {
+      setShowQualityButton(true);
+      
+      // Auto scroll to quality button after a short delay
+      setTimeout(() => {
+        const qualitySection = document.getElementById('quality-section');
+        if (qualitySection) {
+          qualitySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  }, [selectedSize]);
 
-  const pricingrule = findOffsetPrintingPricingRule(
-    productDetails.OffsetPrintingPricingRules,
-    selectedSize,
-    selectedQuantity,
-    selectedQuality
-  );
-  setSelectedPricingRule(pricingrule);
+  const isAddToCartDisabled = !uploadedDocumentId || !selectedSize || !selectedQuality || !selectedQuantity || isLoading;
 
-  // Calculate price
-  const price = calculateOffsetPrintingPrice(
-    productDetails.OffsetPrintingPricingRules,
-    selectedSize,
-    selectedQuantity,
-    selectedQuality
-  );
-  setCalculatedPrice(price);
+  // Memoized size options
+  const memoizedSizeOptions = useMemo(() => {
+    const sizeOptions = productDetails.NoticeType || productDetails.sizes || [];
+    
+    return sizeOptions.map((size: string, index: number) => {
+      const totalPrice = getSizePrice(size, selectedQuality, selectedQuantity || 0);
+      const isSelected = selectedSize === size;
 
-  setSelectedPrice(pricingrule ? pricingrule.Price : null); // Store selected price
-}, [selectedSize, selectedQuantity, selectedQuality, productDetails, errorMessage]);
+      return (
+        <div
+          key={index}
+          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? "border-black bg-gray-100"
+              : "border-gray-200 bg-white hover:border-gray-300"
+          }`}
+          onClick={() => handleSizeSelection(size)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-gray-900">
+              {size}
+            </div>
+            <div className="text-right">
+              {selectedQuantity && selectedQuality && totalPrice > 0 ? (
+                <div className="text-sm font-semibold text-gray-900">
+                  ₹{totalPrice.toFixed(2)}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Select quality
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }, [productDetails.NoticeType, productDetails.sizes, getSizePrice, selectedSize, selectedQuantity, selectedQuality]);
 
-
-  // Process stored cart item after login
-    const processPendingCartItem = async () => {
-      const pendingCartItem = sessionStorage.getItem("pendingCartItem");
-      if (!pendingCartItem) return;
-  
-      const {
-        dataId: pendingDataId,
-        selectedPricingRule: pendingPricingRule,
-        uploadedDocumentId: pendingDocumentId,
-      } = JSON.parse(pendingCartItem);
-  
+  // Memoized quality options
+  const memoizedQualityOptions = useMemo(() => {
+    const qualityOptions = productDetails.Quality || [];
+    const isOffsetPrinting = productDetails.name === "Offset Printing";
+    
+    let filteredQualities = qualityOptions;
+    if (isOffsetPrinting && selectedSize) {
       try {
-        await addToCartOffSetPrinting(
-          pendingDataId,
-          pendingPricingRule,
-          selectedQuantity ?? 1, // Default to 1 if quantity is not set
-          pendingDocumentId,
-        );
-        sessionStorage.removeItem("pendingCartItem");
-        router.push("/Cart");
+        const { noticeTypeQualityRules } = require("@/utils/bindingdisable");
+        const allowedQualities = noticeTypeQualityRules[selectedSize];
+        if (allowedQualities) {
+          filteredQualities = qualityOptions.filter((q: string) =>
+            allowedQualities.includes(q.toUpperCase())
+          );
+        }
       } catch (error) {
-        setErrorMessage("Failed to process pending cart item. Please try again.");
+        console.error("Error loading quality rules:", error);
       }
-    };
-       const handleAddToCart = async () => {
-          setIsLoading(true);
-          const missing = [];
-          if (!selectedSize) missing.push("size");
-          if (!uploadedDocumentId) missing.push("document upload");
-          if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
-          if (missing.length > 0) {
-            showErrorToast("Please select: " + missing.join(", "));
-            setIsLoading(false);
-            return;
-          }
-          if (!isLoggedIn()) {
-            const pendingItem = {
-              productType: "offsetPrinting",
-              dataId,
-              selectedPricingRule,
-              uploadedDocumentId,
-            };
-            sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-            router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
-            toast.success("Product added to cart!");
-            setIsLoading(false);
-            return;
-          }
-          try{
-            await addToCartOffSetPrinting(
-              dataId, 
-              selectedPricingRule!,
-              selectedQuantity ?? 1, // Default to 1 if quantity is not set
-              uploadedDocumentId ?? undefined
-            ); //2= buddle quantity change that
-           toast.success("Product added to cart!");
-             incrementCart();  
-           router.push("/");
-          }  catch (error) {
-            alert("Failed to add to cart. Please try again.");
-            setIsLoading(false);
-          }
-        };
+    }
 
-        const handleProceedToCart = async () => {
-          setIsLoading(true);
-          const missing = [];
-          if (!selectedSize) missing.push("size");
-          if (!uploadedDocumentId) missing.push("document upload");
-          if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
-          if (missing.length > 0) {
-            showErrorToast("Please select: " + missing.join(", "));
-            setIsLoading(false);
-            return;
-          }
-          if (!isLoggedIn()) {
-            const pendingItem = {
-              productType: "offsetPrinting",
-              dataId,
-              selectedPricingRule,
-              uploadedDocumentId,
-            };
-            sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-            router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
-            setIsLoading(false);
-            return;
-          }
-          try{
-            await addToCartOffSetPrinting(
-              dataId, 
-              selectedPricingRule!,
-              selectedQuantity ?? 1, // Default to 1 if quantity is not set
-              uploadedDocumentId ?? undefined
-            ); //2= buddle quantity change that
-           toast.success("Product added to cart!");
-            router.push("/Cart");
-          }  catch (error) {
-            toast.error("Failed to add to cart. Please try again.");
-            setIsLoading(false);
-          }
-        };
+    return filteredQualities.map((quality: string, index: number) => {
+      const totalPrice = getSizePrice(selectedSize, quality, selectedQuantity || 0);
+      const isSelected = selectedQuality === quality;
 
+      return (
+        <div
+          key={index}
+          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? "border-black bg-gray-100"
+              : "border-gray-200 bg-white hover:border-gray-300"
+          }`}
+          onClick={() => handleQualitySelection(quality)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-gray-900">
+              {quality}
+            </div>
+            <div className="text-right">
+              {selectedSize && selectedQuantity && totalPrice > 0 ? (
+                <div className="text-sm font-semibold text-gray-900">
+                  ₹{totalPrice.toFixed(2)}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Select size
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }, [productDetails.Quality, selectedSize, selectedQuantity, selectedQuality, getSizePrice]);
 
-    useEffect(() => {
-      if (isLoggedIn()) {
-        processPendingCartItem();
+  const processPendingCartItem = async () => {
+    const pendingItem = sessionStorage.getItem("pendingCartItem");
+    if (pendingItem) {
+      try {
+        const item = JSON.parse(pendingItem);
+        if (item.productId === dataId) {
+          await addToCartOffSetPrinting(
+            item.productId,
+            item.selectedPricingRule,
+            item.selectedQuantity,
+            item.uploadedDocumentId
+          );
+          sessionStorage.removeItem("pendingCartItem");
+          toast.success("Pending item added to cart!");
+        }
+      } catch (error) {
+        console.error("Error processing pending cart item:", error);
       }
-    }, []);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    setIsLoading(true);
+    
+    if (!isLoggedIn()) {
+      const pendingItem = {
+        productId: dataId,
+        selectedPricingRule: findOffsetPrintingPricingRule(
+          productDetails.OffsetPrintingPricingRules || [],
+          selectedSize,
+          selectedQuantity || 0,
+          selectedQuality
+        ),
+        selectedQuantity: selectedQuantity || 0,
+        uploadedDocumentId,
+      };
+      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+      router.push(`/auth/signin?redirect=/Cart`);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const pricingRule = findOffsetPrintingPricingRule(
+        productDetails.OffsetPrintingPricingRules || [],
+        selectedSize,
+        selectedQuantity || 0,
+        selectedQuality
+      );
+      
+      await addToCartOffSetPrinting(
+        dataId,
+        pricingRule!,
+        selectedQuantity ?? 1,
+        uploadedDocumentId ?? undefined
+      );
+      toast.success("Product added to cart!");
+      router.push("/Cart");
+    } catch (error) {
+      toast.error("Failed to add to cart. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleProceedToCart = async () => {
+    handleAddToCart();
+  };
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      processPendingCartItem();
+    }
+  }, []);
 
   return (
-    <div className="flex flex-col pt-[31px] bg-white px-4 md:px-20 pb-[79px] py-20">
+    <div className="min-h-screen bg-gray-50">
       {isLoading && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
-    <Loader />
-  </div>
-)}
-      {/* First Row */}
-      <div className="flex flex-col md:flex-row">
-        {/* Left Section */}
-        <FileUploader onUploadSuccess={handleUploadSuccess} />  
-        {/* Right Section */}
-        <div className="flex flex-1 flex-col justify-between px-4 md:px-7 py-[25px] rounded shadow">
-        {productDetails &&<DropDown
-           productDetails={productDetails} 
-           onSizeChange={setSelectedSize}
-           onQuantityChange={setSelectedQuantity}
-           onQualityChange={setSelectedQuality}
-          />}
-          {/**Note */}
-          <div className="flex-1 flex flex-row mt-10 ml-0 md:ml-30 text-base text-[#000] overflow-hidden">
-              <span className="font-medium whitespace-nowrap">Note :</span>
-              <span className="font-normal italic whitespace-nowrap"> In Offset Printing, quantity 1 represents 1000 copies.</span>
-          </div>
-          <div className="flex-1 flex-col items-start justify-start mt-10">
-          </div>
-          <div className="flex-1 flex flex-col md:flex-row justify-center gap-2 md:gap-19 mt-19">
-            {/* First Button */}
-            <button
-              onClick={() => {
-                const missing = [];
-                if (!selectedSize) missing.push("size");
-                if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
-                if (!selectedQuality) missing.push("quality");
-                if (!uploadedDocumentId) missing.push("document upload");
-                if (missing.length > 0) {
-                  showErrorToast("Please select: " + missing.join(", "));
-                  return;
-                }
-                handleAddToCart();
-              }}
-              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center gap-4 rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span className="pr-1">🛒</span>
-              <span className="text-lg font-medium">Add to Cart</span>
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+          <Loader />
+        </div>
+      )}
+      
+      <div className="max-w-[97vw] mx-auto px-3 py-4">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
+            
+            {/* Left Section - Static PDF Preview */}
+            <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
+              </div>
+              
+              {/* Upload Area */}
+              <div className="flex-1 flex flex-col items-center justify-center w-full">
+                {!uploadedFile ? (
+                  <div className="w-full max-w-md">
+                    <FileUploader 
+                      onUploadSuccess={handleUploadSuccess} 
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full max-w-md">
+                    {/* File Info */}
+                    <div className="bg-white rounded-lg p-4 mb-4 shadow-sm w-full">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{fileName}</h3>
+                          <p className="text-sm text-gray-600">Document uploaded successfully</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">Document ID</p>
+                          <p className="text-xs text-gray-500">#{uploadedDocumentId}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* PDF Preview */}
+                    <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6 w-full">
+                      <div className="relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white mx-auto">
+                        {pdfUrl ? (
+                          <iframe
+                            src={`${pdfUrl}#toolbar=0&page=1`}
+                            width="100%"
+                            height="100%"
+                            className="rounded-md border"
+                            title="PDF Preview"
+                          />
+                        ) : (
+                          <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-            {/* Second Button */}
-            <button
-              onClick={() => {
-                const missing = [];
-                if (!selectedSize) missing.push("size");
-                if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
-                if (!selectedQuality) missing.push("quality");
-                if (!uploadedDocumentId) missing.push("document upload");
-                if (missing.length > 0) {
-                  showErrorToast("Please select: " + missing.join(", "));
-                  return;
-                }
-                handleProceedToCart();
-              }}
-              className={`relative flex h-[44px] w-full md:flex-1 items-center justify-center rounded-[48px] border-2 text-lg cursor-pointer border-[#242424] bg-white text-[#242424] hover:bg-gray-100 transition ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span className="pr-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="21"
-                  viewBox="0 0 20 21"
-                  fill="#242424"
+            {/* Right Section - Configuration */}
+            <div className="xl:col-span-3 p-8 overflow-y-auto">
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Offset Print</h1>
+                <p className="text-gray-600">Configure your print settings</p>
+              </div>
+
+                             {/* Configuration Steps */}
+               <div className="space-y-8">
+                 
+                 {/* Step 1: Quantity Selection */}
+                 {showQuantityInput && (
+                   <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
+                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
+                     <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
+                     
+                     <div className="mb-6">
+                       <label className="block text-sm font-medium text-gray-700 mb-2">
+                         Number of Copies
+                       </label>
+                                               <input
+                          type="number"
+                          min="1000"
+                          max="10000"
+                          step="1000"
+                          value={selectedQuantity ? selectedQuantity * 1000 : 1000}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 1000;
+                            const units = Math.floor(value / 1000);
+                            setSelectedQuantity(units);
+                          }}
+                          onBlur={(e) => {
+                            const value = parseInt(e.target.value) || 1000;
+                            const units = Math.floor(value / 1000);
+                            setSelectedQuantity(units);
+                          }}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
+                          placeholder="1000"
+                        />
+                       <p className="text-xs text-gray-500 mt-1">
+                         Use up/down arrows to adjust. Range: 1000 - 10000 copies (1-10 units).
+                       </p>
+                     </div>
+                   </div>
+                 )}
+
+                 {/* Step 2: Size Selection Button */}
+                 {showSizeButton && !showSizeOptions && (
+                   <div id="size-section" className="bg-gray-50 rounded-xl p-6">
+                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Size</h3>
+                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
+                     
+                     <button
+                       onClick={() => setShowSizeOptions(true)}
+                       className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                     >
+                       <span className="text-gray-700 font-medium">
+                         {selectedSize || "Click to select paper size"}
+                       </span>
+                       <svg
+                         className="w-5 h-5 text-gray-400"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24"
+                       >
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                       </svg>
+                     </button>
+                   </div>
+                 )}
+
+                 {/* Step 2: Size Options */}
+                 {showSizeOptions && (
+                   <div className="bg-gray-50 rounded-xl p-6">
+                     <div className="flex items-center justify-between mb-4">
+                       <h3 className="text-lg font-semibold text-gray-900">Paper Size</h3>
+                       <button
+                         onClick={() => setShowSizeOptions(false)}
+                         className="text-gray-500 hover:text-gray-700"
+                       >
+                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                         </svg>
+                       </button>
+                     </div>
+                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
+                     
+                     <div className="space-y-3">
+                       {memoizedSizeOptions.length > 0 ? (
+                         memoizedSizeOptions
+                       ) : (
+                         <div className="text-gray-500 text-center py-4">
+                           No size options available. Please check the product configuration.
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 )}
+
+                 {/* Step 3: Quality Selection Button */}
+                 {showQualityButton && !showQualityOptions && selectedSize && (
+                   <div id="quality-section" className="bg-gray-50 rounded-xl p-6">
+                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Quality</h3>
+                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
+                     
+                     <button
+                       onClick={() => setShowQualityOptions(true)}
+                       className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                     >
+                       <span className="text-gray-700 font-medium">
+                         {selectedQuality || "Click to select paper quality"}
+                       </span>
+                       <svg
+                         className="w-5 h-5 text-gray-400"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24"
+                       >
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                       </svg>
+                     </button>
+                   </div>
+                 )}
+
+                 {/* Step 3: Quality Options */}
+                 {showQualityOptions && (
+                   <div className="bg-gray-50 rounded-xl p-6">
+                     <div className="flex items-center justify-between mb-4">
+                       <h3 className="text-lg font-semibold text-gray-900">Paper Quality</h3>
+                       <button
+                         onClick={() => setShowQualityOptions(false)}
+                         className="text-gray-500 hover:text-gray-700"
+                       >
+                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                         </svg>
+                       </button>
+                     </div>
+                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
+                     
+                     <div className="space-y-3">
+                       {memoizedQualityOptions.length > 0 ? (
+                         memoizedQualityOptions
+                       ) : (
+                         <div className="text-gray-500 text-center py-4">
+                           No quality options available for the selected size.
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 )}
+
+                
+
+                {/* Error Message */}
+                {errorMessage && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-800 text-sm">{errorMessage}</p>
+                  </div>
+                )}
+
+                {/* Order Summary - Only show after all selections are made */}
+                {selectedSize && selectedQuality && selectedQuantity && !showSizeOptions && !showQualityOptions && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                    
+                    <div className="bg-white rounded-lg p-6 border border-gray-200">
+                      <div className="space-y-4">
+                        {/* Product Info */}
+                        <div className="border-b border-gray-200 pb-4">
+                          <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Product</span>
+                              <span className="font-medium text-gray-900">Offset Printing</span>
+                            </div>
+                            {fileName && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">File Name</span>
+                                <span className="font-medium text-gray-900 truncate max-w-[200px]" title={fileName}>{fileName}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Print Specifications */}
+                        <div className="border-b border-gray-200 pb-4">
+                          <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Paper Size</span>
+                              <span className="font-medium text-gray-900">{selectedSize}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Paper Quality</span>
+                              <span className="font-medium text-gray-900">{selectedQuality}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Quantity</span>
+                              <span className="font-medium text-gray-900">{selectedQuantity * 1000} copies</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pricing */}
+                        {calculatedPrice && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                <span className="text-lg font-semibold text-gray-900">Total Price</span>
+                                <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                              </div>
+
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-8 space-y-3">
+                <button
+                  onClick={() => {
+                    const missing = [];
+                    if (!uploadedDocumentId) missing.push("document upload");
+                    if (!selectedSize) missing.push("paper size");
+                    if (!selectedQuality) missing.push("paper quality");
+                    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+                    if (missing.length > 0) {
+                      showErrorToast("Please select: " + missing.join(", "));
+                      return;
+                    }
+                    handleAddToCart();
+                  }}
+                  disabled={isAddToCartDisabled}
+                  className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
+                    isAddToCartDisabled
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
+                  }`}
                 >
-                  <path
-                    d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-                    fill="black"
-                  />
-                </svg>
-              </span>
-              <span className="font-bold">{calculatedPrice}</span>
-              <span className="pl-4 font-medium">Proceed To Cart</span>
-            </button>
+                  Add to Cart
+                </button>
+
+                <button
+                  onClick={() => {
+                    const missing = [];
+                    if (!uploadedDocumentId) missing.push("document upload");
+                    if (!selectedSize) missing.push("paper size");
+                    if (!selectedQuality) missing.push("paper quality");
+                    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+                    if (missing.length > 0) {
+                      showErrorToast("Please select: " + missing.join(", "));
+                      return;
+                    }
+                    handleProceedToCart();
+                  }}
+                  disabled={isAddToCartDisabled}
+                  className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
+                    isAddToCartDisabled
+                      ? "border-gray-300 text-gray-500 cursor-not-allowed"
+                      : "border-black text-black hover:bg-gray-50"
+                  }`}
+                >
+                  {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

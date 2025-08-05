@@ -8,6 +8,7 @@ import Loader from "@/components/common/Loader";
 import { Toaster } from "react-hot-toast";
 import { processPendingCartItem } from "@/utils/processPendingCartItem";
 import { useCartStore } from "@/utils/store/cartStore";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export default function RootLayout({
   children,
@@ -73,6 +74,7 @@ export default function RootLayout({
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {loading ? <Loader /> : children}
         </div>
+        <FloatingWhatsApp />
           <Toaster
             position="bottom-right"
             toastOptions={{

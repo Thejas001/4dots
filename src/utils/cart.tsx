@@ -354,6 +354,7 @@ export const addToCartPaperPrint = async (
   pageCount: number,
   noOfCopies: number,
   selectedBindingType?: string,
+  selectedLaminationType?: string,
   addonRule?: any,
   addonBookCount?: number,
   
@@ -367,8 +368,18 @@ export const addToCartPaperPrint = async (
     "Hard Binding": 3
   };
 
+  // ✅ Map lamination type to AddonID
+  const laminationTypeToAddonIdMap: Record<string, number> = {
+    "Lamination Matt": 4,
+    "Lamination Glossy": 5
+  };
+
 const resolvedAddonId = selectedBindingType
   ? bindingTypeToAddonIdMap[selectedBindingType] ?? selectedBindingType
+  : null; // explicitly set to null if undefined
+
+const resolvedLaminationAddonId = selectedLaminationType
+  ? laminationTypeToAddonIdMap[selectedLaminationType] ?? selectedLaminationType
   : null; // explicitly set to null if undefined
 
 
@@ -385,16 +396,29 @@ const resolvedAddonId = selectedBindingType
         AttributeValueId: pricingRule.ColorType.ValueID,
       },
     ],
-    Addons:
-      addonRule && selectedBindingType && resolvedAddonId !== null
-        ? [
-            {
-              AddonID: resolvedAddonId,
-              IsDeleted: false,
-              NumberOfBooks: addonBookCount || 1,
-            },
-          ]
-        : [],
+    Addons: (() => {
+      const addons = [];
+      
+      // Add binding addon if selected
+      if (addonRule && selectedBindingType && resolvedAddonId !== null) {
+        addons.push({
+          AddonID: resolvedAddonId,
+          IsDeleted: false,
+          NumberOfBooks: addonBookCount || 1,
+        });
+      }
+      
+             // Add lamination addon if selected
+       if (selectedLaminationType && resolvedLaminationAddonId !== null) {
+         addons.push({
+           AddonID: resolvedLaminationAddonId,
+           IsDeleted: false,
+           NumberOfBooks: noOfCopies, // Lamination is applied per page × quantity
+         });
+       }
+      
+      return addons;
+    })(),
 
     DynamicAttributes: [
       {

@@ -125,12 +125,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination
       <div
         className="mt-[11px] h-10 w-[60px] rounded-[30px] bg-white px-3 py-2 text-sm font-medium leading-6 tracking-[-0.2px] text-[#242424] flex items-center justify-center shadow-[0px_4px_16px_0px_rgba(91,91,91,0.10)]"
       >
         {pageCount}
-      </div>
+      </div> */}
       
       <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
         Supported file formats: PDF.

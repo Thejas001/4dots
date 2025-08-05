@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import DropDown from "./DropDoun";
 import AddOnService from "./AddOnService";
@@ -10,14 +10,17 @@ import {
   PaperPrintingPricingRule,
   Product,
 } from "@/app/models/products";
-import { findPricingRule, findAddonPrice } from "@/utils/priceFinder";
+import { findPricingRule, findAddonPrice, checkMissingPricingRules, isPageCountValid, isDoubleSidedAvailable } from "@/utils/priceFinder";
 import { validatePrintSelection } from "@/utils/validatePrint";
 import PriceCalculator from "./PriceCalculator";
+import PricingRuleDebugger from "./AddOnRuleFinder";
 import { addToCartPaperPrint } from "@/utils/cart";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
+import { getCombinedAddons } from "@/utils/laminationAddons";
+import CartProceedPopUp from "@/components/CartProceedPopUp";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -66,6 +69,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [selectedBindingType, setSelectedBindingType] = useState("");
   const [selectedBinderColor, setSelectedBinderColor] = useState("");
+  const [selectedLaminationType, setSelectedLaminationType] = useState("");
   const [copySelection, setCopySelection] = useState<string>("");
   const [customCopies, setCustomCopies] = useState<number>(0);
   const [selectedPricingRule, setSelectedPricingRule] = useState<PaperPrintingPricingRule | null>(null);
@@ -80,14 +84,102 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const [showBindingQuestion, setShowBindingQuestion] = useState<boolean>(false);
   const [bindingChoice, setBindingChoice] = useState<"yes" | "no" | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isSizeLoading, setIsSizeLoading] = useState<boolean>(false);
+  const [showCartPopUp, setShowCartPopUp] = useState(false);
 
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
+
+  // Check if page count is valid for current selection
+  const isPageCountValidForCurrentSelection = useMemo(() => {
+    if (!selectedSize || !selectedOption || !pageCount || !productDetails?.PaperPrintingPricingRules) {
+      return true; // Don't show warning if no selection made yet
+    }
+    const mappedColor = selectedOption === "B/W" ? "BlackAndWhite" : "Color";
+    return isPageCountValid(productDetails.PaperPrintingPricingRules, selectedSize, mappedColor, pageCount);
+  }, [selectedSize, selectedOption, pageCount, productDetails?.PaperPrintingPricingRules]);
+
+  // Memoized pricing calculation to improve performance
+  const getSizePrice = useMemo(() => {
+    return (size: string) => {
+      if (!selectedOption || !pageCount || !noOfCopies) return 0;
+      
+      const mappedColor = selectedOption === "B/W" ? "BlackAndWhite" : "Color";
+      const isDoubleSided = size.toUpperCase().includes("DOUBLE SIDE");
+      const totalSheets = isDoubleSided
+        ? Math.ceil(pageCount / 2) * noOfCopies
+        : pageCount * noOfCopies;
+      
+      const pricingRule = findPricingRule(
+        productDetails.PaperPrintingPricingRules || [],
+        size,
+        mappedColor,
+        totalSheets
+      );
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔍 getSizePrice for", size, ":", {
+          mappedColor,
+          totalSheets,
+          pricingRule: pricingRule ? "Found" : "Not found",
+          pricePerPage: pricingRule?.PricePerPage
+        });
+        
+        // Additional debugging for 13*19
+        if (size.toLowerCase().includes('13')) {
+          console.log("🔍 13*19 getSizePrice details:", {
+            size,
+            pageCount,
+            noOfCopies,
+            totalSheets,
+            pricingRuleFound: !!pricingRule
+          });
+        }
+      }
+      
+      // If no pricing rule found, return 0 (no price)
+      if (!pricingRule) {
+        return 0;
+      }
+      
+      const pricePerPage = pricingRule.PricePerPage;
+      return pricePerPage * totalSheets;
+    };
+  }, [selectedOption, pageCount, noOfCopies, productDetails.PaperPrintingPricingRules]);
+
+  // Debounced size selection handler for better performance
+  const handleSizeSelection = useCallback((size: string) => {
+    setIsSizeLoading(true);
+    setSelectedSize(size);
+    setShowSizeOptions(false);
+    
+    // Clear loading state after a short delay
+    setTimeout(() => {
+      setIsSizeLoading(false);
+    }, 50); // Reduced from 100ms to 50ms for faster response
+  }, []);
 
   // Check if user is logged in
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
     return !!token;
+  };
+
+  // Handle continue shopping
+  const handleContinueShopping = () => {
+    setShowCartPopUp(false);
+    router.push("/");
+  };
+
+  // Handle proceed to payment
+  const handleProceedToPayment = () => {
+    setShowCartPopUp(false);
+    router.push("/Cart");
+  };
+
+  // Handle close popup
+  const handleClosePopUp = () => {
+    setShowCartPopUp(false);
   };
 
   const handleCopySelectionChange = (value: string) => {
@@ -128,6 +220,10 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   const handleBinderColorChange = (binderColor: string) => {
     setSelectedBinderColor(binderColor);
+  };
+
+  const handleLaminationTypeChange = (laminationType: string) => {
+    setSelectedLaminationType(laminationType);
   };
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
@@ -185,10 +281,20 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       console.warn("No matching pricing rule found.");
     }
 
+    const combinedAddons = getCombinedAddons(productDetails.Addons);
+    
     const addonRule = selectedBindingType
       ? findAddonPrice(
-          productDetails.Addons,
+          combinedAddons,
           selectedBindingType,
+          selectedSize,
+          mappedColor,
+          pageCount,
+        )
+      : selectedLaminationType
+      ? findAddonPrice(
+          combinedAddons,
+          selectedLaminationType,
           selectedSize,
           mappedColor,
           pageCount,
@@ -197,7 +303,22 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
     setSelectedAddonRule(addonRule);
     console.log("Addon Rule:", addonRule);
-  }, [selectedSize, selectedOption, productDetails, pageCount, errorMessage, selectedBindingType]);
+  }, [selectedSize, selectedOption, productDetails, pageCount, errorMessage, selectedBindingType, selectedLaminationType]);
+
+  // Check for missing pricing rules on component load
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && productDetails?.PaperPrintingPricingRules && productDetails?.sizes) {
+      const missingSizes = checkMissingPricingRules(
+        productDetails.PaperPrintingPricingRules,
+        productDetails.sizes
+      );
+      
+      if (missingSizes && missingSizes.length > 0) {
+        console.error("🚨 Missing pricing rules detected for sizes:", missingSizes);
+        console.error("Please ensure these sizes have pricing rules configured in the backend.");
+      }
+    }
+  }, [productDetails]);
 
   // Cleanup PDF URL on unmount
   useEffect(() => {
@@ -218,6 +339,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedPricingRule: pendingPricingRule,
       pageCount: pendingPageCount,
       selectedBindingType: pendingBindingType,
+      selectedLaminationType: pendingLaminationType,
       selectedAddonRule: pendingAddonRule,
       addonBookCount: pendingAddonBookCount,
       noOfCopies: pendingNoOfCopies,
@@ -231,6 +353,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         pendingPageCount,
         pendingNoOfCopies,
         pendingBindingType,
+        pendingLaminationType,
         pendingAddonRule,
         pendingAddonBookCount,
         pendingUploadedDocumentId
@@ -244,7 +367,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   const getApiPageCount = () => {
     if (selectedSize && selectedSize.toUpperCase().includes("DOUBLE SIDE")) {
-      return Math.ceil(pageCount / 2);
+      // For double-sided: return total sheets (sheets per copy × number of copies)
+      return Math.ceil(pageCount / 2) * noOfCopies;
     }
     return pageCount;
   };
@@ -261,6 +385,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedPricingRule,
         pageCount: apiPageCount,
         selectedBindingType,
+        selectedLaminationType,
         selectedAddonRule,
         addonBookCount:
           copySelection === "all" ? noOfCopies : customCopies || 0,
@@ -291,13 +416,16 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         apiPageCount,
         noOfCopies,
         selectedBindingType,
+        selectedLaminationType,
         selectedAddonRule,
         addonBookCount,
         uploadedDocumentId ?? undefined
       );
       toast.success("Product added to cart!");
       incrementCart();
-      router.push("/");
+      
+      // Show popup for logged-in users instead of directly going to cart
+      setShowCartPopUp(true);
     } catch (error) {
       console.error("Failed to add to cart:", error);
     }
@@ -316,6 +444,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedPricingRule,
         pageCount: apiPageCount,
         selectedBindingType,
+        selectedLaminationType,
         selectedAddonRule,
         noOfCopies,
         addonBookCount:
@@ -347,6 +476,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         apiPageCount,
         noOfCopies,
         selectedBindingType,
+        selectedLaminationType,
         selectedAddonRule,
         addonBookCount,
         uploadedDocumentId ?? undefined
@@ -434,6 +564,103 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   const isAddToCartDisabled = !uploadedDocumentId || !selectedSize || !selectedOption || !noOfCopies || isLoading;
 
+  // Memoized size options to prevent unnecessary re-renders
+  const memoizedSizeOptions = useMemo(() => {
+    const allSizes = productDetails.sizes || [];
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log("🔍 Product details:", {
+        sizes: allSizes,
+        pricingRules: productDetails.PaperPrintingPricingRules,
+        pricingRulesLength: productDetails.PaperPrintingPricingRules?.length
+      });
+    }
+    
+    // Filter sizes based on conditions
+    const filteredSizes = allSizes.filter((size: string) => {
+      // Check if this is a double-sided option
+      const isDoubleSided = size.toUpperCase().includes("DOUBLE SIDE");
+      
+      if (isDoubleSided) {
+        // For double-sided options, check if pricing is available
+        if (!selectedOption || !pageCount) {
+          return true; // Show all options if no color/page count selected yet
+        }
+        
+        const mappedColor = selectedOption === "B/W" ? "BlackAndWhite" : "Color";
+        const isAvailable = isDoubleSidedAvailable(
+          productDetails.PaperPrintingPricingRules,
+          size,
+          mappedColor,
+          pageCount,
+          noOfCopies
+        );
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`🔍 Checking double-sided availability for ${size}:`, isAvailable);
+        }
+        
+        // For 13*19 double side: only show if total sheets >= 100
+        if (size.toLowerCase().includes('13') && size.toLowerCase().includes('double')) {
+          const totalSheets = Math.ceil(pageCount / 2) * noOfCopies;
+          const shouldShow = totalSheets >= 100;
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log("🔍 13*19 double side check:", {
+              size,
+              pageCount,
+              noOfCopies,
+              totalSheets,
+              shouldShow
+            });
+          }
+          
+          return shouldShow;
+        }
+        
+        return isAvailable;
+      }
+      
+      // All other sizes are always available
+      return true;
+    });
+    
+    return filteredSizes.map((size: string, index: number) => {
+      // Use memoized pricing calculation
+      const totalPrice = getSizePrice(size);
+      const isSelected = selectedSize === size;
+
+      return (
+        <div
+          key={index}
+          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? "border-black bg-gray-100"
+              : "border-gray-200 bg-white hover:border-gray-300"
+          }`}
+          onClick={() => handleSizeSelection(size)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-gray-900">
+              {size}
+            </div>
+            <div className="text-right">
+              {pageCount > 0 && noOfCopies > 0 && totalPrice > 0 ? (
+                <div className="text-sm font-semibold text-gray-900">
+                  ₹{totalPrice.toFixed(2)}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Select copies
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }, [productDetails.sizes, getSizePrice, selectedSize, pageCount, noOfCopies, selectedOption, handleSizeSelection]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {isLoading && (
@@ -470,7 +697,14 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                        <div className="flex items-center justify-between">
                          <div>
                            <h3 className="font-semibold text-gray-900">{fileName}</h3>
-                           <p className="text-sm text-gray-600">{pageCount} pages</p>
+                           <div className="flex items-center gap-2">
+                             <p className="text-sm text-gray-600">{pageCount} pages</p>
+                             {!isPageCountValidForCurrentSelection && selectedSize && selectedOption && (
+                               <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
+                                 ⚠️ Using closest available pricing
+                               </span>
+                             )}
+                           </div>
                          </div>
                          <div className="text-right">
                            <p className="text-sm font-medium text-gray-900">Document ID</p>
@@ -660,19 +894,26 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                        
                        <button
                          onClick={() => setShowSizeOptions(true)}
-                         className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                         disabled={isSizeLoading}
+                         className={`w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between ${
+                           isSizeLoading ? 'opacity-50 cursor-not-allowed' : ''
+                         }`}
                        >
                          <span className="text-gray-700 font-medium">
-                           {selectedSize || "Click to select paper size"}
-                </span>
-                         <svg
-                           className="w-5 h-5 text-gray-400"
-                           fill="none"
-                           stroke="currentColor"
-                           viewBox="0 0 24 24"
-                         >
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                         </svg>
+                           {isSizeLoading ? "Loading..." : (selectedSize || "Click to select paper size")}
+                         </span>
+                         {isSizeLoading ? (
+                           <div className="w-5 h-5 border-2 border-gray-300 border-t-black rounded-full animate-spin"></div>
+                         ) : (
+                           <svg
+                             className="w-5 h-5 text-gray-400"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24"
+                           >
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                           </svg>
+                         )}
                        </button>
                      </div>
                    )}
@@ -694,58 +935,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                        <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
                        
                        <div className="space-y-3">
-                         {(productDetails.sizes || []).map((size: string, index: number) => {
-                           // Calculate price for this size
-                           const mappedColor = selectedOption === "B/W" ? "BlackAndWhite" : "Color";
-                           const isDoubleSided = size.toUpperCase().includes("DOUBLE SIDE");
-                           const totalSheets = isDoubleSided
-                             ? Math.ceil(pageCount / 2) * (noOfCopies || 1)
-                             : pageCount * (noOfCopies || 1);
-                           
-                           const pricingRule = findPricingRule(
-                             productDetails.PaperPrintingPricingRules || [],
-                             size,
-                             mappedColor,
-                             totalSheets
-                           );
-                           
-                           const pricePerPage = pricingRule?.PricePerPage || 0;
-                           const totalPrice = pricePerPage * totalSheets;
-                           const isSelected = selectedSize === size;
-
-                           return (
-                             <div
-                               key={index}
-                               className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                                 isSelected
-                                   ? "border-black bg-gray-100"
-                                   : "border-gray-200 bg-white hover:border-gray-300"
-                               }`}
-                               onClick={() => {
-                                 setSelectedSize(size);
-                                 setShowSizeOptions(false);
-                               }}
-                             >
-                               <div className="flex items-center justify-between">
-                                 <div className="font-medium text-gray-900">
-                                   {size}
-                                 </div>
-                                 <div className="text-right">
-                                   {pageCount > 0 && noOfCopies > 0 && pricingRule ? (
-                                     <div className="text-sm font-semibold text-gray-900">
-                                       ₹{totalPrice.toFixed(2)}
-                                     </div>
-                                   ) : (
-                                     <div className="text-sm text-gray-500">
-                                       Select copies
-                                     </div>
-                                   )}
-                                 </div>
-                               </div>
-                             </div>
-                           );
-                         })}
-              </div>
+                         {memoizedSizeOptions}
+                       </div>
             </div>
                    )}
 
@@ -759,11 +950,11 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                          <button
                            onClick={() => {
                              setBindingChoice("yes");
-                             // Auto scroll to addon section after a short delay
+                             // Auto scroll to order summary section after a short delay
                              setTimeout(() => {
-                               const addonSection = document.getElementById('addon-section');
-                               if (addonSection) {
-                                 addonSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                               const orderSummary = document.getElementById('order-summary');
+                               if (orderSummary) {
+                                 orderSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                }
                              }, 300);
                            }}
@@ -827,6 +1018,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                 onBinderColorChange={handleBinderColorChange}
                 onCopySelectionChange={handleCopySelectionChange}
                 onCustomCopiesChange={handleCustomCopiesChange}
+                onLaminationTypeChange={handleLaminationTypeChange}
                 pageCount={pageCount}
                 paperSize={selectedSize}
                 colorType={selectedOption}
@@ -846,9 +1038,10 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                    {selectedOption && selectedSize && noOfCopies > 0 && !showSizeOptions && bindingChoice !== null && (
                      <div className="bg-gray-50 rounded-xl p-6">
                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Price Summary</h3>
+                       
             <PriceCalculator
               pricingRules={productDetails.PaperPrintingPricingRules || []}
-              addons={productDetails.Addons || []}
+              addons={getCombinedAddons(productDetails.Addons)}
               selectedSize={selectedSize}
                          selectedColor={selectedOption || "B/W"}
               pageCount={pageCount}
@@ -856,37 +1049,18 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
               copySelection={copySelection}
                          customCopies={customCopies}
               selectedBindingType={selectedBindingType}
+              selectedLaminationType={selectedLaminationType}
               onPriceUpdate={(price) => setCalculatedPrice(price)}
             />
                      </div>
                    )}
+
+
+                   
                  </div>
 
-                {/* Action Buttons */}
-                <div className="mt-8 space-y-3">
-              <button
-                onClick={() => {
-                  const missing = [];
-                  if (!uploadedDocumentId) missing.push("document upload");
-                  if (!selectedSize) missing.push("paper size");
-                  if (!selectedOption) missing.push("color type");
-                  if (!noOfCopies || noOfCopies <= 0) missing.push("number of copies");
-                  if (missing.length > 0) {
-                    showErrorToast("Please select: " + missing.join(", "));
-                    return;
-                  }
-                  handleAddToCart();
-                }}
-                    disabled={isAddToCartDisabled}
-                    className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-                      isAddToCartDisabled
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
-                    }`}
-                  >
-                    Add to Cart
-              </button>
-
+                {/* Action Button */}
+                <div className="mt-8">
               <button
                 onClick={() => {
                   const missing = [];
@@ -901,10 +1075,10 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                   handleProceedToCart();
                 }}
                     disabled={isAddToCartDisabled}
-                    className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
+                    className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
                       isAddToCartDisabled
-                        ? "border-gray-300 text-gray-500 cursor-not-allowed"
-                        : "border-black text-black hover:bg-gray-50"
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
                     }`}
                   >
                     {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
@@ -915,6 +1089,20 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
           </div>
         </div>
       </div>
+      
+      {showCartPopUp && (
+        <CartProceedPopUp
+          onContinueShopping={handleContinueShopping}
+          onProceedToPayment={handleProceedToPayment}
+          onClose={handleClosePopUp}
+          productInfo={{
+            name: "Paper Printing",
+            size: selectedSize,
+            quantity: noOfCopies || undefined,
+            price: calculatedPrice || undefined
+          }}
+        />
+      )}
     </div>
   );
 };
