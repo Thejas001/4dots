@@ -160,7 +160,7 @@ const handleCancelOrder = async (orderId: number) => {
   }
 
   return (
-    <div className="w-full grid h-auto grid-rows-[auto,1fr] bg-[#fff]">
+    <div className="w-[99vw] grid h-auto grid-rows-[auto,1fr] bg-[#fff]">
       {/* Top Section */}
       <div className="my-2 ml-4 sm:ml-6 md:ml-8 lg:ml-10 flex flex-row items-center">
         <img
