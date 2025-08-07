@@ -81,6 +81,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [showQualityButton, setShowQualityButton] = useState<boolean>(false);
   const [showQualityOptions, setShowQualityOptions] = useState<boolean>(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
 
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
@@ -108,12 +109,13 @@ const ProductUpload = ({ product }: { product: any }) => {
     setShowCartPopUp(false);
   };
 
-  const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
+  const handleUploadSuccess = (documentId: number, fileURL: string | null) => {
     setUploadedDocumentId(documentId);
-    if (file) {
-      setUploadedFile(file);
-      setFileName(name || file.name);
-      setPdfUrl(URL.createObjectURL(file));
+    if (fileURL) {
+      setPdfUrl(fileURL);
+      setIsUploaded(true);
+        } else {
+      setUploadedFile({} as File); // Only if no preview URL, to trigger options
     }
   };
 
@@ -422,6 +424,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         pricingRule,
         uploadedDocumentId ?? undefined
       );
+      
       toast.success("Product added to cart successfully!");
       // Don't redirect to cart - let the popup handle navigation
       // router.push("/Cart");
@@ -509,14 +512,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     
     const missingItems = validateSelections();
     
-    console.log("🔍 Validation check:");
-    console.log("uploadedDocumentId:", uploadedDocumentId);
-    console.log("selectedOption:", selectedOption);
-    console.log("selectedQuality:", selectedQuality);
-    console.log("selectedQuantity:", selectedQuantity);
-    console.log("selectedSize:", selectedSize);
-    console.log("missingItems:", missingItems);
-    
     if (missingItems.length > 0) {
       handleValidationError(missingItems);
       return;
@@ -571,7 +566,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                   <div className="w-full max-w-md">
                     <FileUploader 
                       onUploadSuccess={handleUploadSuccess} 
-                    />
+                      />
                   </div>
                 ) : (
                   <div className="w-full max-w-md">
@@ -621,7 +616,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               <div className="space-y-8">
                 
                 {/* Step 1: Upload Message - Only show when no file is uploaded */}
-                {!uploadedFile && (
+                {!isUploaded && (
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
                     <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
@@ -633,7 +628,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                 )}
 
                 {/* Step 2: Print Type Selection - Only show after upload */}
-                {uploadedFile && (
+                {isUploaded && (
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Print Type</h3>
                     <p className="text-sm text-gray-600 mb-4">Select your preferred print type</p>
@@ -686,7 +681,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               <div className="space-y-8">
                 
                 {/* Step 2: Quality Selection Button */}
-                {uploadedFile && showQualityButton && !showQualityOptions && selectedOption && (
+                {isUploaded && showQualityButton && !showQualityOptions && selectedOption && (
                   <div id="quality-section" className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Quality</h3>
                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
@@ -717,7 +712,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                 )}
 
                 {/* Step 2: Quality Options */}
-                {showQualityOptions && (
+                {isUploaded && showQualityOptions && (
                   <div className="bg-gray-50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-gray-900">Paper Quality</h3>
@@ -745,7 +740,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                 )}
 
                 {/* Step 3: Quantity Selection */}
-{showQuantityInput && selectedQuality && (
+{isUploaded && showQuantityInput && selectedQuality && (
   <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
@@ -783,7 +778,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
 
                 {/* Step 4: Size Selection Button */}
-                {showSizeButton && !showSizeOptions && selectedQuantity && (
+                {isUploaded && showSizeButton && !showSizeOptions && selectedQuantity && (
                   <div id="size-section" className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Size</h3>
                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
@@ -818,7 +813,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                 )}
 
                 {/* Step 4: Size Options */}
-                {showSizeOptions && (
+                {isUploaded && showSizeOptions && (
                   <div className="bg-gray-50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-gray-900">Paper Size</h3>

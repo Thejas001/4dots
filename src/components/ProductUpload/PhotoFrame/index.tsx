@@ -112,8 +112,10 @@ const ProductUpload = ({ product }: { product: any }) => {
   const incrementCart = useCartStore((state) => state.incrementCart);
 
   const isLoggedIn = () => {
-    return typeof window !== "undefined" && localStorage.getItem("token");
+    const token = localStorage.getItem("jwtToken");
+    return !!token;
   };
+
 
   const handleContinueShopping = () => {
     setShowCartPopUp(false);
@@ -177,10 +179,11 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
   const handleAddToCart = async () => {
-    if (!isLoggedIn()) {
-      showErrorToast("Please login to add items to cart");
-      return;
-    }
+        if (!isLoggedIn()) {
+          showErrorToast("Please login to add items to cart");
+          return;
+        }
+
 
     if (!uploadedDocumentId) {
       showErrorToast("Please upload a file first");
