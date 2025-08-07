@@ -65,7 +65,7 @@ const handlePlaceOrder = async () => {
       key: response.RazorpayKey,
       amount: response.Amount,
       currency: response.Currency,
-      name: "PrintDot",
+      name: "Your Client Business Name",
       description: "Order Payment",
       order_id: response.RazorpayOrderId,
       handler: async function (razorpayResponse: any) {
@@ -86,9 +86,9 @@ const handlePlaceOrder = async () => {
 
       },
       prefill: {
-        name: "Thejas V Panicker",
-        email: "your@email.com",
-        contact: "9744003284",
+        name: "",
+        email: "",
+        contact: "",
       },
       theme: {
         color: "black",

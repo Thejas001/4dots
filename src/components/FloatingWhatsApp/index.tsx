@@ -7,7 +7,7 @@ const FloatingWhatsApp = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleWhatsAppClick = () => {
-    const phoneNumber = "919037061189";
+    const phoneNumber = "+9197466 70448";
     const message = "Hello! I'm interested in your printing services.";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
