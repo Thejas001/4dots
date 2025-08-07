@@ -42,7 +42,7 @@ const Product1DropDown = ({
   // Function to find pricing based on size and quantity
   const findPriceForSizeAndQuantity = (size: string, quantity: number) => {
     const matchingRule = productDetails.PhotoFramePricingRules?.find(rule => {
-      const [min, max] = rule.QuantityRange.ValueName.split("-").map(Number);
+      const [min, max] = rule.Quantity.ValueName.split("-").map(Number);
       return (
         rule.Size?.ValueName.trim() === size.trim() &&
         quantity >= min && quantity <= max

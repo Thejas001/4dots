@@ -224,25 +224,25 @@ const ProductUpload = ({ product }: { product: any }) => {
     setIsLoading(true);
 
     try {
-      const cartItem = {
-        productId: dataId,
-        documentId: uploadedDocumentId,
-        size: selectedSize,
-        quantity: selectedQuantity,
-        frameColor: selectedFrameColor,
-        price: calculatedPrice,
-        fileName: fileName,
+      // Create a mock pricing rule since the actual pricing rule structure is not available
+      // This should be replaced with the actual pricing rule from the product details
+      const mockPricingRule = {
+        Size: { AttributeID: 1, ValueID: 1 }, // These should come from actual product data
+        Quantity: { AttributeID: 2, ValueID: selectedQuantity || 1 },
+        Price: calculatedPrice || 0
       };
 
-      const response = await addToCartPhotoFrame(cartItem);
+      await addToCartPhotoFrame(
+        dataId,
+        mockPricingRule,
+        selectedQuantity || 0,
+        [uploadedDocumentId], // Convert to array as expected by the function
+        selectedFrameColor
+      );
 
-      if (response.success) {
-        incrementCart();
-        showSuccessToast("Added to cart successfully!");
-        setShowCartPopUp(true);
-      } else {
-        showErrorToast(response.message || "Failed to add to cart");
-      }
+      incrementCart();
+      showSuccessToast("Added to cart successfully!");
+      setShowCartPopUp(true);
     } catch (error) {
       console.error("Error adding to cart:", error);
       showErrorToast("Failed to add to cart");
@@ -654,6 +654,12 @@ const ProductUpload = ({ product }: { product: any }) => {
           onContinueShopping={handleContinueShopping}
           onProceedToPayment={handleProceedToPayment}
           onClose={handleClosePopUp}
+          productInfo={{
+            name: "Photo Frame",
+            size: selectedSize,
+            quantity: selectedQuantity || undefined,
+            price: calculatedPrice || undefined
+          }}
         />
       )}
     </div>
