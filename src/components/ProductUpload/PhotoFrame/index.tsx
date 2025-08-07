@@ -52,6 +52,55 @@ const showErrorToast = (message: string) => {
   ));
 };
 
+const showSuccessToast = (message: string) => {
+  toast.custom((t) => (
+    <div
+      style={{
+        background: "#000000",
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "20px 32px",
+        fontSize: "1.25rem",
+        minWidth: "320px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          style={{ marginRight: "12px" }}
+        >
+          <path
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            fill="#fff"
+          />
+        </svg>
+        <span>{message}</span>
+      </div>
+      <button
+        onClick={() => toast.dismiss(t.id)}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: "#fff",
+          fontSize: "1.5rem",
+          marginLeft: "16px",
+          cursor: "pointer",
+        }}
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+  ));
+};
+
 const showWarningToast = (message: string) => {
   toast.custom((t) => (
     <div
@@ -217,7 +266,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       );
 
       incrementCart();
-      showErrorToast("Added to cart successfully!");
+      showSuccessToast("Added to cart successfully!");
       setShowCartPopUp(true);
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -272,14 +321,14 @@ const ProductUpload = ({ product }: { product: any }) => {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
             {/* Left Section - File Preview */}
-            <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
+            <div className="bg-gray-100 p-8 pl-12 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
                 <p className="text-gray-600">Upload your files to see a preview</p>
               </div>
               {/* Upload Area - Only show if quantity is valid */}
-              <div className="flex-1 flex flex-col items-center justify-center w-full">
-                <div className="w-full max-w-md">
+              <div className="flex-1 flex flex-col justify-center w-full">
+                <div className="w-full lg:mr-[-8px] max-w-md mx-auto">
                   {selectedQuantity && selectedQuantity > 0 ? (
                     <FileUploader
                       quantity={selectedQuantity}
