@@ -414,11 +414,23 @@ const ProductUpload = ({ product }: { product: any }) => {
                 <p className="text-gray-600">Configure your print settings</p>
               </div>
 
-                             {/* Configuration Steps */}
-               <div className="space-y-8">
-                 
-                 {/* Step 1: Quantity Selection */}
-                 {showQuantityInput && (
+              {/* Configuration Steps */}
+              <div className="space-y-8">
+                
+                {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                {!uploadedFile && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                    <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                    
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Please upload a document in the left column first</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Quantity Selection - Only show after upload */}
+                {uploadedFile && showQuantityInput && (
                    <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
                      <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
@@ -453,8 +465,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 2: Size Selection Button */}
-                 {showSizeButton && !showSizeOptions && (
+                 {/* Step 3: Size Selection Button */}
+                 {uploadedFile && showSizeButton && !showSizeOptions && (
                    <div id="size-section" className="bg-gray-50 rounded-xl p-6">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Size</h3>
                      <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
@@ -478,8 +490,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 2: Size Options */}
-                 {showSizeOptions && (
+                 {/* Step 3: Size Options */}
+                 {uploadedFile && showSizeOptions && (
                    <div className="bg-gray-50 rounded-xl p-6">
                      <div className="flex items-center justify-between mb-4">
                        <h3 className="text-lg font-semibold text-gray-900">Paper Size</h3>
@@ -506,8 +518,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 3: Quality Selection Button */}
-                 {showQualityButton && !showQualityOptions && selectedSize && (
+                 {/* Step 4: Quality Selection Button */}
+                 {uploadedFile && showQualityButton && !showQualityOptions && selectedSize && (
                    <div id="quality-section" className="bg-gray-50 rounded-xl p-6">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Quality</h3>
                      <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
@@ -531,8 +543,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 3: Quality Options */}
-                 {showQualityOptions && (
+                 {/* Step 4: Quality Options */}
+                 {uploadedFile && showQualityOptions && (
                    <div className="bg-gray-50 rounded-xl p-6">
                      <div className="flex items-center justify-between mb-4">
                        <h3 className="text-lg font-semibold text-gray-900">Paper Quality</h3>

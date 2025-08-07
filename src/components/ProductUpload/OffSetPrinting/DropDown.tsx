@@ -18,6 +18,7 @@ const DropDown = ({
       const [isOpenSize, setIsOpenSize] = useState(false);
       const [selectedSize, setSelectedSize] = useState("");
     
+      const [isOpenQuantity, setIsOpenQuantity] = useState(false);
       const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
 
       const [isOpenQuality, setIsOpenQuality] = useState(false);
@@ -43,7 +44,6 @@ const getFilteredQualities = () => {
   return qualityOptions;
 };
 
-
       
     return (
         <div className="flex flex-col md:flex-row gap-6 md:gap-[45px] w-full">
@@ -53,52 +53,74 @@ const getFilteredQualities = () => {
                 <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
                      Size
                 </label>
-                <div
-                    className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
+                <button
                     onClick={() => setIsOpenSize(!isOpenSize)}
+                    className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
                 >
-                    <div className="text-sm font-normal text-gray-700">{selectedSize || "Select Size"}</div>
-                    <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    ▼
+                    <span className="text-gray-700 font-medium">
+                        {selectedSize || "Click to select size"}
                     </span>
-                </div>
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
                 {isOpenSize && (
-                    <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
-                    {sizeOptions.map((option, index) => (
-                        <li
-                        key={index}
-                        className={`px-5 py-3 text-sm cursor-pointer ${
-                            selectedSize === option ? "bg-[#242424] text-white" : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
-                        }`}
-                        onClick={() => { 
-                            setSelectedSize(option); 
-                            onSizeChange(option);
-                            setIsOpenSize(false); }}
-                        >
-                        {option}
-                        </li>
-                    ))}
-                    </ul>
+                    <div className="mt-2 border rounded-md bg-white">
+                        {sizeOptions.map((option, index) => (
+                            <div
+                                key={index}
+                                className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                                    selectedSize === option
+                                        ? "bg-[#242424] text-white"
+                                        : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                                }`}
+                                onClick={() => { 
+                                    setSelectedSize(option); 
+                                    onSizeChange(option);
+                                    setIsOpenSize(false); }}
+                            >
+                                {option}
+                            </div>
+                        ))}
+                    </div>
                 )}
                 </div>
-                {/**Orientation DropDown */}
+                {/**Quantity DropDown */}
                 <div className="h-auto">
                 <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
                      Quantity
                 </label>
-                 <input
-                    type="number"
-                    min="1"
-                    className="border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white text-gray-700 w-full"
-                    placeholder="Enter Quantity"
-                    value={selectedQuantity || ""}
-                    onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        const adjustedValue = value;
-                        setSelectedQuantity(value);
-                        onQuantityChange(adjustedValue);
-                    }}
-                    />
+                <button
+                    onClick={() => setIsOpenQuantity(!isOpenQuantity)}
+                    className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                >
+                    <span className="text-gray-700 font-medium">
+                        {selectedQuantity || "Click to select quantity"}
+                    </span>
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {isOpenQuantity && (
+                    <div className="mt-2 border rounded-md bg-white">
+                        {sizeQuantity.map((option, index) => (
+                            <div
+                                key={index}
+                                className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                                    selectedQuantity === option
+                                        ? "bg-[#242424] text-white"
+                                        : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                                }`}
+                                onClick={() => { 
+                                    setSelectedQuantity(option); 
+                                    onQuantityChange(option);
+                                    setIsOpenQuantity(false); }}
+                            >
+                                {option}
+                            </div>
+                        ))}
+                    </div>
+                )}
                 </div>
             </div>
 
@@ -108,33 +130,37 @@ const getFilteredQualities = () => {
             <label className="block text-[#242424] text-base font-medium leading-6 tracking-[-0.2px] mb-2.5">
                 Quality
             </label>
-            <div
-                className="relative border rounded-md focus:ring-2 focus:ring-gray-300 py-3 px-5 bg-white cursor-pointer"
+            <button
                 onClick={() => setIsOpenQuality(!isOpenQuality)}
+                className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
             >
-                <div className="text-sm font-normal text-gray-700">{selectedQuality || "Select Quality"}</div>
-                <span className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                ▼
+                <span className="text-gray-700 font-medium">
+                    {selectedQuality || "Click to select quality"}
                 </span>
-            </div>
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
             {isOpenQuality && (
-                <ul className="z-10 w-full mt-1 py-3 bg-white border rounded-md shadow-lg">
-                {getFilteredQualities().map((option, index) => (
-                    <li
-                    key={index}
-                    className={`px-5 py-3 text-sm cursor-pointer ${
-                        selectedQuality === option ? "bg-[#242424] text-white" : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
-                    }`}
-                    onClick={() => { 
-                        setSelectedQulaity(option); 
-                        onQualityChange(option);
-                        setIsOpenQuality(false); 
-                    }}
-                    >
-                    {option}
-                    </li>
-                ))}
-                </ul>
+                <div className="mt-2 border rounded-md bg-white">
+                    {getFilteredQualities().map((option, index) => (
+                        <div
+                            key={index}
+                            className={`px-5 py-3 text-sm cursor-pointer border-b last:border-b-0 ${
+                                selectedQuality === option
+                                    ? "bg-[#242424] text-white"
+                                    : "bg-white text-[#242424] hover:bg-[#242424] hover:text-white"
+                            }`}
+                            onClick={() => { 
+                                setSelectedQulaity(option); 
+                                onQualityChange(option);
+                                setIsOpenQuality(false); 
+                            }}
+                        >
+                            {option}
+                        </div>
+                    ))}
+                </div>
             )}
             </div>
         </div>

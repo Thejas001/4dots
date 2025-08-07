@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import DropDown from "./DropDown";
+import React, { useState, useEffect, useMemo } from "react";
 import { NameSlipPricingRule, Product } from "@/app/models/products";
 import { findNameSlipPricingRule } from "@/utils/priceFinder";
 import { addToCartNameSlip } from "@/utils/cart";
@@ -46,20 +45,39 @@ const showErrorToast = (message: string) => {
   ));
 };
 
+const showSuccessToast = (message: string) => {
+  toast.success(message, {
+    duration: 4000,
+    style: {
+      background: '#10b981',
+      color: '#fff',
+      fontSize: '1rem',
+      padding: '16px 24px',
+      borderRadius: '8px',
+    },
+  });
+};
+
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
-  const productDetails = product;//stores state from dropdown and passed to princingfrle finder
+  const productDetails = product;
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedQuantity, setSelectedQuantity] = useState<string | null>(null);
-  const [price, setPrice] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
+  const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
-  const [selectedPricingRule, setSelectedPricingRule] =  useState<NameSlipPricingRule | null>(null);
+  const [selectedPricingRule, setSelectedPricingRule] = useState<NameSlipPricingRule | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
-  const isAddToCartDisabled = !selectedSize || !selectedQuantity || !uploadedDocumentId || isLoading;
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  
+  // Progressive disclosure states
+  const [showQuantityInput, setShowQuantityInput] = useState<boolean>(false);
+  const [showSizeButton, setShowSizeButton] = useState<boolean>(false);
+  const [showSizeOptions, setShowSizeOptions] = useState<boolean>(false);
+
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
   
@@ -69,24 +87,90 @@ const ProductUpload = ({ product }: { product: any }) => {
     return !!token;
   };
 
-  // Function to handle price calculation and set it in the parent
-  const handlePriceCalculation = (
-    price: number | null,
-    error: string | null,
-  ) => {
-    setPrice(price);
-    setError(error);
-  };
-
-  const handleUploadSuccess = (documentId: number) => {
+  const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
     console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
+    if (file) {
+      setUploadedFile(file);
+      setFileName(name || file.name);
+      setPdfUrl(URL.createObjectURL(file));
+    }
+    // Show quantity selection after file upload
+    setShowQuantityInput(true);
   };
+
+  // Handle size selection
+  const handleSizeSelection = (size: string) => {
+    setSelectedSize(size);
+    setShowSizeOptions(false);
+  };
+
+  // Get available sizes from product details
+  const availableSizes = useMemo(() => {
+    if (!productDetails?.sizes) return [];
+    return productDetails.sizes;
+  }, [productDetails]);
+
+  // Get available quantities
+  const availableQuantities = useMemo(() => {
+    return [1, 5, 10, 25, 50, 100, 250, 500, 1000];
+  }, []);
+
+  // Memoized size options with pricing
+  const memoizedSizeOptions = useMemo(() => {
+    if (!productDetails?.sizes || !selectedQuantity || selectedQuantity <= 0) {
+      return [];
+    }
+
+    return productDetails.sizes.map((size: string, index: number) => {
+      const pricingRule = findNameSlipPricingRule(
+        productDetails.NameSlipPricingRules,
+        size,
+        selectedQuantity
+      );
+      
+      const totalPrice = pricingRule ? pricingRule.Price * selectedQuantity : 0;
+      const isSelected = selectedSize === size;
+
+      return (
+        <div
+          key={index}
+          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? "border-black bg-gray-100"
+              : "border-gray-200 bg-white hover:border-gray-300"
+          }`}
+          onClick={() => {
+            setSelectedSize(size);
+            setCalculatedPrice(totalPrice);
+            setSelectedPricingRule(pricingRule);
+            setShowSizeOptions(false);
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-gray-900">
+              {size}
+            </div>
+            <div className="text-right">
+              {totalPrice > 0 ? (
+                <div className="text-sm font-semibold text-gray-900">
+                  ₹{totalPrice.toFixed(2)}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Price not available
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }, [productDetails?.sizes, selectedQuantity, selectedSize]);
 
   // Handle continue shopping
   const handleContinueShopping = () => {
     setShowCartPopUp(false);
-    // Optionally redirect to home or stay on current page
     router.push("/");
   };
 
@@ -100,31 +184,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   const handleClosePopUp = () => {
     setShowCartPopUp(false);
   };
-
-  useEffect(() => {
-    // Check if all necessary data is available before proceeding
-    if (!productDetails || !selectedSize || !selectedQuantity) return;
-
-    // Reset error message
-    setErrorMessage(null);
-
-    console.log(
-      "Extracted Name Slip PricingRules:",
-      productDetails?.NameSlipPricingRules,
-    );
-
-    // Find the matching pricing rule based on the selected size and quantity
-    const pricingRule = findNameSlipPricingRule(
-      productDetails.NameSlipPricingRules,
-      selectedSize,
-      Number(selectedQuantity),
-    );
-    setSelectedPricingRule(pricingRule);
-    console.log("Matched Name Slip Pricing Rule:", pricingRule);
-
-    // Set selected price based on the matched pricing rule
-    setSelectedPrice(pricingRule ? pricingRule.Price : null);
-  }, [selectedSize, selectedQuantity, productDetails]);
 
   // Process stored cart item after login
   const processPendingCartItem = async () => {
@@ -159,7 +218,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     setIsLoading(true);
     const missing = [];
     if (!selectedSize) missing.push("size");
-    if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
+    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
@@ -186,12 +245,12 @@ const ProductUpload = ({ product }: { product: any }) => {
       await addToCartNameSlip(
         dataId,
         selectedPricingRule!,
-        Number(selectedQuantity),
+        selectedQuantity!,
         uploadedDocumentId ?? undefined 
       );
       incrementCart();
       toast.success("Product added to cart!");
-      router.push("/"); // ✅ Redirect to Cart page after adding
+      setShowCartPopUp(true);
     } catch (error) {
       alert("Failed to add to cart. Please try again.");
     }
@@ -202,7 +261,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     setIsLoading(true);
     const missing = [];
     if (!selectedSize) missing.push("size");
-    if (!selectedQuantity || Number(selectedQuantity) <= 0) missing.push("quantity");
+    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
     if (!uploadedDocumentId) missing.push("document upload");
     if (missing.length > 0) {
       showErrorToast("Please select: " + missing.join(", "));
@@ -228,7 +287,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       await addToCartNameSlip(
         dataId,
         selectedPricingRule!,
-        Number(selectedQuantity),
+        selectedQuantity!,
         uploadedDocumentId ?? undefined 
       );
       toast.success("Product added to cart!");
@@ -241,9 +300,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     setIsLoading(false);
   };
 
-
-  
-
   // Process pending cart item when user logs in
   useEffect(() => {
     if (isLoggedIn()) {
@@ -252,83 +308,266 @@ const ProductUpload = ({ product }: { product: any }) => {
   }, []);
 
   return (
-    <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
+    <div className="min-h-screen bg-gray-50">
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
           <Loader />
         </div>
       )}
-             {showCartPopUp && (
-         <CartProceedPopUp
-           onContinueShopping={handleContinueShopping}
-           onProceedToPayment={handleProceedToPayment}
-           onClose={handleClosePopUp}
-           productInfo={{
-             name: "Custom Name Slip",
-             size: selectedSize,
-             quantity: selectedQuantity ? Number(selectedQuantity) : undefined,
-             price: price || undefined
-           }}
-         />
-       )}
-      {/* First Row */}
-      <div className="flex flex-col md:flex-row">
-        {/* Left Section */}
-        <FileUploader onUploadSuccess={handleUploadSuccess} />
-        {/* Right Section */}
-        <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
-          {productDetails && (
-            <DropDown
-              productDetails={productDetails}
-              onSizeChange={setSelectedSize}
-              onQuantityChange={setSelectedQuantity}
-              onPriceCalculation={handlePriceCalculation}
-            />
-          )}
+      
+      <div className="max-w-[97vw] mx-auto px-3 py-4">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
+            
+            {/* Left Section - Document Preview */}
+            <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
+                <p className="text-gray-600">Upload your document to see a preview</p>
+              </div>
+              
+              {/* Upload Area */}
+              <div className="flex-1 flex flex-col items-center justify-center w-full">
+                <div className="w-full max-w-md">
+                  <FileUploader onUploadSuccess={handleUploadSuccess} />
+                </div>
+              </div>
+            </div>
 
-          {/**error message*/}
-          <div className="flex w-full flex-col items-center justify-center ">
-            {error && <div className="text-red-500">{error}</div>}
+            {/* Right Section - Configuration */}
+            <div className="xl:col-span-3 p-8 overflow-y-auto">
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Custom Name Slip</h1>
+                <p className="text-gray-600">Configure your print settings</p>
+              </div>
+
+              {/* Configuration Steps */}
+              <div className="space-y-8">
+                
+                {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                {!uploadedFile && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                    <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                    
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Please upload a document in the left column first</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Quantity Selection */}
+                {showQuantityInput && uploadedFile && (
+                  <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Enter Quantity
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-black focus:ring-0 transition-all duration-200"
+                          placeholder="Enter number of copies"
+                          value={selectedQuantity || ""}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (value > 0) {
+                              setSelectedQuantity(value);
+                              // Automatically navigate to size options
+                              setTimeout(() => {
+                                setShowSizeOptions(true);
+                                // Auto-scroll to size selection section with offset
+                                setTimeout(() => {
+                                  const sizeSection = document.getElementById('size-options-section');
+                                  if (sizeSection) {
+                                    const elementRect = sizeSection.getBoundingClientRect();
+                                    const absoluteElementTop = elementRect.top + window.pageYOffset;
+                                    const offset = 100; // Offset to ensure heading is visible
+                                    window.scrollTo({
+                                      top: absoluteElementTop - offset,
+                                      behavior: 'smooth'
+                                    });
+                                  }
+                                }, 100); // Small delay to ensure DOM is updated
+                              }, 300); // Reduced delay for faster navigation
+                            } else {
+                              setSelectedQuantity(null);
+                              setShowSizeButton(false);
+                              setShowSizeOptions(false);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-gray-500 mt-4">
+                      Enter the number of copies you need for your Custom Name Slip.
+                    </p>
+                  </div>
+                )}
+
+                {/* Step 3: Size Selection Button - Auto-shows after quantity */}
+                {showSizeButton && !showSizeOptions && selectedQuantity && (
+                  <div id="size-section" className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Size Selection</h3>
+                    <p className="text-sm text-gray-600 mb-4">Select your preferred size</p>
+                    
+                    <button
+                      onClick={() => {
+                        if (!selectedQuantity || selectedQuantity <= 0) {
+                          showErrorToast("Please select quantity first");
+                          return;
+                        }
+                        setShowSizeOptions(true);
+                      }}
+                      className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                    >
+                      <span className="text-gray-700 font-medium">
+                        {selectedSize || "Click to select size"}
+                      </span>
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 3: Size Options */}
+                {showSizeOptions && (
+                  <div id="size-options-section" className="bg-gray-50 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Size Selection</h3>
+                      <button
+                        onClick={() => setShowSizeOptions(false)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">Select your preferred size</p>
+                    
+                    <div className="space-y-3">
+                      {memoizedSizeOptions.length > 0 ? (
+                        memoizedSizeOptions
+                      ) : (
+                        <div className="text-gray-500 text-center py-4">
+                          No size options available for the selected configuration.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {errorMessage && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-800 text-sm">{errorMessage}</p>
+                  </div>
+                )}
+
+                {/* Order Summary - Only show after all selections are made */}
+                {selectedSize && selectedQuantity && uploadedDocumentId && !showSizeOptions && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                    
+                    <div className="bg-white rounded-lg p-6 border border-gray-200">
+                      <div className="space-y-4">
+                        {/* Product Info */}
+                        <div className="border-b border-gray-200 pb-4">
+                          <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Product</span>
+                              <span className="font-medium text-gray-900">Custom Name Slip</span>
+                            </div>
+                            {fileName && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">File Name</span>
+                                <span className="font-medium text-gray-900 truncate max-w-[200px]" title={fileName}>{fileName}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Print Specifications */}
+                        <div className="border-b border-gray-200 pb-4">
+                          <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Size</span>
+                              <span className="font-medium text-gray-900">{selectedSize}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Quantity</span>
+                              <span className="font-medium text-gray-900">{selectedQuantity} copies</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pricing */}
+                        {calculatedPrice && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                <span className="text-lg font-semibold text-gray-900">Total Price</span>
+                                <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Button */}
+              <div className="mt-8">
+                <button
+                  onClick={handleProceddToCart}
+                  disabled={isProceedToCartDisabled}
+                  className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
+                    isProceedToCartDisabled
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
+                  }`}
+                >
+                  {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
+                </button>
+              </div>
+            </div>
           </div>
-          {/**Cart & Payment Button*/}
-          <div className="mt-10 flex w-full max-w-[800px] flex-col justify-center px-4 mx-auto">
-  <button
-    onClick={() => {
-      const missing = [];
-      if (!selectedSize) missing.push("size");
-      if (!selectedQuantity) missing.push("quantity");
-      if (!uploadedDocumentId) missing.push("document upload");
-      if (missing.length > 0) {
-        showErrorToast("Please select: " + missing.join(", "));
-        return;
-      }
-      handleProceddToCart();
-    }}
-    className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-  >
-    <span className="pr-1">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="21"
-        viewBox="0 0 20 21"
-        fill="white"
-      >
-        <path
-          d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-          fill="white"
-        />
-      </svg>
-    </span>
-    <span className="font-bold">{price !== null ? price : "0"}</span>
-    <span className="pl-4 font-medium">Proceed To Cart</span>
-  </button>
-</div>
-
-
-
         </div>
       </div>
+
+      {/* Cart Popup */}
+      {showCartPopUp && (
+        <CartProceedPopUp
+          onContinueShopping={handleContinueShopping}
+          onProceedToPayment={handleProceedToPayment}
+          onClose={handleClosePopUp}
+          productInfo={{
+            name: "Custom Name Slip",
+            size: selectedSize,
+            quantity: selectedQuantity || undefined,
+            price: calculatedPrice || undefined
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -399,6 +399,14 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
 
     try {
+      // Debug: Log the values being passed to findLetterHeadPricingRule
+      console.log("🔍 Debug - Values being passed to findLetterHeadPricingRule:");
+      console.log("selectedOption:", selectedOption);
+      console.log("selectedSize:", selectedSize);
+      console.log("selectedQuantity:", selectedQuantity);
+      console.log("selectedQuality:", selectedQuality);
+      console.log("productDetails.LetterHeadPricingRules:", productDetails.LetterHeadPricingRules);
+
       // Use findLetterHeadPricingRule to get the correct pricing rule structure
       const pricingRule = findLetterHeadPricingRule(
         productDetails.LetterHeadPricingRules,
@@ -409,6 +417,14 @@ const ProductUpload = ({ product }: { product: any }) => {
       );
       
       if (!pricingRule) {
+        console.error("❌ Pricing rule not found. Debug info:");
+        console.error("Available pricing rules:", productDetails.LetterHeadPricingRules);
+        console.error("Selected values:", {
+          selectedOption,
+          selectedSize,
+          selectedQuantity,
+          selectedQuality
+        });
         toast.error("Pricing rule not found. Please check your selections.");
         setIsLoading(false);
         return;
@@ -423,6 +439,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       // Don't redirect to cart - let the popup handle navigation
       // router.push("/Cart");
     } catch (error) {
+      console.error("❌ Error in handleAddToCart:", error);
       toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
     }
@@ -491,12 +508,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       return;
     }
 
-    // Validate file upload
-    if (!uploadedFile) {
-      showErrorToast("Please upload a document before proceeding");
-      return;
-    }
-
     // Validate file type (optional - can be enhanced based on requirements)
     if (uploadedFile && !uploadedFile.name.toLowerCase().endsWith('.pdf')) {
       showWarningToast("For best results, please upload a PDF file");
@@ -506,7 +517,18 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
   const handleProceedToCartWithValidation = async () => {
+    // Add a small delay to ensure state is properly updated
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const missingItems = validateSelections();
+    
+    console.log("🔍 Validation check:");
+    console.log("uploadedDocumentId:", uploadedDocumentId);
+    console.log("selectedOption:", selectedOption);
+    console.log("selectedQuality:", selectedQuality);
+    console.log("selectedQuantity:", selectedQuantity);
+    console.log("selectedSize:", selectedSize);
+    console.log("missingItems:", missingItems);
     
     if (missingItems.length > 0) {
       handleValidationError(missingItems);
@@ -521,12 +543,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     if (calculatedPrice === 0 || calculatedPrice === null) {
       showErrorToast("Unable to calculate price. Please check your selections and try again.");
-      return;
-    }
-
-    // Validate file upload
-    if (!uploadedFile) {
-      showErrorToast("Please upload a document before proceeding");
       return;
     }
 
@@ -614,51 +630,68 @@ const ProductUpload = ({ product }: { product: any }) => {
                 <p className="text-gray-600">Configure your print settings</p>
               </div>
 
-              {/* Print Type Selection */}
-              <div className="bg-gray-50 rounded-xl p-6 mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Print Type</h3>
-                <p className="text-sm text-gray-600 mb-4">Select your preferred print type</p>
+              {/* Configuration Steps */}
+              <div className="space-y-8">
                 
-                <div className="flex space-x-6">
-                  {/* B/W Option */}
-                  <div
-                    className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      selectedOption === "B/W"
-                        ? "border-black bg-gray-100"
-                        : "border-gray-200 bg-white hover:border-gray-300"
-                    }`}
-                    onClick={() => setSelectedOption("B/W")}
-                  >
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedOption === "B/W" ? "border-black bg-black" : "border-gray-300"
-                    }`}>
-                      {selectedOption === "B/W" && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      )}
+                {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                {!uploadedFile && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                    <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                    
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Please upload a document in the left column first</p>
                     </div>
-                    <span className="font-medium text-gray-900">B/W Print</span>
                   </div>
+                )}
 
-                  {/* Color Option */}
-                  <div
-                    className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      selectedOption === "Color"
-                        ? "border-black bg-gray-100"
-                        : "border-gray-200 bg-white hover:border-gray-300"
-                    }`}
-                    onClick={() => setSelectedOption("Color")}
-                  >
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedOption === "Color" ? "border-black bg-black" : "border-gray-300"
-                    }`}>
-                      {selectedOption === "Color" && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      )}
+                {/* Step 2: Print Type Selection - Only show after upload */}
+                {uploadedFile && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Print Type</h3>
+                    <p className="text-sm text-gray-600 mb-4">Select your preferred print type</p>
+                    
+                    <div className="flex space-x-6">
+                      {/* B/W Option */}
+                      <div
+                        className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          selectedOption === "B/W"
+                            ? "border-black bg-gray-100"
+                            : "border-gray-200 bg-white hover:border-gray-300"
+                        }`}
+                        onClick={() => setSelectedOption("B/W")}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          selectedOption === "B/W" ? "border-black bg-black" : "border-gray-300"
+                        }`}>
+                          {selectedOption === "B/W" && (
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          )}
+                        </div>
+                        <span className="font-medium text-gray-900">B/W Print</span>
+                      </div>
+
+                      {/* Color Option */}
+                      <div
+                        className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          selectedOption === "Color"
+                            ? "border-black bg-gray-100"
+                            : "border-gray-200 bg-white hover:border-gray-300"
+                        }`}
+                        onClick={() => setSelectedOption("Color")}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          selectedOption === "Color" ? "border-black bg-black" : "border-gray-300"
+                        }`}>
+                          {selectedOption === "Color" && (
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          )}
+                        </div>
+                        <span className="font-medium text-gray-900">Color Print</span>
+                      </div>
                     </div>
-                    <span className="font-medium text-gray-900">Color Print</span>
                   </div>
-                </div>
-              </div>
+                )}
 
 
 
@@ -666,7 +699,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               <div className="space-y-8">
                 
                 {/* Step 2: Quality Selection Button */}
-                {showQualityButton && !showQualityOptions && selectedOption && (
+                {uploadedFile && showQualityButton && !showQualityOptions && selectedOption && (
                   <div id="quality-section" className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Quality</h3>
                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
@@ -725,36 +758,42 @@ const ProductUpload = ({ product }: { product: any }) => {
                 )}
 
                 {/* Step 3: Quantity Selection */}
-                {showQuantityInput && selectedQuality && (
-                  <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
-                    <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
-                    
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Number of Copies
-                      </label>
-                      <select
-                        value={selectedQuantity || ""}
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value);
-                          setSelectedQuantity(value);
-                        }}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
-                      >
-                        <option value="">Select quantity</option>
-                        {availableQuantities.map((quantity) => (
-                          <option key={quantity} value={quantity}>
-                            {quantity} copies
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Available quantities based on your print type and quality selection.
-                      </p>
-                    </div>
-                  </div>
-                )}
+{showQuantityInput && selectedQuality && (
+  <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
+    </div>
+    <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
+
+    <div className="space-y-3">
+      {availableQuantities && availableQuantities.length > 0 ? (
+        availableQuantities.map((quantity) => (
+          <div
+            key={quantity}
+            onClick={() => setSelectedQuantity(quantity)}
+            className={`w-full px-5 py-3 rounded-lg cursor-pointer border-2 transition-all duration-200 ${
+              selectedQuantity === quantity
+                ? "border-black bg-gray-100"
+                : "border-gray-200 bg-white hover:border-gray-300"
+            }`}
+          >
+            {quantity} copies
+          </div>
+        ))
+      ) : (
+        <div className="text-gray-500 text-center py-4">
+          No quantities available for the selected configuration.
+        </div>
+      )}
+    </div>
+
+    <p className="text-xs text-gray-500 mt-4">
+      Available quantities based on your print type and quality selection.
+    </p>
+  </div>
+)}
+              
+
 
                 {/* Step 4: Size Selection Button */}
                 {showSizeButton && !showSizeOptions && selectedQuantity && (
@@ -890,8 +929,9 @@ const ProductUpload = ({ product }: { product: any }) => {
                   </div>
                 )}
               </div>
+            </div>
 
-                             {/* Action Button */}
+            {/* Action Button */}
                <div className="mt-8">
                  <button
                    onClick={handleProceedToCartWithValidation}

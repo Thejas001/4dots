@@ -784,7 +784,25 @@ export const findLetterHeadPricingRule = (
     return null;
   }
 
-  if (selectedService === "Black And White" && selectedQuantity < 500) {
+  console.log("🔍 findLetterHeadPricingRule called with:");
+  console.log("selectedService:", selectedService);
+  console.log("selectedSize:", selectedSize);
+  console.log("selectedQuantity:", selectedQuantity);
+  console.log("selectedQuality:", selectedQuality);
+  console.log("Available pricing rules:", pricingRules);
+
+  // Map selected service to possible pricing rule values
+  const getServiceMapping = (service: string) => {
+    const mappings = {
+      "B/W": ["B/W", "Black And White", "Black & White", "BW"],
+      "Color": ["Color", "Colour", "Full Color", "Full Colour"]
+    };
+    return mappings[service as keyof typeof mappings] || [service];
+  };
+
+  const possibleServices = getServiceMapping(selectedService);
+
+  if (selectedService === "B/W" && selectedQuantity < 500) {
     console.warn(
       "B/W printing is only available for quantities of 500 or more.",
     );
@@ -793,16 +811,36 @@ export const findLetterHeadPricingRule = (
 
   const rule =
     pricingRules.find(
-      (rule) =>
-        rule.Service?.ValueName.trim() === selectedService.trim() &&
-        rule.Size?.ValueName.trim() === selectedSize.trim() &&
-        rule.Quality?.ValueName.trim() === selectedQuality.trim() &&
-        rule.Quantity?.ValueName.trim() === selectedQuantity.toString().trim(),
+      (rule) => {
+        const serviceMatch = possibleServices.some(service => 
+          rule.Service?.ValueName.trim().toLowerCase() === service.trim().toLowerCase()
+        );
+        const sizeMatch = rule.Size?.ValueName.trim().toLowerCase() === selectedSize.trim().toLowerCase();
+        const qualityMatch = rule.Quality?.ValueName.trim().toLowerCase() === selectedQuality.trim().toLowerCase();
+        const quantityMatch = rule.Quantity?.ValueName.trim() === selectedQuantity.toString().trim();
+        
+        console.log("🔍 Rule comparison:");
+        console.log("Service:", rule.Service?.ValueName.trim(), "in", possibleServices, "=", serviceMatch);
+        console.log("Size:", rule.Size?.ValueName.trim(), "===", selectedSize.trim(), "=", sizeMatch);
+        console.log("Quality:", rule.Quality?.ValueName.trim(), "===", selectedQuality.trim(), "=", qualityMatch);
+        console.log("Quantity:", rule.Quantity?.ValueName.trim(), "===", selectedQuantity.toString().trim(), "=", quantityMatch);
+        
+        return serviceMatch && sizeMatch && qualityMatch && quantityMatch;
+      }
     ) || null;
 
   console.log("✅ Matched Letterhead Pricing Rule:", rule);
 
   if (!rule) {
+    console.error("❌ No matching rule found. Available rules:");
+    pricingRules.forEach((rule, index) => {
+      console.log(`Rule ${index}:`, {
+        Service: rule.Service?.ValueName,
+        Size: rule.Size?.ValueName,
+        Quality: rule.Quality?.ValueName,
+        Quantity: rule.Quantity?.ValueName
+      });
+    });
     return null; // Return null if no rule is found
   }
 
@@ -831,7 +869,7 @@ export const findLetterHeadPricingRule = (
     },
   };
 
-  console.log("xtracted Attribute IDs & Value Names:", extractedData);
+  console.log("✅ Extracted Attribute IDs & Value Names:", extractedData);
   return extractedData;
 };
 

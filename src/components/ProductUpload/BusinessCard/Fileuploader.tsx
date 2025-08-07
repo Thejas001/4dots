@@ -6,7 +6,7 @@ import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
 interface FileUploaderProps {
-  onUploadSuccess: (documentId: number) => void;
+  onUploadSuccess: (documentId: number, file?: File, name?: string) => void;
 }
 
 
@@ -42,11 +42,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         if (response?.Success) {
           const documentId = response.Data?.Id;  
           sessionStorage.setItem("uploadedDocumentId", documentId);
-          onUploadSuccess(documentId); 
-          message.success(`${info.file.name} uploaded successfully`);
+          onUploadSuccess(documentId, info.file.originFileObj, info.file.name); 
           console.log("📄 Document ID:", documentId);
         } else {
-          message.error("Upload failed. Server did not return success.");        }
+          message.error("Upload failed. Server did not return success.");
+        }
       } else if (info.file.status === "error") {
         message.error(`${info.file.name} upload failed.`);
       }
