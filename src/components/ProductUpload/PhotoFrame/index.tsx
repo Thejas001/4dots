@@ -13,6 +13,9 @@ import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import CartButton from "./CartButton";
+import type { UploadFile } from "antd/es/upload";
+
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -93,6 +96,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<UploadFile[]>([]);
   const [selectedPricingRule, setSelectedPricingRule] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -279,14 +283,10 @@ const ProductUpload = ({ product }: { product: any }) => {
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <div className="w-full max-w-md">
                   {selectedQuantity && selectedQuantity > 0 ? (
-                    <FileUploader 
-                      onUploadSuccess={handleUploadSuccess}
+                    <FileUploader
                       quantity={selectedQuantity}
                       uploadedImages={fileList}
                       setUploadedImages={setFileList}
-                      currentImageIndex={currentImageIndex}
-                      handleNext={handleNext}
-                      handlePrevious={handlePrevious}
                     />
                   ) : (
                     <div className="w-full text-center text-gray-500 py-20">
@@ -589,17 +589,15 @@ const ProductUpload = ({ product }: { product: any }) => {
                       {/* Proceed to Cart Button */}
                       {fileList.length > 0 && selectedSize && selectedFrameColor && (
                         <div className="bg-gray-50 rounded-xl p-6">
-                          <button
-                            onClick={handleProceedToCartWithValidation}
-                            disabled={isAddToCartDisabled()}
-                            className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-                              isAddToCartDisabled()
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-black text-white hover:bg-gray-800"
-                            }`}
-                          >
-                            {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
-                          </button>
+                          <CartButton
+                            uploadedImages={fileList}
+                            dataId={dataId}
+                            selectedQuantity={selectedQuantity}
+                            calculatedPrice={calculatedPrice ?? 0}
+                            selectedPricingRule={selectedPricingRule}
+                            selectedFrameColor={selectedFrameColor}
+                            selectedSize={selectedSize}
+                          />                        
                         </div>
                       )}
                     </>
@@ -610,20 +608,6 @@ const ProductUpload = ({ product }: { product: any }) => {
           </div>
         </div>
       </div>
-      {/* Cart Popup */}
-      {showCartPopUp && (
-        <CartProceedPopUp
-          onContinueShopping={handleContinueShopping}
-          onProceedToPayment={handleProceedToPayment}
-          onClose={handleClosePopUp}
-          productInfo={{
-            name: "Photo Frame",
-            size: selectedSize,
-            quantity: selectedQuantity || undefined,
-            price: calculatedPrice || undefined
-          }}
-        />
-      )}
     </div>
   );
 };
