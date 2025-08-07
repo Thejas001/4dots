@@ -283,7 +283,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             item.uploadedDocumentId
           );
           sessionStorage.removeItem("pendingCartItem");
-          toast.success("Pending item added to cart!");
+          // toast.success("Pending item added to cart!"); // Removed
         }
       } catch (error) {
         console.error("Error processing pending cart item:", error);
@@ -326,7 +326,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         selectedQuantity ?? 1,
         uploadedDocumentId ?? undefined
       );
-      toast.success("Product added to cart!");
+      // toast.success("Product added to cart!"); // Removed
       router.push("/Cart");
     } catch (error) {
       toast.error("Failed to add to cart. Please try again.");

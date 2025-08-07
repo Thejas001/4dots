@@ -48,19 +48,6 @@ const showErrorToast = (message: string) => {
   ));
 };
 
-const showSuccessToast = (message: string) => {
-  toast.success(message, {
-    duration: 4000,
-    style: {
-      background: '#10b981',
-      color: '#fff',
-      fontSize: '1rem',
-      padding: '16px 24px',
-      borderRadius: '8px',
-    },
-  });
-};
-
 const showWarningToast = (message: string) => {
   toast(message, {
     duration: 4000,
@@ -368,7 +355,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             item.uploadedDocumentId
           );
           sessionStorage.removeItem("pendingCartItem");
-          showSuccessToast("Pending item added to cart successfully!");
+          toast.success("Pending item added to cart successfully!");
         }
       } catch (error) {
         console.error("Error processing pending cart item:", error);
@@ -435,7 +422,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         pricingRule,
         uploadedDocumentId ?? undefined
       );
-      showSuccessToast("Product added to cart successfully!");
+      toast.success("Product added to cart successfully!");
       // Don't redirect to cart - let the popup handle navigation
       // router.push("/Cart");
     } catch (error) {

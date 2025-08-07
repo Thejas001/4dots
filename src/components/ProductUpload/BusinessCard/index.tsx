@@ -199,7 +199,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      toast.success("Product added to cart!");
+      toast.error("Product added to cart!");
       router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;
@@ -207,7 +207,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     try {
       await addToCartBusinessCard(dataId, selectedPricingRule!, uploadedDocumentId ?? undefined);
-      toast.success("Product added to cart!");
+      toast.error("Product added to cart!");
       
       // Show popup for logged-in users instead of directly going to cart
       setShowCartPopUp(true);
@@ -228,7 +228,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-       toast.success("Product added to cart!");
+       toast.error("Product added to cart!");
       router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;
@@ -236,7 +236,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     try {
       await addToCartBusinessCard(dataId, selectedPricingRule!, uploadedDocumentId ?? undefined);
-      toast.success("Product added to cart!");
+      toast.error("Product added to cart!");
       
       // Show popup for logged-in users instead of directly going to cart
       setShowCartPopUp(true);

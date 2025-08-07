@@ -49,41 +49,6 @@ const showErrorToast = (message: string) => {
   ));
 };
 
-const showSuccessToast = (message: string) => {
-  toast.custom((t) => (
-    <div
-      style={{
-        background: "#4caf50",
-        color: "#fff",
-        borderRadius: "10px",
-        padding: "20px 32px",
-        fontSize: "1.25rem",
-        minWidth: "320px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-      }}
-    >
-      <span>{message}</span>
-      <button
-        onClick={() => toast.dismiss(t.id)}
-        style={{
-          background: "transparent",
-          border: "none",
-          color: "#fff",
-          fontSize: "1.5rem",
-          marginLeft: "16px",
-          cursor: "pointer",
-        }}
-        aria-label="Close"
-      >
-        &times;
-      </button>
-    </div>
-  ));
-};
-
 const showWarningToast = (message: string) => {
   toast.custom((t) => (
     <div
@@ -170,7 +135,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       const url = URL.createObjectURL(file);
       setPdfUrl(url);
     }
-    showSuccessToast("File uploaded successfully!");
     // Show size selection after file upload
     setShowSizeSelection(true);
   };
@@ -235,7 +199,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       );
 
       incrementCart();
-      showSuccessToast("Added to cart successfully!");
       setShowCartPopUp(true);
     } catch (error) {
       console.error("Error adding to cart:", error);
