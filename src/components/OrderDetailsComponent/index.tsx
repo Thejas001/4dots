@@ -18,6 +18,7 @@ interface Item {
   Quantity: number;
   Price: number;
   Attributes: Attribute[];
+  Documents?: { ContentType: string; DocumentUrl: string }[];
 }
 
 interface Order {
@@ -142,11 +143,68 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
 
                   {/**Second row */}
                   <div className="mt-2 flex flex-col xl:flex-row">
-                    <img
-                      src="/images/product/Rectangle4597.svg"
-                      alt="Product Image"
-                      className="bg-lightgray h-[113px] w-[107px] rounded-md border border-[#ECECEC] bg-cover bg-center bg-no-repeat object-cover"
-                    />
+                    {/* Dynamic Product Image */}
+                    <div className="bg-lightgray h-[113px] w-[107px] rounded-md border border-[#ECECEC] bg-cover bg-center bg-no-repeat object-cover overflow-hidden">
+                      {(() => {
+                        // Get the item's documents if available
+                        const documents = item.Documents || [];
+                        const hasMultiple = documents.length > 1;
+                        
+                        if (documents.length > 0) {
+                          const firstDoc = documents[0];
+                          const isPdf = firstDoc.ContentType?.toLowerCase().includes("pdf") || 
+                                       firstDoc.DocumentUrl?.toLowerCase().endsWith(".pdf");
+                          
+                          if (isPdf) {
+                            return (
+                              <div className="relative w-full h-full">
+                                <img
+                                  src="/images/product/pdf.png"
+                                  alt="PDF Document"
+                                  className="w-full h-full object-contain"
+                                />
+                                {hasMultiple && (
+                                  <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white text-xs px-2 py-0.5 rounded">
+                                    +{documents.length - 1}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          
+                          if (firstDoc.DocumentUrl) {
+                            return (
+                              <div className="relative w-full h-full">
+                                <img
+                                  src={firstDoc.DocumentUrl}
+                                  alt="Product Image"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Fallback to placeholder if image fails to load
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = "/images/product/Rectangle4597.svg";
+                                  }}
+                                />
+                                {hasMultiple && (
+                                  <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white text-xs px-2 py-0.5 rounded">
+                                    +{documents.length - 1}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                        }
+                        
+                        // Fallback to default placeholder
+                        return (
+                          <img
+                            src="/images/product/Rectangle4597.svg"
+                            alt="Product Image"
+                            className="w-full h-full object-cover"
+                          />
+                        );
+                      })()}
+                    </div>
 
                     {/**Right Section */}
                     <div className="ml-1 mt-2 flex flex-1 flex-col">
