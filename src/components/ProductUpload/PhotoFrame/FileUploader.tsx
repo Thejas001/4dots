@@ -2,227 +2,169 @@
 
 import React, { useState, useEffect } from "react";
 import { UploadOutlined } from "@ant-design/icons";
-import type { UploadProps } from "antd";
-import { Button, message, Upload } from "antd";
+import { Button, Upload, message } from "antd";
+import type { UploadFile, UploadProps } from "antd/es/upload";
 
-interface FileUploaderProps {
-  onUploadSuccess: (documentId: number, file?: File, name?: string) => void;
-  quantity?: number | null;
-  uploadedImages?: any[];
-  setUploadedImages?: React.Dispatch<React.SetStateAction<any[]>>;
-  currentImageIndex?: number;
-  handleNext?: () => void;
-  handlePrevious?: () => void;
-}
-
-const FileUploader: React.FC<FileUploaderProps> = ({ 
-  onUploadSuccess,
+const FileUploader = ({
   quantity,
   uploadedImages,
   setUploadedImages,
-  currentImageIndex,
-  handleNext,
-  handlePrevious
+}: {
+  quantity: number | null;
+  uploadedImages: UploadFile[];
+  setUploadedImages: React.Dispatch<React.SetStateAction<UploadFile[]>>;
 }) => {
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [fileType, setFileType] = useState<"pdf" | "image" | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState<string>("");
-  const [isMobile, setIsMobile] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+  const isImageFile = (fileName: string) => {
+    const imageExtensions = [
+      ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",
+       ".svg", ".webp"
+    ];
+    return imageExtensions.some((ext) =>
+      fileName.toLowerCase().endsWith(ext)
+    );
+  };
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+  const isPdfFile = (fileName: string) => fileName.toLowerCase().endsWith(".pdf");
 
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
-
-  const props: UploadProps = {
-    name: "document",
-    action: "https://fourdotsapp.azurewebsites.net/api/document/upload?returnPageCount=true",
-    method: "POST",
-    accept: ".pdf,.jpg,.jpeg,.png,.gif,.svg,.webp,.psd",
-    headers: {
-      authorization: "authorization-text",
-    },
-    beforeUpload: (file) => {
-      const fileURL = URL.createObjectURL(file);
-      setSelectedFile(fileURL);
-      setUploadedFile(file);
-      setFileName(file.name);
-
-      // Check file type
-      if (file.type === "application/pdf") {
-        setFileType("pdf");
-      } else if (file.type.startsWith("image/")) {
-        setFileType("image");
-      } else {
-        message.error("Unsupported file type. Please upload a PDF or image file.");
-        return false;
-      }
-
-      return true;
-    },
-    onChange(info) {
-      if (info.file.status === "done") {
-        const response = info.file.response;
-
-        if (response?.Success) {
-          const documentId = response.Data?.Id;
-
-          sessionStorage.setItem("uploadedDocumentId", documentId);
-          onUploadSuccess(documentId, uploadedFile || undefined, fileName);
-
-          // Update file list for navigation
-          if (setUploadedImages && uploadedFile) {
-            const newFile = {
-              uid: info.file.uid,
-              name: fileName,
-              url: selectedFile,
-              type: fileType,
-              documentId: documentId
-            };
-            setUploadedImages(prev => [...prev, newFile]);
-          }
-
-          message.success(`${info.file.name} uploaded successfully`);
-          console.log("📄 Document ID:", documentId);
-        } else {
-          message.error("Upload failed. Server did not return success.");
-        }
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} upload failed.`);
-      }
-    },
+  const getFileTypeLabel = (fileName: string) => {
+    const lower = fileName.toLowerCase();
+    if (lower.endsWith(".pdf")) return "PDF Document";
+    if (lower.endsWith(".psd")) return "Photoshop Document";
+    if (lower.endsWith(".ai") || lower.endsWith(".eps") || lower.endsWith(".ait")) return "Illustrator Document";
+    if (lower.endsWith(".ppt") || lower.endsWith(".pptx")) return "PowerPoint Presentation";
+    return "File Preview Unavailable";
   };
 
   useEffect(() => {
-    const handleBeforeUnload = async () => {
-      const docId = sessionStorage.getItem("uploadedDocumentId");
+    if (quantity === null || quantity === 0) {
+      setUploadedImages([]);
+    } else if (uploadedImages.length > quantity) {
+      setUploadedImages((prev) => prev.slice(0, quantity));
+    }
+  }, [quantity, setUploadedImages]);
 
-      if (docId) {
-        try {
-          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
-            method: "DELETE",
-          });
-
-          sessionStorage.removeItem("uploadedDocumentId");
-          console.log("🧹 Document removed on unload.");
-        } catch (err) {
-          console.error("❌ Failed to delete document on unload:", err);
-        }
+  const props: UploadProps = {
+    name: "document",
+    multiple: true,
+    accept:
+      "image/*,.pdf,.psd",
+    showUploadList: false,
+    beforeUpload: (file) => {
+      const allowedExtensions = [
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",".svg", ".webp", ".pdf", ".psd"
+      ];
+      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type. Please upload a supported format.");
+        return false;
       }
-    };
+      return true; // Allow upload for all allowed types
+    },
+    onChange: (info) => {
+      // Create preview URLs for uploaded files
+      const updatedFileList = info.fileList.map(file => {
+        if (file.originFileObj && !file.url) {
+          // Create preview URL for local files
+          file.url = URL.createObjectURL(file.originFileObj);
+        }
+        return file;
+      });
+      
+      // Update the uploadedImages state when files are added/removed
+      setUploadedImages(updatedFileList);
+    },
+    fileList: uploadedImages,
+    maxCount: quantity ?? undefined,
+  };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [uploadedImages]);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
+  const handleNext = () => {
+    if (uploadedImages.length > 1) {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % uploadedImages.length);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (uploadedImages.length > 1) {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === 0 ? uploadedImages.length - 1 : prevIndex - 1
+      );
+    }
+  };
 
   return (
-    <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
-      {/* Upload Button */}
-      <Upload {...props} showUploadList={false} disabled={quantity === null || quantity === 0}>
+    <div className="flex flex-col bg-[#F7F7F7] w-full max-w-md md:max-w-xs lg:max-w-sm px-4 sm:px-8 items-center shadow h-auto py-6">
+      <Upload {...props} disabled={quantity === null || quantity === 0}>
         <Button
           icon={<UploadOutlined />}
-          className="flex justify-center mt-5 items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium disabled:bg-gray-300"
+          className="flex mt-5 justify-center items-center bg-[#242424] w-full max-w-[180px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium disabled:bg-gray-300"
           disabled={quantity === null || quantity === 0}
         >
-          Upload File
+          Upload Files
         </Button>
       </Upload>
 
-      {/* Display Area with Navigation Arrows */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center border rounded-md bg-white">
-        {uploadedImages && uploadedImages.length > 0 ? (
-          uploadedImages[currentImageIndex || 0]?.type === "pdf" ? (
-            isMobile ? (
-              <div className="flex flex-col items-center justify-center p-4 text-center">
-                <p className="text-sm text-gray-700 mb-2">PDF preview is not supported on mobile.</p>
-                <a
-                  href={uploadedImages[currentImageIndex || 0]?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline text-sm"
-                >
-                  Open PDF in new tab
-                </a>
-              </div>
-            ) : (
-              <iframe
-                src={`${uploadedImages[currentImageIndex || 0]?.url}#toolbar=0`}
-                width="100%"
-                height="100%"
-                className="rounded-md border"
-                title="PDF Preview"
+      {uploadedImages.length > 0 && (
+        <div className="mt-3 relative w-full flex justify-center items-center">
+          {isImageFile(uploadedImages[currentImageIndex]?.name) ? (
+            <img
+              src={uploadedImages[currentImageIndex]?.url}
+              alt={uploadedImages[currentImageIndex]?.name}
+              className="w-full max-w-[320px] h-auto max-h-[400px] object-contain rounded-md"
+              onError={(e) => (e.currentTarget.src = "https://placehold.co/200")}
+            />
+          ) : isPdfFile(uploadedImages[currentImageIndex]?.name) ? (
+            <embed
+              src={uploadedImages[currentImageIndex]?.url}
+              type="application/pdf"
+              className="w-full max-w-[320px] h-[400px] rounded-md"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full max-w-[320px] h-[200px] bg-gray-100 rounded-md">
+              <img
+                src="/images/product/Rectangle970.svg" // Replace with your icon
+                alt="File Icon"
+                className="w-12 h-12 mb-2"
               />
-            )
-          ) : (
-            <img 
-              src={uploadedImages[currentImageIndex || 0]?.url} 
-              alt="Uploaded File" 
-              className="w-full h-full object-contain rounded-md" 
-            />
-          )
-        ) : selectedFile ? (
-          fileType === "pdf" ? (
-            <iframe
-              src={`${selectedFile}#toolbar=0`}
-              width="100%"
-              height="100%"
-              className="rounded-md border"
-              title="PDF Preview"
-            />
-          ) : (
-            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-cover rounded-md" />
-          )
-        ) : (
-          <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
-        )}
-
-        {/* Navigation Arrows */}
-        {uploadedImages && uploadedImages.length > 1 && handleNext && handlePrevious && (
-          <>
-            {/* Left Arrow */}
-            <div
-              className="absolute top-1/2 -left-6 -translate-y-1/2 cursor-pointer bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200"
-              onClick={handlePrevious}
-            >
-              <img src="/images/icon/vector-left.svg" alt="Previous" className="w-4 h-4" />
+              <p className="text-sm text-gray-600">{getFileTypeLabel(uploadedImages[currentImageIndex]?.name)}</p>
             </div>
-            
-            {/* Right Arrow */}
-            <div
-              className="absolute top-1/2 -right-6 -translate-y-1/2 cursor-pointer bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200"
-              onClick={handleNext}
-            >
-              <img src="/images/icon/vector-right.svg" alt="Next" className="w-4 h-4" />
-            </div>
-          </>
-        )}
-      </div>
+          )}
 
-      {/* File Counter */}
-      {uploadedImages && uploadedImages.length > 0 && (
+          {uploadedImages.length > 1 && (
+            <>
+              <div
+                className="absolute top-1/2 left-2 -translate-y-1/2 cursor-pointer"
+                onClick={handlePrevious}
+              >
+                <img src="/images/icon/vector-left.svg" alt="Previous" />
+              </div>
+              <div
+                className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
+                onClick={handleNext}
+              >
+                <img src="/images/icon/vector-right.svg" alt="Next" />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {uploadedImages.length > 0 && (
         <div
           className="w-[75px] h-10 bg-[#fff] rounded-[30px] mt-3 px-5 py-2 text-sm font-medium leading-6 text-[#242424] tracking-[-0.2px] flex justify-center items-center text-center"
           style={{ boxShadow: "0px 4px 16px 0px rgba(91, 91, 91, 0.10)" }}
         >
-          {(currentImageIndex || 0) + 1} / {uploadedImages.length}
+          {currentImageIndex + 1} / {uploadedImages.length}
         </div>
       )}
-
-      <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-        Supported file formats: PDF, JPG, JPEG, PNG, GIF, SVG, WEBP, PSD.
-      </div>
+    <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
+      Supported file formats: JPG, JPEG, PNG, GIF, SVG, WEBP, PDF.
+    </div>
     </div>
   );
 };
