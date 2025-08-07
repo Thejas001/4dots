@@ -98,10 +98,10 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   const handleUploadSuccess = (documentId: number, fileURL: string | null) => {
     setUploadedDocumentId(documentId);
+    setIsUploaded(true); // Always set to true when document is uploaded
     if (fileURL) {
       setPdfUrl(fileURL);
-      setIsUploaded(true);
-        } else {
+    } else {
       setUploadedFile({} as File); // Only if no preview URL, to trigger options
     }
   };
@@ -149,22 +149,26 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   }, [selectedSize, selectedQuantity, selectedQuality, getSizePrice]);
 
-  // Show quantity input immediately (first step)
+  // Show quantity input only after document is uploaded
   useEffect(() => {
-    setShowQuantityInput(true);
-    // Set default quantity to 1 unit (1000 copies)
-    if (!selectedQuantity) {
-      setSelectedQuantity(1);
-    }
-    
-    // Auto scroll to quantity input after a short delay
-    setTimeout(() => {
-      const quantitySection = document.getElementById('quantity-section');
-      if (quantitySection) {
-        quantitySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (isUploaded) {
+      setShowQuantityInput(true);
+      // Set default quantity to 1 unit (1000 copies)
+      if (!selectedQuantity) {
+        setSelectedQuantity(1);
       }
-    }, 300);
-  }, []);
+      
+      // Auto scroll to quantity input after a short delay
+      setTimeout(() => {
+        const quantitySection = document.getElementById('quantity-section');
+        if (quantitySection) {
+          quantitySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    } else {
+      setShowQuantityInput(false);
+    }
+  }, [isUploaded]);
 
   // Show size button after quantity input
   useEffect(() => {

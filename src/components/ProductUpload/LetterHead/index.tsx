@@ -61,6 +61,44 @@ const showWarningToast = (message: string) => {
   });
 };
 
+const showSuccessToast = (message: string) => {
+  toast.custom((t) => (
+    <div
+      style={{
+        background: "#000000",
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "20px 32px",
+        fontSize: "1.25rem",
+        minWidth: "320px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span style={{ marginRight: "12px", fontSize: "1.5rem" }}>✓</span>
+        <span>{message}</span>
+      </div>
+      <button
+        onClick={() => toast.dismiss(t.id)}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: "#fff",
+          fontSize: "1.5rem",
+          marginLeft: "16px",
+          cursor: "pointer",
+        }}
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+  ));
+};
+
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
   const productDetails = product;
@@ -111,10 +149,10 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   const handleUploadSuccess = (documentId: number, fileURL: string | null) => {
     setUploadedDocumentId(documentId);
+    setIsUploaded(true); // Always set to true when document is uploaded
     if (fileURL) {
       setPdfUrl(fileURL);
-      setIsUploaded(true);
-        } else {
+    } else {
       setUploadedFile({} as File); // Only if no preview URL, to trigger options
     }
   };
@@ -169,10 +207,9 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   }, [selectedSize, selectedQuantity, selectedQuality, selectedOption, getSizePrice]);
 
-  // Show quality button after print type selection
+  // Reset states when print type changes
   useEffect(() => {
     if (selectedOption) {
-      setShowQualityButton(true);
       // Reset other states when print type changes
       setSelectedQuality("");
       setSelectedQuantity(null);
@@ -357,7 +394,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             item.uploadedDocumentId
           );
           sessionStorage.removeItem("pendingCartItem");
-          toast.success("Pending item added to cart successfully!");
+          showSuccessToast("Pending item added to cart successfully!");
         }
       } catch (error) {
         console.error("Error processing pending cart item:", error);
@@ -425,7 +462,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId ?? undefined
       );
       
-      toast.success("Product added to cart successfully!");
+      showSuccessToast("Product added to cart successfully!");
       // Don't redirect to cart - let the popup handle navigation
       // router.push("/Cart");
     } catch (error) {
@@ -681,33 +718,33 @@ const ProductUpload = ({ product }: { product: any }) => {
               <div className="space-y-8">
                 
                 {/* Step 2: Quality Selection Button */}
-                {isUploaded && showQualityButton && !showQualityOptions && selectedOption && (
+                {isUploaded && selectedOption && !showQualityOptions && (
                   <div id="quality-section" className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Quality</h3>
                     <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
                     
-                                         <button
-                       onClick={() => {
-                         if (!selectedOption) {
-                           showErrorToast("Please select a print type first");
-                           return;
-                         }
-                         setShowQualityOptions(true);
-                       }}
-                       className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
-                     >
-                       <span className="text-gray-700 font-medium">
-                         {selectedQuality || "Click to select paper quality"}
-                       </span>
-                       <svg
-                         className="w-5 h-5 text-gray-400"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24"
-                       >
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                       </svg>
-                     </button>
+                    <button
+                      onClick={() => {
+                        if (!selectedOption) {
+                          showErrorToast("Please select a print type first");
+                          return;
+                        }
+                        setShowQualityOptions(true);
+                      }}
+                      className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                    >
+                      <span className="text-gray-700 font-medium">
+                        {selectedQuality || "Click to select paper quality"}
+                      </span>
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
                   </div>
                 )}
 
