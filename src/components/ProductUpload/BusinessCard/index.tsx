@@ -216,7 +216,7 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
     setIsLoading(false);
   };
-
+  
   const handleAddToCart = async () => {
     setIsLoading(true);
 
@@ -228,7 +228,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      toast.success("Product added to cart!");
+       toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;
@@ -329,7 +329,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <div className="w-full max-w-md ml-4">
-                  <FileUploader onUploadSuccess={handleUploadSuccess} />
+      <FileUploader onUploadSuccess={handleUploadSuccess} />
                 </div>
               </div>
             </div>
@@ -535,18 +535,18 @@ const ProductUpload = ({ product }: { product: any }) => {
                   {/* Proceed to Cart Button */}
                   {selectedCard && selectedSurface && uploadedFile && !showCardOptions && (
                     <div className="bg-gray-50 rounded-xl p-6">
-                      <button
-                        onClick={() => {
-                          const missing = [];
-                          if (!selectedCard) missing.push("card type");
-                          if (!selectedSurface) missing.push("surface type");
-                          if (!uploadedDocumentId) missing.push("document upload");
-                          if (missing.length > 0) {
-                            showErrorToast("Please select: " + missing.join(", "));
-                            return;
-                          }
-                          handleProceedToCart();
-                        }}
+            <button
+              onClick={() => {
+                const missing = [];
+                if (!selectedCard) missing.push("card type");
+                if (!selectedSurface) missing.push("surface type");
+                if (!uploadedDocumentId) missing.push("document upload");
+                if (missing.length > 0) {
+                  showErrorToast("Please select: " + missing.join(", "));
+                  return;
+                }
+                handleProceedToCart();
+              }}
                         disabled={isAddToCartDisabled}
                         className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
                           isAddToCartDisabled
@@ -555,7 +555,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                         }`}
                       >
                         {price ? `Proceed to Cart - ₹${price.toFixed(2)}` : "Proceed to Cart"}
-                      </button>
+            </button>
                     </div>
                   )}
                 </div>
