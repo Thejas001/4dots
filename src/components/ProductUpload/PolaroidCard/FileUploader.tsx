@@ -43,6 +43,20 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     };
   }, []);
 
+  // Update file type when current image changes
+  useEffect(() => {
+    if (uploadedImages && uploadedImages.length > 0 && currentImageIndex !== undefined) {
+      const currentFile = uploadedImages[currentImageIndex];
+      if (currentFile?.originFileObj) {
+        if (currentFile.originFileObj.type === "application/pdf") {
+          setFileType("pdf");
+        } else {
+          setFileType(null);
+        }
+      }
+    }
+  }, [uploadedImages, currentImageIndex]);
+
   const props: UploadProps = {
     name: "document",
     multiple: true,
@@ -57,6 +71,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         message.error("Unsupported file type. Please upload a supported format.");
         return false;
       }
+      
+      // Set file type for preview
+      if (file.type === "application/pdf") {
+        setFileType("pdf");
+      } else {
+        setFileType(null);
+      }
+      
       return true;
     },
     onChange: (info) => {
@@ -65,6 +87,13 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         if (file.originFileObj && !file.url) {
           // Create preview URL for local files
           file.url = URL.createObjectURL(file.originFileObj);
+          
+          // Set file type for the first file
+          if (file.originFileObj.type === "application/pdf") {
+            setFileType("pdf");
+          } else {
+            setFileType(null);
+          }
         }
         return file;
       });
