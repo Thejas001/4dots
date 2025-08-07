@@ -11,6 +11,7 @@ import { findOffsetPrintingPricingRule1, calculateOffsetPrintingPrice} from "./P
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
+import CartProceedPopUp from "@/components/CartProceedPopUp";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -65,22 +66,43 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [showSizeOptions, setShowSizeOptions] = useState<boolean>(false);
   const [showQualityButton, setShowQualityButton] = useState<boolean>(false);
   const [showQualityOptions, setShowQualityOptions] = useState<boolean>(false);
+  const [showCartPopUp, setShowCartPopUp] = useState(false);
+
+  const [isUploaded, setIsUploaded] = useState(false);
+
 
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
 
+    // Handle continue shopping
+    const handleContinueShopping = () => {
+      setShowCartPopUp(false);
+      router.push("/");
+    };
+  
+    // Handle proceed to payment
+    const handleProceedToPayment = () => {
+      setShowCartPopUp(false);
+      router.push("/Cart");
+    };
+  
+    // Handle close popup
+    const handleClosePopUp = () => {
+      setShowCartPopUp(false);
+    };
   // Check if user is logged in
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
     return !!token;
   };
 
-  const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
+  const handleUploadSuccess = (documentId: number, fileURL: string | null) => {
     setUploadedDocumentId(documentId);
-    if (file) {
-      setUploadedFile(file);
-      setFileName(name || file.name);
-      setPdfUrl(URL.createObjectURL(file));
+    if (fileURL) {
+      setPdfUrl(fileURL);
+      setIsUploaded(true);
+        } else {
+      setUploadedFile({} as File); // Only if no preview URL, to trigger options
     }
   };
 
@@ -283,7 +305,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             item.uploadedDocumentId
           );
           sessionStorage.removeItem("pendingCartItem");
-          toast.success("Pending item added to cart!");
+          // toast.success("Pending item added to cart!"); // Removed
         }
       } catch (error) {
         console.error("Error processing pending cart item:", error);
@@ -326,8 +348,9 @@ const ProductUpload = ({ product }: { product: any }) => {
         selectedQuantity ?? 1,
         uploadedDocumentId ?? undefined
       );
-      toast.success("Product added to cart!");
-      router.push("/Cart");
+      // toast.success("Product added to cart!"); // Removed
+      setShowCartPopUp(true); 
+      toast.success("Product added to cart successfully!");
     } catch (error) {
       toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
@@ -336,6 +359,8 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   const handleProceedToCart = async () => {
     handleAddToCart();
+    setShowCartPopUp(true);
+
   };
 
   useEffect(() => {
@@ -414,11 +439,23 @@ const ProductUpload = ({ product }: { product: any }) => {
                 <p className="text-gray-600">Configure your print settings</p>
               </div>
 
-                             {/* Configuration Steps */}
-               <div className="space-y-8">
-                 
-                 {/* Step 1: Quantity Selection */}
-                 {showQuantityInput && (
+              {/* Configuration Steps */}
+              <div className="space-y-8">
+                
+                {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                {!isUploaded  && (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                    <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                    
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">Please upload a document in the left column first</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Quantity Selection - Only show after upload */}
+                {isUploaded  && showQuantityInput && (
                    <div id="quantity-section" className="bg-gray-50 rounded-xl p-6">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
                      <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>
@@ -453,8 +490,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 2: Size Selection Button */}
-                 {showSizeButton && !showSizeOptions && (
+                 {/* Step 3: Size Selection Button */}
+                 {isUploaded  && showSizeButton && !showSizeOptions && (
                    <div id="size-section" className="bg-gray-50 rounded-xl p-6">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Size</h3>
                      <p className="text-sm text-gray-600 mb-4">Select your preferred paper size</p>
@@ -478,8 +515,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 2: Size Options */}
-                 {showSizeOptions && (
+                 {/* Step 3: Size Options */}
+                 {isUploaded  && showSizeOptions && (
                    <div className="bg-gray-50 rounded-xl p-6">
                      <div className="flex items-center justify-between mb-4">
                        <h3 className="text-lg font-semibold text-gray-900">Paper Size</h3>
@@ -506,8 +543,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 3: Quality Selection Button */}
-                 {showQualityButton && !showQualityOptions && selectedSize && (
+                 {/* Step 4: Quality Selection Button */}
+                 {isUploaded  && showQualityButton && !showQualityOptions && selectedSize && (
                    <div id="quality-section" className="bg-gray-50 rounded-xl p-6">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Paper Quality</h3>
                      <p className="text-sm text-gray-600 mb-4">Select your preferred paper quality</p>
@@ -531,8 +568,8 @@ const ProductUpload = ({ product }: { product: any }) => {
                    </div>
                  )}
 
-                 {/* Step 3: Quality Options */}
-                 {showQualityOptions && (
+                 {/* Step 4: Quality Options */}
+                 {isUploaded  && showQualityOptions && (
                    <div className="bg-gray-50 rounded-xl p-6">
                      <div className="flex items-center justify-between mb-4">
                        <h3 className="text-lg font-semibold text-gray-900">Paper Quality</h3>
@@ -632,28 +669,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
               {/* Action Buttons */}
               <div className="mt-8 space-y-3">
-                <button
-                  onClick={() => {
-                    const missing = [];
-                    if (!uploadedDocumentId) missing.push("document upload");
-                    if (!selectedSize) missing.push("paper size");
-                    if (!selectedQuality) missing.push("paper quality");
-                    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
-                    if (missing.length > 0) {
-                      showErrorToast("Please select: " + missing.join(", "));
-                      return;
-                    }
-                    handleAddToCart();
-                  }}
-                  disabled={isAddToCartDisabled}
-                  className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-                    isAddToCartDisabled
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
-                  }`}
-                >
-                  Add to Cart
-                </button>
 
                 <button
                   onClick={() => {
@@ -671,9 +686,9 @@ const ProductUpload = ({ product }: { product: any }) => {
                   disabled={isAddToCartDisabled}
                   className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
                     isAddToCartDisabled
-                      ? "border-gray-300 text-gray-500 cursor-not-allowed"
-                      : "border-black text-black hover:bg-gray-50"
-                  }`}
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
+                    }`}
                 >
                   {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
                 </button>
@@ -682,6 +697,19 @@ const ProductUpload = ({ product }: { product: any }) => {
           </div>
         </div>
       </div>
+      {showCartPopUp && (
+         <CartProceedPopUp
+           onContinueShopping={handleContinueShopping}
+           onProceedToPayment={handleProceedToPayment}
+           onClose={handleClosePopUp}
+           productInfo={{
+             name: "Letter Head",
+             size: selectedSize,
+             quantity: selectedQuantity || undefined,
+             price: calculatedPrice || undefined
+           }}
+         />
+       )}
     </div>
   );
 };

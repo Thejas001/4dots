@@ -10,6 +10,7 @@ import FileUploader from "./FileUploader";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import Loader from "@/components/common/Loader";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -48,44 +49,49 @@ const showErrorToast = (message: string) => {
 
 const ProductUpload = ({ product }: { product: any }) => {
     const dataId = product.id;
-    const productDetails = product;//stores state from dropdown and passed to princingfrle finder
+    const productDetails = product;
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [sqftRange, setSqftRange] = useState<number | null>(null);
     const [selectedPricingRule, setSelectedPricingRule] = useState<CanvasPricingRule | null>(null);
     const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
     const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
     const [showCartPopUp, setShowCartPopUp] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [fileName, setFileName] = useState<string>("");
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const isAddToCartDisabled = !selectedPricingRule || !uploadedDocumentId;
     const router = useRouter();
     const incrementCart = useCartStore((state) => state.incrementCart);
 
+    const isLoggedIn = () => {
+      const token = localStorage.getItem("jwtToken");
+      return !!token;
+    };
 
-    
-  const handleUploadSuccess = (documentId: number) => {
-    console.log("Received Document ID from child:", documentId);
-    setUploadedDocumentId(documentId);
-  };
-
-  // Handle continue shopping
   const handleContinueShopping = () => {
     setShowCartPopUp(false);
     router.push("/");
   };
 
-  // Handle proceed to payment
   const handleProceedToPayment = () => {
     setShowCartPopUp(false);
     router.push("/Cart");
   };
 
-  // Handle close popup
   const handleClosePopUp = () => {
     setShowCartPopUp(false);
   };
 
-    const isLoggedIn = () => {
-      const token = localStorage.getItem("jwtToken");
-      return !!token;
+    const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
+      console.log("Received Document ID from child:", documentId);
+      setUploadedDocumentId(documentId);
+      if (file) {
+        setUploadedFile(file);
+        setFileName(name || file.name);
+        const fileUrl = URL.createObjectURL(file);
+        setPdfUrl(fileUrl);
+      }
     };
 
     useEffect(() => {
@@ -96,130 +102,286 @@ const ProductUpload = ({ product }: { product: any }) => {
         }
         const pricingRule = findCanvasPricingRule(productDetails.CanvasPricingRules, sqftRange);
         setSelectedPricingRule(pricingRule);
-        setSelectedPrice(pricingRule ? pricingRule.PricePerSquareFoot  * sqftRange : 0);
+        setSelectedPrice(pricingRule ? pricingRule.PricePerSquareFoot * sqftRange : 0);
     }, [sqftRange, productDetails]);
 
-
-// Process stored cart item after login
     const processPendingCartItem = async () => {
-      const pendingCartItem = sessionStorage.getItem("pendingCartItem");
-      if (!pendingCartItem) return;
-  
-      const { dataId: pendingDataId, selectedPricingRule: pendingPricingRule, selectedQuantity: pendingQuantity, uploadedDocumentId: pendingDocumentId} = 
-        JSON.parse(pendingCartItem);
-  
       try {
-        await addToCartCanvasPrinting(pendingDataId, pendingPricingRule, sqftRange as number, pendingDocumentId);
-        sessionStorage.removeItem("pendingCartItem");
-        router.push("/Cart");
+        const pendingItem = sessionStorage.getItem("pendingCartItem");
+        if (pendingItem) {
+          const item = JSON.parse(pendingItem);
+          await addToCartCanvasPrinting(
+            item.productId,
+            item.pricingRule,
+            item.sqftRange,
+            item.documentId
+          );
+          sessionStorage.removeItem("pendingCartItem");
+          incrementCart();
+        }
       } catch (error) {
-        setErrorMessage("Failed to process pending cart item. Please try again.");
+        console.error("Error processing pending cart item:", error);
+        showErrorToast("Failed to add item to cart");
       }
     };
-      //add to cart function
-      const handleAddToCart = async () => {
-        const missing = [];
-        if (!sqftRange) missing.push("height and  width");
-        if (!uploadedDocumentId) missing.push("document upload");
-        if (missing.length > 0) {
-          showErrorToast("Please select: " + missing.join(", "));
-          return;
-        }
 
-        if (!isLoggedIn()) {
-          const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
-          sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-          toast.success("Product added to cart!");
-          router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
-          return;
-        }
-
-    
-        try {
-          await addToCartCanvasPrinting(dataId, selectedPricingRule!, Number(sqftRange), uploadedDocumentId ?? undefined);
-          incrementCart();
-          toast.success("Product added to cart!");
-          router.push("/"); // ✅ Redirect to Cart page after adding
-        } catch (error) {
-          alert("Failed to add to cart. Please try again.");
-        }
-      };
-
-      const handleProceedToCart = async () => {
-        const missing = [];
-        if (!sqftRange) missing.push("height and  width");
-        if (!uploadedDocumentId) missing.push("document upload");
-        if (missing.length > 0) {
-          showErrorToast("Please select: " + missing.join(", "));
-          return;
-        }
-
-        if (!isLoggedIn()) {
-          const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
-          sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-          router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
-          return;
-        }
-
-    
-        try {
-          await addToCartCanvasPrinting(dataId, selectedPricingRule!, Number(sqftRange), uploadedDocumentId ?? undefined);
-          toast.success("Product added to cart!");
-          
-          // Show popup for logged-in users instead of directly going to cart
-          setShowCartPopUp(true);
-        } catch (error) {
-          alert("Failed to add to cart. Please try again.");
-        }
-      };
-    // Process pending cart item when user logs in
-    useEffect(() => {
-      if (isLoggedIn()) {
-        processPendingCartItem();
+    const handleAddToCart = async () => {
+      if (!uploadedDocumentId || !selectedPricingRule) {
+        showErrorToast("Please upload a file and select size first");
+        return;
       }
-    }, []);
+
+      setIsLoading(true);
+      try {
+        const cartItem = {
+          productId: dataId,
+          documentId: uploadedDocumentId,
+          sqftRange: sqftRange,
+          price: selectedPrice,
+          pricingRule: selectedPricingRule,
+        };
+
+        if (isLoggedIn()) {
+          await addToCartCanvasPrinting(
+            dataId,
+            selectedPricingRule,
+            sqftRange || 0,
+            uploadedDocumentId
+          );
+          incrementCart();
+        } else {
+          sessionStorage.setItem("pendingCartItem", JSON.stringify(cartItem));
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        showErrorToast("Failed to add item to cart");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleProceedToCart = async () => {
+      if (!uploadedDocumentId || !selectedPricingRule) {
+        showErrorToast("Please upload a file and select size first");
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const cartItem = {
+          productId: dataId,
+          documentId: uploadedDocumentId,
+          sqftRange: sqftRange,
+          price: selectedPrice,
+          pricingRule: selectedPricingRule,
+        };
+
+        if (isLoggedIn()) {
+          await addToCartCanvasPrinting(
+            dataId,
+            selectedPricingRule,
+            sqftRange || 0,
+            uploadedDocumentId
+          );
+          incrementCart();
+          router.push("/Cart");
+        } else {
+          sessionStorage.setItem("pendingCartItem", JSON.stringify(cartItem));
+          router.push("/Cart");
+        }
+      } catch (error) {
+        console.error("Error proceeding to cart:", error);
+        showErrorToast("Failed to proceed to cart");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const validateSelections = () => {
+      const missingItems = [];
+      
+      if (!uploadedFile) {
+        missingItems.push("File upload");
+      }
+      
+      if (!sqftRange) {
+        missingItems.push("Size selection");
+      }
+      
+      return missingItems;
+    };
+
+    const handleValidationError = (missingItems: string[]) => {
+      const message = `Please complete the following: ${missingItems.join(", ")}`;
+      showErrorToast(message);
+    };
+
+    const handleProceedToCartWithValidation = async () => {
+      const missingItems = validateSelections();
+      
+      if (missingItems.length > 0) {
+        handleValidationError(missingItems);
+          return;
+        }
+
+      if (selectedPrice === 0 || selectedPrice === null) {
+        showErrorToast("Unable to calculate price. Please check your selections and try again.");
+          return;
+        }
+
+      if (!uploadedFile) {
+        showErrorToast("Please upload a document before proceeding");
+        return;
+      }
+
+      if (isLoggedIn()) {
+        await handleAddToCart();
+        setShowCartPopUp(true);
+      } else {
+        await handleProceedToCart();
+      }
+    };
 
   return (
-    <div className="flex flex-col pt-[31px] bg-white px-4 md:px-20 pb-[79px] py-20">
-      {/* First Row */}
-      <div className="flex flex-col md:flex-row">
-        {/* Left Section */}
-        <FileUploader onUploadSuccess={handleUploadSuccess} />
-        {/* Right Section */}
-        <div className="flex flex-1 flex-col justify-between px-4 md:px-7 py-[25px] rounded shadow">
-         
-          <DropDown onSqftChange={(sqft) => setSqftRange(sqft)}  />
-
-           {/**Note */}
-           <div className="mt-10 w-full max-w-[800px] mx-auto px-4 text-base text-[#000]">
-            <p className="font-medium">
-              Note: <span className="font-normal italic">The rate for Canvas printing is based on square-feet (10sqft : 250rs/sqft)</span>
-            </p>
+      <div className="min-h-screen bg-gray-50">
+        {isLoading && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+            <Loader />
           </div>
+        )}
+        
+        <div className="max-w-[97vw] mx-auto px-3 py-4">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
+              
+              {/* Left Section - Document Preview */}
+              <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
+                  <p className="text-gray-600">Upload your document to see a preview</p>
+                </div>
+                
+                {/* Upload Area */}
+                <div className="flex-1 flex flex-col items-center justify-center w-full">
+                  <div className="w-full max-w-md">
+                    <FileUploader onUploadSuccess={handleUploadSuccess} />
+                  </div>
+                </div>
+              </div>
 
-           {/**Cart & Payment Button*/}
-          <div className="flex-1 flex flex-col justify-center mt-[252px]">
-            <button
-              onClick={handleProceedToCart}
-              className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span className="pr-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="21"
-                  viewBox="0 0 20 21"
-                  fill="white"
-                >
-                  <path
-                    d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-                    fill="white"
-                  />
-                </svg>
-              </span>
-              <span className="font-bold">{selectedPrice || 0}</span>
-              <span className="pl-4 font-medium">Proceed To Cart</span>
+              {/* Right Section - Configuration */}
+              <div className="xl:col-span-3 p-8 overflow-y-auto">
+                <div className="text-center mb-8">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Canvas Printing</h1>
+                  <p className="text-gray-600">Configure your print settings</p>
+                </div>
+
+                {/* Configuration Steps */}
+                <div className="space-y-8">
+                  
+                  {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                  {!uploadedFile && (
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                      <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                      
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">Please upload a document in the left column first</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Size Selection - Only show after upload */}
+                  {uploadedFile && (
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Canvas Size</h3>
+                      <p className="text-sm text-gray-600 mb-4">Select your preferred canvas size</p>
+                      
+                      <DropDown
+                        onSqftChange={setSqftRange}
+                      />
+                    </div>
+                  )}
+
+                {/* Error Message */}
+                {uploadedFile && errorMessage && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-800 text-sm">{errorMessage}</p>
+                  </div>
+                )}
+
+                {/* Order Summary - Only show after all selections are made */}
+                {uploadedFile && selectedPricingRule && (
+                  <div className="bg-gray-50 rounded-xl p-6 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                    
+                    <div className="bg-white rounded-lg p-6 border border-gray-200">
+                      <div className="space-y-4">
+                        {/* Product Info */}
+                        <div className="border-b border-gray-200 pb-4">
+                          <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Product</span>
+                              <span className="font-medium text-gray-900">Canvas Printing</span>
+                            </div>
+                            {fileName && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">File Name</span>
+                                <span className="font-medium text-gray-900 truncate max-w-[200px]" title={fileName}>{fileName}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Print Specifications */}
+                        <div className="border-b border-gray-200 pb-4">
+                          <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Canvas Size</span>
+                              <span className="font-medium text-gray-900">{sqftRange} sq ft</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-600">Price per sq ft</span>
+                              <span className="font-medium text-gray-900">₹{selectedPricingRule?.PricePerSquareFoot}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pricing */}
+                        {selectedPrice && (
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                <span className="text-lg font-semibold text-gray-900">Total Price</span>
+                                <span className="text-lg font-bold text-gray-900">₹{selectedPrice.toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Button */}
+              <div className="mt-8">
+                  <button
+                    onClick={handleProceedToCartWithValidation}
+                    disabled={isAddToCartDisabled}
+                    className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
+                      isAddToCartDisabled
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
+                    }`}
+                  >
+                    {selectedPrice ? `Proceed to Cart - ₹${selectedPrice.toFixed(2)}` : "Proceed to Cart"}
             </button>
+                </div>
+              </div>
           </div>
         </div>
       </div>
@@ -231,8 +393,7 @@ const ProductUpload = ({ product }: { product: any }) => {
           onClose={handleClosePopUp}
           productInfo={{
             name: "Canvas Printing",
-            size: `${sqftRange} sqft`,
-            quantity: undefined,
+              size: `${sqftRange} sq ft`,
             price: selectedPrice || undefined
           }}
         />

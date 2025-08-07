@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import DropDown from "./DropDown";
 import { BusinessCardPricingRule, Product } from "@/app/models/products";
 import { fetchProductDetails } from "@/utils/api";
 import { findBusinessCardPricingRule } from "@/utils/priceFinder";
@@ -50,7 +49,7 @@ const showErrorToast = (message: string) => {
 
 const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
-  const productDetails = product;//stores state from dropdown and passed to princingfrle finder
+  const productDetails = product;
   const [selectedCard, setSelectedCard] = useState<string>("");
   const [selectedSurface, setSelectedSurface] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -59,6 +58,15 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [selectedPricingRule, setSelectedPricingRule] = useState<BusinessCardPricingRule | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  
+  // Progressive display states
+  const [showSurfaceSelection, setShowSurfaceSelection] = useState(false);
+  const [showCardSelection, setShowCardSelection] = useState(false);
+  const [showCardOptions, setShowCardOptions] = useState(false);
+  
   const isAddToCartDisabled = !selectedCard || !selectedSurface || !uploadedDocumentId || isLoading;
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
@@ -69,9 +77,20 @@ const ProductUpload = ({ product }: { product: any }) => {
     return !!token;
   };
 
-  const handleUploadSuccess = (documentId: number) => {
+  const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
     console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
+    if (file) {
+      // Clean up previous URL if it exists
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+      setUploadedFile(file);
+      // Create URL only once when file is uploaded
+      const url = URL.createObjectURL(file);
+      setPdfUrl(url);
+    }
+    if (name) setFileName(name);
   };
 
   // Handle continue shopping
@@ -91,6 +110,25 @@ const ProductUpload = ({ product }: { product: any }) => {
     setShowCartPopUp(false);
   };
 
+  // Handle surface selection
+  const handleSurfaceSelection = (surface: string) => {
+    setSelectedSurface(surface);
+    setShowCardSelection(true);
+    // Auto scroll to card selection after a short delay
+    setTimeout(() => {
+      const cardSection = document.getElementById('card-section');
+      if (cardSection) {
+        cardSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+  };
+
+  // Handle card selection
+  const handleCardSelection = (card: string) => {
+    setSelectedCard(card);
+    setShowCardOptions(false);
+  };
+
   useEffect(() => {
     if (!productDetails || !selectedCard || !selectedSurface) return;
 
@@ -99,40 +137,50 @@ const ProductUpload = ({ product }: { product: any }) => {
       return;
     }
 
-    console.log(
-      "Checking Pricing Rules:",
-      productDetails.BusinessCardPricingRules,
-    );
-    console.log("Selected Card:", selectedCard);
-    console.log("Selected Surface:", selectedSurface);
-
-    const pricingrule = findBusinessCardPricingRule(
+    const pricingRule = findBusinessCardPricingRule(
       productDetails.BusinessCardPricingRules,
       selectedCard,
       selectedSurface,
     );
 
-    setSelectedPricingRule(pricingrule);
-    console.log("Matched Pricing Rule:", pricingrule);
+    setSelectedPricingRule(pricingRule);
+    console.log("**********PricingRule**********", pricingRule);
 
-    if (pricingrule) {
-      setPrice(pricingrule.Price); // Store the price in state
+    if (pricingRule) {
+      console.log("Matched Pricing Rule:", pricingRule);
+      setPrice(pricingRule.Price);
     } else {
       console.warn("No matching pricing rule found.");
       setPrice(null);
     }
-  }, [productDetails, selectedCard, selectedSurface, errorMessage]);
+  }, [selectedCard, selectedSurface, productDetails, errorMessage]);
+
+  // Cleanup PDF URL on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfUrl]);
 
   // Process stored cart item after login
   const processPendingCartItem = async () => {
     const pendingCartItem = sessionStorage.getItem("pendingCartItem");
     if (!pendingCartItem) return;
 
-    const { dataId: pendingDataId, selectedPricingRule: pendingPricingRule,  uploadedDocumentId: pendingDocumentId, } =
-      JSON.parse(pendingCartItem);
+    const {
+      dataId: pendingDataId,
+      selectedPricingRule: pendingPricingRule,
+      uploadedDocumentId: pendingUploadedDocumentId,
+    } = JSON.parse(pendingCartItem);
 
     try {
-      await addToCartBusinessCard(pendingDataId, pendingPricingRule, pendingDocumentId);
+      await addToCartBusinessCard(
+        pendingDataId,
+        pendingPricingRule,
+        pendingUploadedDocumentId
+      );
       sessionStorage.removeItem("pendingCartItem");
       router.push("/Cart");
     } catch (error) {
@@ -142,70 +190,53 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   const handleProceedToCart = async () => {
     setIsLoading(true);
-    const missing = [];
-    if (!selectedCard) missing.push("card type");
-    if (!selectedSurface) missing.push("finish");
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      setIsLoading(false);
-      return;
-    }
 
     if (!isLoggedIn()) {
       const pendingItem = {
-        productType: "bussinesscard",
         dataId,
+        productType: "businesscard",
         selectedPricingRule,
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      router.push(`/auth/signin?redirect=/Cart`); // ✅ Redirect to cart after login
+      toast.error("Product added to cart!");
+      router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;
     }
 
     try {
-      await addToCartBusinessCard(dataId, selectedPricingRule!,  uploadedDocumentId ?? undefined);
-      toast.success("Product added to cart!");
-      router.push("/Cart");
+      await addToCartBusinessCard(dataId, selectedPricingRule!, uploadedDocumentId ?? undefined);
+      toast.error("Product added to cart!");
+      
+      // Show popup for logged-in users instead of directly going to cart
+      setShowCartPopUp(true);
     } catch (error) {
       toast.error("Failed to add to cart. Please try again.");
     }
     setIsLoading(false);
   };
-
   
   const handleAddToCart = async () => {
     setIsLoading(true);
-    const missing = [];
-    if (!selectedCard) missing.push("card type");
-    if (!selectedSurface) missing.push("finish");
-    if (!uploadedDocumentId) missing.push("document upload");
-    if (missing.length > 0) {
-      showErrorToast("Please select: " + missing.join(", "));
-      setIsLoading(false);
-      return;
-    }
 
     if (!isLoggedIn()) {
       const pendingItem = {
-        productType: "bussinesscard",
         dataId,
+        productType: "businesscard",
         selectedPricingRule,
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-       toast.success("Product added to cart!");
-      router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+       toast.error("Product added to cart!");
+      router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;
     }
 
     try {
-      await addToCartBusinessCard(dataId, selectedPricingRule!,  uploadedDocumentId ?? undefined);
-      //incrementCart();
-      toast.success("Product added to cart!");
+      await addToCartBusinessCard(dataId, selectedPricingRule!, uploadedDocumentId ?? undefined);
+      toast.error("Product added to cart!");
       
       // Show popup for logged-in users instead of directly going to cart
       setShowCartPopUp(true);
@@ -221,27 +252,289 @@ const ProductUpload = ({ product }: { product: any }) => {
     }
   }, []);
 
+  // Show surface selection after file upload
+  useEffect(() => {
+    if (uploadedFile) {
+      setShowSurfaceSelection(true);
+    } else {
+      setShowSurfaceSelection(false);
+      setShowCardSelection(false);
+      setShowCardOptions(false);
+    }
+  }, [uploadedFile]);
+
+  // Memoized card options to prevent unnecessary re-renders
+  const memoizedCardOptions = useMemo(() => {
+    const cardTypes = productDetails?.cardType || [];
+    
+    return cardTypes.map((cardType: string, index: number) => {
+      const pricingRule = findBusinessCardPricingRule(
+        productDetails.BusinessCardPricingRules,
+        cardType,
+        selectedSurface
+      );
+      const cardPrice = pricingRule ? pricingRule.Price : 0;
+      const isSelected = selectedCard === cardType;
+
+      return (
+        <div
+          key={index}
+          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? "border-black bg-gray-100"
+              : "border-gray-200 bg-white hover:border-gray-300"
+          }`}
+          onClick={() => handleCardSelection(cardType)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-gray-900">
+              {cardType}
+            </div>
+            <div className="text-right">
+              {cardPrice > 0 ? (
+                <div className="text-sm font-semibold text-gray-900">
+                  ₹{cardPrice.toFixed(2)}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Price not available
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }, [productDetails?.cardType, productDetails?.BusinessCardPricingRules, selectedSurface, selectedCard]);
+
   return (
-    <div className="flex flex-col bg-white px-4 py-20 pb-[79px] pt-[31px] md:px-20">
+    <div className="min-h-screen bg-gray-50">
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
           <Loader />
         </div>
       )}
-      {/* First Row */}
-      <div className="flex flex-col md:flex-row">
+      
+      <div className="w-[99vw] py-4">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
+            
+            {/* Left Section - Document Preview */}
+            <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
+                <p className="text-gray-600">Upload your document to see a preview</p>
+              </div>
+              
+              {/* Upload Area */}
+              <div className="flex-1 flex flex-col items-center justify-center w-full">
+                <div className="w-full max-w-md ml-4">
       <FileUploader onUploadSuccess={handleUploadSuccess} />
-        {/* Right Section */}
-        <div className="flex flex-1 flex-col justify-between rounded px-4 py-[25px] shadow md:px-7">
-          {productDetails && (
-            <DropDown
-              productDetails={productDetails}
-              onCardChange={setSelectedCard}
-              onSurfaceChange={setSelectedSurface}
-            />
-          )}
+                </div>
+              </div>
+            </div>
 
-          <div className="mt-[400px] flex flex-1 flex-col justify-center">
+            {/* Right Section - Configuration */}
+            <div className="p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
+              <div className="max-w-5xl mx-auto">
+                <div className="text-center mb-8">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Card</h1>
+                  <p className="text-gray-600">Configure your print settings</p>
+                </div>
+
+                {/* Configuration Steps */}
+                <div className="space-y-8">
+                  
+                  {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                  {!uploadedFile && (
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                      <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                      
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">Please upload a document in the left column first</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Surface Selection - Only show after upload */}
+                  {uploadedFile && showSurfaceSelection && (
+                    <div id="surface-section" className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Surface Finish</h3>
+                      <p className="text-sm text-gray-600 mb-4">Select your preferred surface finish</p>
+                      
+                      <div className="space-y-3">
+                        <div
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            selectedSurface === "GLOSSY"
+                              ? "border-black bg-gray-100"
+                              : "border-gray-200 bg-white hover:border-gray-300"
+                          }`}
+                          onClick={() => handleSurfaceSelection("GLOSSY")}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-gray-900">Glossy Finish</div>
+                              <div className="text-sm text-gray-600">High shine, professional look</div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                              selectedSurface === "GLOSSY"
+                                ? "border-black bg-black"
+                                : "border-gray-300"
+                            }`}>
+                              {selectedSurface === "GLOSSY" && (
+                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            selectedSurface === "MATT"
+                              ? "border-black bg-gray-100"
+                              : "border-gray-200 bg-white hover:border-gray-300"
+                          }`}
+                          onClick={() => handleSurfaceSelection("MATT")}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-gray-900">Matte Finish</div>
+                              <div className="text-sm text-gray-600">Smooth, elegant appearance</div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                              selectedSurface === "MATT"
+                                ? "border-black bg-black"
+                                : "border-gray-300"
+                            }`}>
+                              {selectedSurface === "MATT" && (
+                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: Card Type Selection Button - Only show after surface selection */}
+                  {showCardSelection && selectedSurface && (
+                    <div id="card-section" className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Card Type</h3>
+                      <p className="text-sm text-gray-600 mb-4">Select your preferred card type</p>
+                      
+                      {!showCardOptions ? (
+                        <button
+                          onClick={() => setShowCardOptions(true)}
+                          className="w-full p-4 border-2 border-gray-300 rounded-lg bg-white hover:border-black hover:bg-gray-50 transition-all duration-200 flex items-center justify-between"
+                        >
+                          <span className="text-gray-700 font-medium">
+                            {selectedCard || "Click to select card type"}
+                          </span>
+                          <svg
+                            className="w-5 h-5 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-base font-semibold text-gray-900">Card Type</h4>
+                            <button
+                              onClick={() => setShowCardOptions(false)}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="space-y-3">
+                            {memoizedCardOptions.length > 0 ? (
+                              memoizedCardOptions
+                            ) : (
+                              <div className="text-gray-500 text-center py-4">
+                                No card types available for the selected surface finish.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {errorMessage && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <p className="text-red-800 text-sm">{errorMessage}</p>
+                    </div>
+                  )}
+
+                  {/* Order Summary - Only show after all selections are made */}
+                  {selectedCard && selectedSurface && uploadedFile && !showCardOptions && (
+                    <div id="order-summary" className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                      
+                      <div className="bg-white rounded-lg p-6 border border-gray-200">
+                        <div className="space-y-4">
+                          {/* Product Info */}
+                          <div className="border-b border-gray-200 pb-4">
+                            <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Product</span>
+                                <span className="font-medium text-gray-900">Business Card</span>
+                              </div>
+                              {fileName && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">File</span>
+                                  <span className="font-medium text-gray-900">{fileName}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Print Specifications */}
+                          <div className="border-b border-gray-200 pb-4">
+                            <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Card Type</span>
+                                <span className="font-medium text-gray-900">{selectedCard}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Surface Type</span>
+                                <span className="font-medium text-gray-900">
+                                  {selectedSurface === "GLOSSY" ? "Glossy Finish" : "Matte Finish"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Pricing */}
+                          {price && (
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                  <span className="text-lg font-semibold text-gray-900">Total Price</span>
+                                  <span className="text-lg font-bold text-gray-900">₹{price.toFixed(2)}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Proceed to Cart Button */}
+                  {selectedCard && selectedSurface && uploadedFile && !showCardOptions && (
+                    <div className="bg-gray-50 rounded-xl p-6">
             <button
               onClick={() => {
                 const missing = [];
@@ -254,25 +547,20 @@ const ProductUpload = ({ product }: { product: any }) => {
                 }
                 handleProceedToCart();
               }}
-              className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span className="pr-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="21"
-                  viewBox="0 0 20 21"
-                  fill="white"
-                >
-                  <path
-                    d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-                    fill="white"
-                  />
-                </svg>
-              </span>
-              <span className="font-bold">{price !== null ? price : "0"}</span>
-              <span className="pl-4 font-medium">Proceed To Cart</span>
+                        disabled={isAddToCartDisabled}
+                        className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
+                          isAddToCartDisabled
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
+                        }`}
+                      >
+                        {price ? `Proceed to Cart - ₹${price.toFixed(2)}` : "Proceed to Cart"}
             </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

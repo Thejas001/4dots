@@ -819,10 +819,23 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                  {/* Configuration Steps */}
                  <div className="space-y-8">
                    
-                   {/* Step 1: Color Selection */}
-                   <div className="bg-gray-50 rounded-xl p-6">
-                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Print Type</h3>
-                     <p className="text-sm text-gray-600 mb-4">Which print type is right for you?</p>
+                   {/* Step 1: Upload Message - Only show when no file is uploaded */}
+                   {!uploadedFile && (
+                     <div className="bg-gray-50 rounded-xl p-6">
+                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Document</h3>
+                       <p className="text-sm text-gray-600 mb-4">Upload your document for printing</p>
+                       
+                       <div className="text-center py-8">
+                         <p className="text-gray-500">Please upload a document in the left column first</p>
+                       </div>
+                     </div>
+                   )}
+
+                   {/* Step 2: Color Selection - Only show after upload */}
+                   {uploadedFile && (
+                     <div className="bg-gray-50 rounded-xl p-6">
+                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Print Type</h3>
+                       <p className="text-sm text-gray-600 mb-4">Which print type is right for you?</p>
                      
                      <div className="space-y-3">
                        <div
@@ -876,9 +889,10 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                        </div>
                      </div>
                    </div>
+                   )}
 
-                   {/* Step 2: Number of Copies - Only show after color selection */}
-                   {showCopiesInput && (
+                   {/* Step 3: Number of Copies - Only show after color selection */}
+                   {uploadedFile && showCopiesInput && (
                      <div id="copies-section" className="bg-gray-50 rounded-xl p-6">
                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Number of Copies</h3>
                        <p className="text-sm text-gray-600 mb-4">How many copies do you need?</p>

@@ -6,7 +6,7 @@ import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
 interface FileUploaderProps {
-  onUploadSuccess: (documentId: number) => void;
+  onUploadSuccess: (documentId: number, previewUrl: string | null) => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
@@ -41,7 +41,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         if (response?.Success) {
           const documentId = response.Data?.Id;  
           sessionStorage.setItem("uploadedDocumentId", documentId);
-          onUploadSuccess(documentId); 
+          onUploadSuccess(documentId, selectedFile); // Pass preview URL to parent
           message.success(`${info.file.name} uploaded successfully`);
           console.log("📄 Document ID:", documentId);
         } else {

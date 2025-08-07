@@ -6,38 +6,23 @@ import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 
 interface FileUploaderProps {
-  onUploadSuccess: (documentId: number) => void;
+  onUploadSuccess: (documentId: number, previewUrl: string | null) => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileType, setFileType] = useState<"pdf" | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-      useEffect(() => {
-        const checkMobile = () => {
-          setIsMobile(window.innerWidth <= 768);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-
-        return () => {
-          window.removeEventListener('resize', checkMobile);
-        };
-      }, []);
-
   const props: UploadProps = {
     name: "document",  // Important: match backend's expected form field name
     action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
-    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.pdf,.psd",
+    accept: ".jpg,.jpeg,.jfif,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd,.ai,.eps,.ait,.ppt,.pptx,.tif,.tiff",
     headers: {
       authorization: "authorization-text",
     },
     beforeUpload: (file) => {
       const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".pdf", ".psd"
+        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".heic", ".svg", ".webp", ".pdf", ".psd", ".ai", ".eps", ".ait", ".ppt", ".pptx", ".tif", ".tiff"
       ];
       const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedExtensions.includes(fileExt)) {
@@ -56,7 +41,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         if (response?.Success) {
           const documentId = response.Data?.Id;  
           sessionStorage.setItem("uploadedDocumentId", documentId);
-          onUploadSuccess(documentId); 
+          onUploadSuccess(documentId, selectedFile); // Pass preview URL to parent
           message.success(`${info.file.name} uploaded successfully`);
           console.log("📄 Document ID:", documentId);
         } else {
@@ -91,7 +76,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
-  
+
 
   return (
     <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
@@ -106,41 +91,26 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       </Upload>
 
       {/* Display Area */}
-      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center ">
-      {selectedFile ? (
-  fileType === "pdf" ? (
-    isMobile ? (
-      <div className="flex flex-col items-center justify-center p-4 text-center">
-        <p className="text-sm text-gray-700 mb-2">PDF preview is not supported on mobile.</p>
-        <a
-          href={selectedFile}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline text-sm"
-        >
-          Open PDF in new tab
-        </a>
-      </div>
-    ) : (
-      <iframe
-        src={`${selectedFile}#toolbar=0`}
-        width="100%"
-        height="100%"
-        className="rounded-md border"
-        title="PDF Preview"
-      />
-    )
-  ) : (
-    <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
-  )
-) : (
-  <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
-)}
-
+      <div className="mt-[11px] relative w-[300px] h-[400px] flex items-center justify-center  rounded-md ">
+        {selectedFile ? (
+          fileType === "pdf" ? (
+            <iframe
+              src={`${selectedFile}#toolbar=0`}
+              width="100%"
+              height="100%"
+              className=" rounded-md border"
+              title="PDF Preview"
+            />
+          ) : (
+            <img src={selectedFile} alt="Uploaded File" className="w-full h-full object-contain rounded-md" />
+          )
+        ) : (
+          <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
+        )}
       </div>
       <div className="mt-4 text-center text-xs text-gray-500 max-w-xs">
-      Supported file formats: JPG, JPEG, PNG, PDF, PSD.
-    </div>
+        Supported file formats: JPG, JPEG, PNG, GIF, HEIC, SVG, WEBP, PDF, PSD, AI, EPS.
+      </div>
     </div>
   );
 };

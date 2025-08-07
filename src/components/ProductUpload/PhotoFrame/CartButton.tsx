@@ -78,13 +78,7 @@ const CartButton: React.FC<CartButtonProps> = ({
       selectedFrameColor: pendingFrameColor, // get from pending item!
     } = JSON.parse(pendingCartItem);
 
-    console.log("Parsed pendingCartItem:", {
-      pendingDataId,
-      pendingPricingRule,
-      pendingQuantity,
-      pendingDocumentIds,
-      pendingFrameColor,
-    });
+
 
     try {
       setIsLoading(true);
