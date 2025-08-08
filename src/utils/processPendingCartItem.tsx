@@ -132,6 +132,7 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
           pageCount,
           noOfCopies,
           selectedBindingType,
+          undefined,
           selectedAddonRule,
           addonBookCount,
           uploadedDocumentId

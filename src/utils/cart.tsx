@@ -427,7 +427,7 @@ const resolvedLaminationAddonId = selectedLaminationType
       },
       {
         "AttributeName": "NumberOfCopies",
-        "AttributeValue": noOfCopies.toString()
+        "AttributeValue": noOfCopies.toString(), // Convert to string as per API format
       }
     ],
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],

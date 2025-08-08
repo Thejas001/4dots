@@ -389,10 +389,10 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedAddonRule,
         addonBookCount:
           copySelection === "all" ? noOfCopies : customCopies || 0,
+          noOfCopies, 
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;
@@ -410,6 +410,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     };
 
     try {
+      
       await addToCartPaperPrint(
         dataId,
         selectedPricingRule!,
@@ -420,7 +421,9 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedAddonRule,
         addonBookCount,
         uploadedDocumentId ?? undefined
+        
       );
+      
       toast.success("Product added to cart!");
       incrementCart();
       
