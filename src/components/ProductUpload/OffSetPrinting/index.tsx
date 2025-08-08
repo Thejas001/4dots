@@ -67,7 +67,7 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [showQualityButton, setShowQualityButton] = useState<boolean>(false);
   const [showQualityOptions, setShowQualityOptions] = useState<boolean>(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
-
+  const [selectedPricingRule, setSelectedPricingRule] = useState<any>(null);
   const [isUploaded, setIsUploaded] = useState(false);
 
 
@@ -297,76 +297,91 @@ const ProductUpload = ({ product }: { product: any }) => {
   }, [productDetails.Quality, selectedSize, selectedQuantity, selectedQuality, getSizePrice]);
 
   const processPendingCartItem = async () => {
-    const pendingItem = sessionStorage.getItem("pendingCartItem");
-    if (pendingItem) {
-      try {
-        const item = JSON.parse(pendingItem);
-        if (item.productId === dataId) {
-          await addToCartOffSetPrinting(
-            item.productId,
-            item.selectedPricingRule,
-            item.selectedQuantity,
-            item.uploadedDocumentId
-          );
-          sessionStorage.removeItem("pendingCartItem");
-          // toast.success("Pending item added to cart!"); // Removed
-        }
+    const pendingCartItem = sessionStorage.getItem("pendingCartItem");
+    if (!pendingCartItem) return;
+      const {
+        dataId: pendingDataId,
+        selectedPricingRule: pendingPricingRule,
+        uploadedDocumentId: pendingDocumentId,
+      } = JSON.parse(pendingCartItem);  
+       try {
+        await addToCartOffSetPrinting(
+          pendingDataId,
+          pendingPricingRule,
+          2,
+          pendingDocumentId,
+        );
+        sessionStorage.removeItem("pendingCartItem");
+        router.push("/Cart");
       } catch (error) {
-        console.error("Error processing pending cart item:", error);
+        setErrorMessage("Failed to process pending cart item. Please try again.");
       }
-    }
-  };
+    };
 
-  const handleAddToCart = async () => {
-    setIsLoading(true);
-    
-    if (!isLoggedIn()) {
-      const pendingItem = {
-        productId: dataId,
-        selectedPricingRule: findOffsetPrintingPricingRule(
-          productDetails.OffsetPrintingPricingRules || [],
-          selectedSize,
-          selectedQuantity || 0,
-          selectedQuality
-        ),
-        selectedQuantity: selectedQuantity || 0,
-        uploadedDocumentId,
-      };
-      sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      router.push(`/auth/signin?redirect=/Cart`);
-      setIsLoading(false);
-      return;
-    }
+const handleAddToCart = async () => {
+  console.log("handleAddToCart called with:", {
+    productDetails,
+    selectedSize,
+    selectedQuality,
+    selectedQuantity,
+    uploadedDocumentId,
+  });
 
-    try {
-      const pricingRule = findOffsetPrintingPricingRule(
-        productDetails.OffsetPrintingPricingRules || [],
-        selectedSize,
-        selectedQuantity || 0,
-        selectedQuality
-      );
-      
-      await addToCartOffSetPrinting(
-        dataId,
-        pricingRule!,
-        selectedQuantity ?? 1,
-        uploadedDocumentId ?? undefined
-      );
-      // toast.success("Product added to cart!"); // Removed
-      setShowCartPopUp(true); 
-          incrementCart();
-          toast.success("Product added to cart successfully!");
-    } catch (error) {
-      toast.error("Failed to add to cart. Please try again.");
-      setIsLoading(false);
-    }
-  };
+  if (!productDetails || !selectedSize || !selectedQuality || !selectedQuantity) {
+    setErrorMessage("Please select all options before adding to the cart.");
+    showErrorToast("Please select all options before adding to the cart.");
+    return;
+  }
 
-  const handleProceedToCart = async () => {
-    handleAddToCart();
+  const pricingRule = findOffsetPrintingPricingRule(
+    productDetails.OffsetPrintingPricingRules || [],
+    selectedSize,
+    selectedQuantity,
+    selectedQuality
+  );
+
+  if (!pricingRule) {
+    setErrorMessage("Invalid pricing rule. Please try different options.");
+    showErrorToast("Invalid pricing rule. Please try different options.");
+    return;
+  }
+
+  setIsLoading(true);
+  if (!isLoggedIn()) {
+    const pendingItem = {
+      productType: "offsetPrinting",
+      dataId,
+      selectedPricingRule: pricingRule,
+      uploadedDocumentId,
+    };
+    sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+    router.push(`/auth/signin?redirect=/Cart`);
+    return;
+  }
+
+  try {
+    console.log("Calling addToCartOffSetPrinting with:", {
+      dataId,
+      pricingRule,
+      selectedQuantity,
+      uploadedDocumentId,
+    });
+    await addToCartOffSetPrinting(
+      dataId,
+      pricingRule,
+      selectedQuantity,
+      uploadedDocumentId ?? undefined
+    );
     setShowCartPopUp(true);
-
-  };
+    incrementCart();
+    toast.success("Product added to cart successfully!");
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    toast.error("Failed to add to cart. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -686,7 +701,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                       showErrorToast("Please select: " + missing.join(", "));
                       return;
                     }
-                    handleProceedToCart();
+                    handleAddToCart();
                   }}
                   disabled={isAddToCartDisabled}
                   className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
