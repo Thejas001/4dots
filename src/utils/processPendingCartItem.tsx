@@ -24,6 +24,7 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     let { 
       productType, 
       dataId, 
+      productId, // Add support for productId
       selectedPricingRule, 
       selectedQuantity, 
       sqftRange, 
@@ -34,6 +35,9 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
       uploadedDocumentId,
       noOfCopies
     } = parsedItem;
+
+    // Handle both dataId and productId for backward compatibility
+    const finalDataId = dataId || productId;
 
     // Ensure uploadedDocumentId is properly extracted
     if (parsedItem.uploadedDocumentId !== undefined) {
@@ -73,7 +77,7 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
 
     const needsSquareFeetRange = selectedPricingRule?.SquareFeetRange?.ValueID == null && isCanvas;
 
-    if (!productType || !dataId || !selectedPricingRule || needsSquareFeetRange || needsSqft || needsQuantity) {
+    if (!productType || !finalDataId || !selectedPricingRule || needsSquareFeetRange || needsSqft || needsQuantity) {
       console.error("❌ Invalid pending cart item data", parsedItem);
       return;
     }
@@ -81,7 +85,7 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     // ✅ Fetch current cart to check for duplicate items
     const currentCart = await fetchCartItems();
     const alreadyInCart = currentCart.Items.some(item =>
-      item.ProductId === dataId &&
+      item.ProductId === finalDataId &&
       item.Attributes.some(attr => attr.AttributeValueId === selectedPricingRule.SquareFeetRange?.ValueID) &&
       (isCanvas || item.Attributes.some(attr => attr.AttributeValueId === sqftRange))
     );
@@ -95,7 +99,7 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     switch (productType) {
       case "photoFrame":
         await addToCartPhotoFrame(
-          dataId,
+          finalDataId,
           selectedPricingRule,
           selectedQuantity,
           parsedItem.documentIds || parsedItem.uploadedDocumentIds || (uploadedDocumentId ? [uploadedDocumentId] : undefined),
@@ -103,31 +107,31 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
         );
         break;
       case "offsetPrinting":
-        await addToCartOffSetPrinting(dataId, selectedPricingRule, selectedQuantity || 1, uploadedDocumentId);
+        await addToCartOffSetPrinting(finalDataId, selectedPricingRule, selectedQuantity || 1, uploadedDocumentId);
         break;
       case "polaroidCard":
         await addToCartPolaroidCard(
-          dataId,
+          finalDataId,
           selectedPricingRule,
           selectedQuantity,
           parsedItem.uploadedDocumentIds || parsedItem.documentIds || (uploadedDocumentId ? [uploadedDocumentId] : undefined)
         );
         break;
       case "nameslip":
-        await addToCartNameSlip(dataId, selectedPricingRule, selectedQuantity, uploadedDocumentId);
+        await addToCartNameSlip(finalDataId, selectedPricingRule, selectedQuantity, uploadedDocumentId);
         break;
       case "canvasprinting":
-        await addToCartCanvasPrinting(dataId, selectedPricingRule, sqftRange, uploadedDocumentId);
+        await addToCartCanvasPrinting(finalDataId, selectedPricingRule, sqftRange, uploadedDocumentId);
         break;
       case "letterhead":
-        await addToCart(dataId, selectedPricingRule, uploadedDocumentId);
+        await addToCart(finalDataId, selectedPricingRule, uploadedDocumentId);
         break;
       case "bussinesscard":
-        await addToCartBusinessCard(dataId, selectedPricingRule, uploadedDocumentId);
+        await addToCartBusinessCard(finalDataId, selectedPricingRule, uploadedDocumentId);
         break;
       case "paperprinting": // ✅ NEW CASE FOR PAPER PRINTING
         await addToCartPaperPrint(
-          dataId,
+          finalDataId,
           selectedPricingRule,
           pageCount,
           noOfCopies,

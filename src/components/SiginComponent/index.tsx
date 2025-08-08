@@ -43,7 +43,7 @@ const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onCl
       />
       
              {/* Modal */}
-       <div className={`relative mx-4 w-full max-w-md transform transition-all duration-300 ${
+       <div className={`relative mx-2 sm:mx-4 w-full max-w-md transform transition-all duration-300 ${
          isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
        }`}>
                   {/* Close Button - Full Circle Clickable */}
@@ -61,7 +61,7 @@ const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onCl
           <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl border border-gray-200">
            
                        {/* Content */}
-            <div className="relative z-10 p-8">
+            <div className="relative z-10 p-4 sm:p-8">
               {/* Header with Simple Icon and Title */}
               <div className="text-center mb-8">
                 {/* Simple Icon */}
@@ -88,7 +88,7 @@ const SigininComponent: React.FC<SigininComponentProps> = ({ isOpen = true, onCl
 
                            {/* OTP Form */}
               <div className="space-y-6">
-                <div className="rounded-xl bg-gray-50 p-6 border border-gray-200">
+                <div className="rounded-xl bg-gray-50 p-4 sm:p-6 border border-gray-200">
                   <OTPInputComponent onLoginSuccess={onClose} />
                 </div>
               </div>

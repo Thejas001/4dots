@@ -12,6 +12,7 @@ import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
 import { letterHeadVariants } from "./letterHeadVariants";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import { processPendingCartItem } from "@/utils/processPendingCartItem";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -382,40 +383,29 @@ const ProductUpload = ({ product }: { product: any }) => {
     });
   }, [availableQualities, selectedSize, selectedQuantity, selectedQuality, selectedOption, getSizePrice]);
 
-  const processPendingCartItem = async () => {
-    const pendingItem = sessionStorage.getItem("pendingCartItem");
-    if (pendingItem) {
-      try {
-        const item = JSON.parse(pendingItem);
-        if (item.productId === dataId) {
-          await addToCart(
-            item.productId,
-            item.selectedPricingRule,
-            item.uploadedDocumentId
-          );
-          sessionStorage.removeItem("pendingCartItem");
-          showSuccessToast("Pending item added to cart successfully!");
-        }
-      } catch (error) {
-        console.error("Error processing pending cart item:", error);
-      }
-    }
-  };
-
   const handleAddToCart = async () => {
     setIsLoading(true);
     
     if (!isLoggedIn()) {
-      // For unauthenticated users, store the basic selection data
+      // For unauthenticated users, store the pricing rule directly
+      const pricingRule = findLetterHeadPricingRule(
+        productDetails.LetterHeadPricingRules,
+        selectedOption,
+        selectedSize,
+        selectedQuantity || 0,
+        selectedQuality
+      );
+      
+      if (!pricingRule) {
+        toast.error("Pricing rule not found. Please check your selections.");
+        setIsLoading(false);
+        return;
+      }
+
       const pendingItem = {
         productId: dataId,
-        selectedOptions: {
-          Size: selectedSize,
-          Quality: selectedQuality,
-          Quantity: selectedQuantity,
-          Service: selectedOption,
-          Price: calculatedPrice
-        },
+        productType: "letterhead",
+        selectedPricingRule: pricingRule,
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
@@ -478,7 +468,9 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      processPendingCartItem();
+      processPendingCartItem((cart: any) => {
+        console.log("Cart updated:", cart);
+      });
     }
   }, []);
 

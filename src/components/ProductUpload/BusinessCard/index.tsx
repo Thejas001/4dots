@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import { processPendingCartItem } from "@/utils/processPendingCartItem";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -213,37 +214,13 @@ const ProductUpload = ({ product }: { product: any }) => {
     };
   }, [pdfUrl]);
 
-  // Process stored cart item after login
-  const processPendingCartItem = async () => {
-    const pendingCartItem = sessionStorage.getItem("pendingCartItem");
-    if (!pendingCartItem) return;
-
-    const {
-      dataId: pendingDataId,
-      selectedPricingRule: pendingPricingRule,
-      uploadedDocumentId: pendingUploadedDocumentId,
-    } = JSON.parse(pendingCartItem);
-
-    try {
-      await addToCartBusinessCard(
-        pendingDataId,
-        pendingPricingRule,
-        pendingUploadedDocumentId
-      );
-      sessionStorage.removeItem("pendingCartItem");
-      router.push("/Cart");
-    } catch (error) {
-      setErrorMessage("Failed to process pending cart item. Please try again.");
-    }
-  };
-
   const handleProceedToCart = async () => {
     setIsLoading(true);
 
     if (!isLoggedIn()) {
       const pendingItem = {
-        dataId,
-        productType: "businesscard",
+        productId: dataId,
+        productType: "bussinesscard",
         selectedPricingRule,
         uploadedDocumentId,
       };
@@ -271,8 +248,8 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     if (!isLoggedIn()) {
       const pendingItem = {
-        dataId,
-        productType: "businesscard",
+        productId: dataId,
+        productType: "bussinesscard",
         selectedPricingRule,
         uploadedDocumentId,
       };
@@ -297,7 +274,9 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      processPendingCartItem();
+      processPendingCartItem((cart: any) => {
+        console.log("Cart updated:", cart);
+      });
     }
   }, []);
 

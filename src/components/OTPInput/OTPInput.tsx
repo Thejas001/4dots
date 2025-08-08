@@ -218,9 +218,9 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
       {/* OTP input fields */}
       {showOTP && (
         <>
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start w-full">
             <label className="mb-2 block font-medium text-gray-700">OTP</label>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3 w-full justify-center">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -230,7 +230,7 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
                   value={digit}
                   onChange={(e) => handleOtpChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="h-12 w-12 rounded-lg border border-gray-300 text-center text-lg focus:outline-none focus:ring focus:ring-blue-300"
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg border border-gray-300 text-center text-base sm:text-lg focus:outline-none focus:ring focus:ring-blue-300 flex-shrink-0"
                 />
               ))}
             </div>
