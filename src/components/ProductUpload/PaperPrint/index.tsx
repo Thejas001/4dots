@@ -481,7 +481,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         addonBookCount,
         uploadedDocumentId ?? undefined
       );
-      toast.success("Product added to cart!");
+          incrementCart();
+          toast.success("Product added to cart successfully!");
       router.push("/Cart");
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -592,45 +593,59 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       // Check if this is a double-sided option
       const isDoubleSided = size.toUpperCase().includes("DOUBLE SIDE");
       
-      if (isDoubleSided) {
-        // For double-sided options, check if pricing is available
-        if (!selectedOption || !pageCount) {
-          return true; // Show all options if no color/page count selected yet
-        }
-        
-        const mappedColor = selectedOption === "B/W" ? "BlackAndWhite" : "Color";
-        const isAvailable = isDoubleSidedAvailable(
-          productDetails.PaperPrintingPricingRules,
+ if (isDoubleSided) {
+  // For double-sided options, check if pricing is available
+  if (!selectedOption || !pageCount) {
+    return true; // Show all options if no color/page count selected yet
+  }
+
+  // Special case: 13*19 double side
+  if (size.toLowerCase().includes('13') && size.toLowerCase().includes('double')) {
+    // ❗ Hide for B/W completely
+    if (selectedOption === "B/W") {
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔍 13*19 double side B/W: hiding (not available for B/W)", {
           size,
-          mappedColor,
-          pageCount,
-          noOfCopies
-        );
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`🔍 Checking double-sided availability for ${size}:`, isAvailable);
-        }
-        
-        // For 13*19 double side: only show if total sheets >= 100
-        if (size.toLowerCase().includes('13') && size.toLowerCase().includes('double')) {
-          const totalSheets = Math.ceil(pageCount / 2) * noOfCopies;
-          const shouldShow = totalSheets >= 100;
-          
-          if (process.env.NODE_ENV === 'development') {
-            console.log("🔍 13*19 double side check:", {
-              size,
-              pageCount,
-              noOfCopies,
-              totalSheets,
-              shouldShow
-            });
-          }
-          
-          return shouldShow;
-        }
-        
-        return isAvailable;
+          selectedOption
+        });
       }
+      return false;
+    }
+
+    // Otherwise, only show if total sheets >= 100
+    const totalSheets = Math.ceil(pageCount / 2) * noOfCopies;
+    const shouldShow = totalSheets >= 100;
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log("🔍 13*19 double side check:", {
+        size,
+        pageCount,
+        noOfCopies,
+        totalSheets,
+        shouldShow
+      });
+    }
+    
+    return shouldShow;
+  }
+
+  // For all other double-sided sizes
+  const mappedColor = selectedOption === "B/W" ? "BlackAndWhite" : "Color";
+  const isAvailable = isDoubleSidedAvailable(
+    productDetails.PaperPrintingPricingRules,
+    size,
+    mappedColor,
+    pageCount,
+    noOfCopies
+  );
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🔍 Checking double-sided availability for ${size}:`, isAvailable);
+  }
+
+  return isAvailable;
+}
+
       
       // All other sizes are always available
       return true;
@@ -1099,7 +1114,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                     showErrorToast("Please select: " + missing.join(", "));
                     return;
                   }
-                  handleProceedToCart();
+                  handleAddToCart();
                 }}
                     disabled={isAddToCartDisabled}
                     className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${

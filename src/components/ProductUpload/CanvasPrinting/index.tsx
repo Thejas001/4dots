@@ -125,40 +125,32 @@ const ProductUpload = ({ product }: { product: any }) => {
       }
     };
 
-    const handleAddToCart = async () => {
-      if (!uploadedDocumentId || !selectedPricingRule) {
-        showErrorToast("Please upload a file and select size first");
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const cartItem = {
-          productId: dataId,
-          documentId: uploadedDocumentId,
-          sqftRange: sqftRange,
-          price: selectedPrice,
-          pricingRule: selectedPricingRule,
-        };
-
-        if (isLoggedIn()) {
-          await addToCartCanvasPrinting(
-            dataId,
-            selectedPricingRule,
-            sqftRange || 0,
-            uploadedDocumentId
-          );
-          incrementCart();
-        } else {
-          sessionStorage.setItem("pendingCartItem", JSON.stringify(cartItem));
+ const handleAddToCart = async () => {
+        const missing = [];
+        if (!sqftRange) missing.push("height and  width");
+        if (!uploadedDocumentId) missing.push("document upload");
+        if (missing.length > 0) {
+          showErrorToast("Please select: " + missing.join(", "));
+          return;
         }
-      } catch (error) {
-        console.error("Error adding to cart:", error);
-        showErrorToast("Failed to add item to cart");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+
+        if (!isLoggedIn()) {
+          const pendingItem = { productType: "canvasprinting", dataId, selectedPricingRule, sqftRange ,  uploadedDocumentId,};
+          sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
+          router.push(`/auth/signin?redirect=/`); // ✅ Redirect to cart after login
+          return;
+        }
+
+    
+        try {
+          await addToCartCanvasPrinting(dataId, selectedPricingRule!, Number(sqftRange), uploadedDocumentId ?? undefined);
+          incrementCart();
+          toast.success("Product added to cart!");
+          router.push("/"); // ✅ Redirect to Cart page after adding
+        } catch (error) {
+          alert("Failed to add to cart. Please try again.");
+        }
+      };
 
     const handleProceedToCart = async () => {
       if (!uploadedDocumentId || !selectedPricingRule) {
@@ -184,6 +176,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             uploadedDocumentId
           );
           incrementCart();
+          toast.success("Product added to cart successfully!");
           router.push("/Cart");
         } else {
           sessionStorage.setItem("pendingCartItem", JSON.stringify(cartItem));
@@ -237,8 +230,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       if (isLoggedIn()) {
         await handleAddToCart();
         setShowCartPopUp(true);
-      } else {
-        await handleProceedToCart();
       }
     };
 
@@ -370,10 +361,10 @@ const ProductUpload = ({ product }: { product: any }) => {
               {/* Action Button */}
               <div className="mt-8">
                   <button
-                    onClick={handleProceedToCartWithValidation}
+                    onClick={handleAddToCart}
                     disabled={isAddToCartDisabled}
                     className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-                      isAddToCartDisabled
+                     isAddToCartDisabled
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
                     }`}

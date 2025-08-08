@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import Loader from "@/components/common/Loader";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import CartButton from "./CartButton";
 
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
@@ -97,10 +98,13 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<any[]>([]);
+  const [showImageSection, setShowImageSection] = useState<boolean>(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
   const [fileList, setFileList] = useState<any[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [price, setPrice] = useState<number | null>(null);
+
 
   // Progressive disclosure states
   const [showSizeSelection, setShowSizeSelection] = useState<boolean>(false);
@@ -139,14 +143,16 @@ const ProductUpload = ({ product }: { product: any }) => {
     setShowSizeSelection(true);
   };
 
-  // Update showSizeSelection when fileList changes
-  useEffect(() => {
-    if (fileList.length > 0) {
-      setShowSizeSelection(true);
-    } else {
-      setShowSizeSelection(false);
-    }
-  }, [fileList]);
+useEffect(() => {
+  if (fileList.length > 0) {
+    setShowSizeSelection(true);
+    setSelectedQuantity(fileList.length); // keep quantity in sync with uploaded files
+  } else {
+    setShowSizeSelection(false);
+    setSelectedQuantity(0); // or 1, depending on your default
+  }
+}, [fileList]);
+
 
   const handleNext = () => {
     if (fileList.length > 1) {
@@ -469,17 +475,13 @@ const ProductUpload = ({ product }: { product: any }) => {
                   {/* Proceed to Cart Button */}
                   {selectedSize && fileList.length > 0 && (
                     <div className="bg-gray-50 rounded-xl p-6">
-                      <button
-                        onClick={handleProceedToCartWithValidation}
-                        disabled={isAddToCartDisabled()}
-                        className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-                          isAddToCartDisabled()
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-black text-white hover:bg-gray-800"
-                        }`}
-                      >
-                        {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
-                      </button>
+                      <CartButton
+                        selectedPricingRule={selectedPricingRule}
+                        dataId={dataId}
+                        uploadedImages={fileList}
+                        selectedSize={selectedSize}
+                        calculatedPrice={calculatedPrice ?? 0}
+                      />
                     </div>
                   )}
                 </div>

@@ -328,7 +328,7 @@ const ProductUpload = ({ product }: { product: any }) => {
               </div>
               {/* Upload Area - Only show if quantity is valid */}
               <div className="flex-1 flex flex-col justify-center w-full">
-                <div className="w-full lg:mr-[-8px] max-w-md mx-auto">
+                <div className="w-full lg:mr-[8px] max-w-md mx-auto">
                   {selectedQuantity && selectedQuantity > 0 ? (
                     <FileUploader
                       quantity={selectedQuantity}
