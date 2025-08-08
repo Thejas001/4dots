@@ -481,7 +481,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         addonBookCount,
         uploadedDocumentId ?? undefined
       );
-      toast.success("Product added to cart!");
+          incrementCart();
+          toast.success("Product added to cart successfully!");
       router.push("/Cart");
     } catch (error) {
       console.error("Failed to add to cart:", error);

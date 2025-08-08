@@ -350,7 +350,8 @@ const ProductUpload = ({ product }: { product: any }) => {
       );
       // toast.success("Product added to cart!"); // Removed
       setShowCartPopUp(true); 
-      toast.success("Product added to cart successfully!");
+          incrementCart();
+          toast.success("Product added to cart successfully!");
     } catch (error) {
       toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);

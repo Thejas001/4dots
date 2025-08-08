@@ -149,6 +149,8 @@ const ProductUpload = ({ product }: { product: any }) => {
             uploadedDocumentId
           );
           incrementCart();
+          toast.success("Product added to cart successfully!");
+
         } else {
           sessionStorage.setItem("pendingCartItem", JSON.stringify(cartItem));
         }
@@ -184,6 +186,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             uploadedDocumentId
           );
           incrementCart();
+          toast.success("Product added to cart successfully!");
           router.push("/Cart");
         } else {
           sessionStorage.setItem("pendingCartItem", JSON.stringify(cartItem));

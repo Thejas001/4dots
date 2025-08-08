@@ -424,7 +424,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         pricingRule,
         uploadedDocumentId ?? undefined
       );
-      
+      incrementCart();
       toast.success("Product added to cart successfully!");
       // Don't redirect to cart - let the popup handle navigation
       // router.push("/Cart");
