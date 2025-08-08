@@ -98,7 +98,7 @@ const FileUploader = ({
   };
 
   return (
-    <div className="flex flex-col bg-[#F7F7F7] w-full max-w-md md:max-w-xs lg:max-w-sm px-4 sm:px-8 items-center shadow h-auto py-6">
+    <div className="flex flex-col bg-[#F7F7F7] w-full max-w-md md:max-w-xs lg:max-w-sm px-4 sm:px-8 items-center shadow h-[500px] py-6">
       <Upload {...props} disabled={quantity === null || quantity === 0}>
         <Button
           icon={<UploadOutlined />}
@@ -119,9 +119,10 @@ const FileUploader = ({
               onError={(e) => (e.currentTarget.src = "https://placehold.co/200")}
             />
           ) : isPdfFile(uploadedImages[currentImageIndex]?.name) ? (
-            <embed
-              src={uploadedImages[currentImageIndex]?.url}
-              type="application/pdf"
+            <iframe
+              src={`${uploadedImages[currentImageIndex]?.url}#toolbar=0&navpanes=0&scrollbar=0`}
+              width="100%"
+            height="100%"
               className="w-full max-w-[320px] h-[400px] rounded-md"
             />
           ) : (
@@ -135,22 +136,26 @@ const FileUploader = ({
             </div>
           )}
 
-          {uploadedImages.length > 1 && (
-            <>
-              <div
-                className="absolute top-1/2 left-2 -translate-y-1/2 cursor-pointer"
-                onClick={handlePrevious}
-              >
-                <img src="/images/icon/vector-left.svg" alt="Previous" />
-              </div>
-              <div
-                className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
-                onClick={handleNext}
-              >
-                <img src="/images/icon/vector-right.svg" alt="Next" />
-              </div>
-            </>
-          )}
+        {/* Navigation Arrows */}
+        {uploadedImages && uploadedImages.length > 1 && handleNext && handlePrevious && (
+          <>
+            {/* Left Arrow */}
+            <div
+              className="absolute top-1/2 -left-6 -translate-y-1/2 cursor-pointer bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200"
+              onClick={handlePrevious}
+            >
+              <img src="/images/icon/vector-left.svg" alt="Previous" className="w-4 h-4" />
+            </div>
+            
+            {/* Right Arrow */}
+            <div
+              className="absolute top-1/2 -right-6 -translate-y-1/2 cursor-pointer bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200"
+              onClick={handleNext}
+            >
+              <img src="/images/icon/vector-right.svg" alt="Next" className="w-4 h-4" />
+            </div>
+          </>
+        )}
         </div>
       )}
 

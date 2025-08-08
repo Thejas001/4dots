@@ -545,7 +545,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                   showErrorToast("Please select: " + missing.join(", "));
                   return;
                 }
-                handleProceedToCart();
+                handleAddToCart();
               }}
                         disabled={isAddToCartDisabled}
                         className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${

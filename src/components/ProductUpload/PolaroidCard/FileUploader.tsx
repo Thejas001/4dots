@@ -68,6 +68,16 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         }
         return file;
       });
+
+        const currentFile = updatedFileList[currentImageIndex || 0]?.originFileObj;
+      if (currentFile) {
+        const ext = currentFile.name.split('.').pop()?.toLowerCase();
+        if (ext === "pdf") {
+          setFileType("pdf");
+        } else {
+          setFileType(null); // Treat others as image
+        }
+      }
       
       // Update the uploadedImages state when files are added/removed
       if (setUploadedImages) {

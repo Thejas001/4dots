@@ -151,6 +151,7 @@ const CartButton: React.FC<CartButtonProps> = ({
     if (!uploadedImages || uploadedImages.length === 0) missing.push("image upload");
     return missing;
   };
+  {/* Check if all required options are selected 
 
   const handleAddToCart = async () => {
     if (!selectedPricingRule) {
@@ -204,58 +205,95 @@ const CartButton: React.FC<CartButtonProps> = ({
       toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
     }
-  };
+  };  */}
 
-  const handleProceedToCart = async () => {
+const handleAddToCart = async () => {
+  setIsLoading(true);
+
+  try {
     if (!selectedPricingRule) {
-      showErrorToast("Please select all required options before continuing.");
+      showErrorToast("Please select a size first");
+      setIsLoading(false);
       return;
     }
-    try {
-      setIsLoading(true);
-      const uploadPromises = uploadedImages.map(async (image) => {
-        if (!image.originFileObj) return null;
-        const formData = new FormData();
-        formData.append("document", image.originFileObj);
-        const response = await fetch(
-          "https://fourdotsapp.azurewebsites.net/api/document/upload",
-          { method: "POST", body: formData }
-        );
-        if (!response.ok) throw new Error("Image upload failed");
-        const result = await response.json();
-        return result?.Data?.Id ?? null;
-      });
-      const documentIds = (await Promise.all(uploadPromises)).filter(
-        (id) => id !== null
-      );
-      if (!isLoggedIn()) {
-        const pendingItem = {
+
+    if (!uploadedImages || uploadedImages.length === 0) {
+      showErrorToast("Please upload at least one file");
+      setIsLoading(false);
+      return;
+    }
+
+    // Step 1: Upload any images without a documentId
+    const uploadedFileList = await Promise.all(
+      uploadedImages.map(async (file) => {
+        if (!file.documentId && file.originFileObj) {
+          const formData = new FormData();
+          formData.append("document", file.originFileObj);
+          const response = await fetch(
+            "https://fourdotsapp.azurewebsites.net/api/document/upload",
+            { method: "POST", body: formData }
+          );
+          if (!response.ok) throw new Error("Image upload failed");
+          const result = await response.json();
+          return { ...file, documentId: result?.Data?.Id ?? null };
+        }
+        return file;
+      })
+    );
+
+    // Step 2: Update local state so files now have documentIds
+    // (you’d need to lift uploadedImages into state with setUploadedImages)
+    // setUploadedImages(uploadedFileList);
+
+    // Step 3: Extract IDs
+    const documentIds = uploadedFileList
+      .map((f) => f.documentId)
+      .filter((id) => id != null);
+
+    if (documentIds.length === 0) {
+      showErrorToast("File upload failed, please try again");
+      setIsLoading(false);
+      return;
+    }
+
+    // Step 4: Quantity = uploaded file count
+    const quantity = uploadedFileList.length;
+
+    // Step 5: If not logged in, store in session and redirect
+    if (!isLoggedIn()) {
+      sessionStorage.setItem(
+        "pendingCartItem",
+        JSON.stringify({
           productType: "polaroidCard",
           dataId,
           selectedPricingRule,
-          selectedQuantity: uploadedImages.length,
+          selectedQuantity: quantity,
           uploadedDocumentIds: documentIds,
-        };
-        sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-        router.push(`/auth/signin?redirect=/Cart`);
-        return;
-      }
-      await addToCartPolaroidCard(
-        dataId,
-        selectedPricingRule,
-        uploadedImages.length,
-        documentIds
+        })
       );
-      sessionStorage.removeItem("pendingCartItem");
-      toast.success("Product added to cart!");
-      
-      // Show popup for logged-in users instead of directly going to cart
-      setShowCartPopUp(true);
-    } catch (error) {
-      toast.error("Failed to add to cart. Please try again.");
-      setIsLoading(false);
+      router.push(`/auth/signin?redirect=/Cart`);
+      return;
     }
-  };
+
+    // Step 6: Add to cart API call
+    await addToCartPolaroidCard(
+      dataId,
+      selectedPricingRule,
+      quantity,
+      documentIds
+    );
+
+    incrementCart();
+    toast.success("Product added to cart!");
+    setShowCartPopUp(true);
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    showErrorToast("Failed to add to cart");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <>
@@ -266,32 +304,15 @@ const CartButton: React.FC<CartButtonProps> = ({
       )}
       <div className="mt-4 flex flex-1 flex-col justify-center">
         <button
-          onClick={() => {
-            const missing = getMissingOptions();
-            if (missing.length > 0) {
-              showErrorToast("Please select: " + missing.join(", "));
-              return;
-            }
-            handleProceedToCart();
-          }}
-          className={`relative flex h-[44px] w-full items-center justify-center rounded-[48px] text-lg cursor-pointer bg-[#242424] text-white ${isAddToCartDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <span className="pr-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="21"
-              viewBox="0 0 20 21"
-              fill="white"
-            >
-              <path
-                d="M14.1667 5.50016V3.8335H5V5.50016H7.91667C9.00167 5.50016 9.9175 6.1985 10.2625 7.16683H5V8.8335H10.2625C10.0919 9.31979 9.77463 9.74121 9.3545 10.0397C8.93438 10.3382 8.43203 10.4991 7.91667 10.5002H5V12.5118L9.655 17.1668H12.0117L7.01167 12.1668H7.91667C8.87651 12.1651 9.80644 11.8327 10.5499 11.2255C11.2933 10.6184 11.8048 9.77363 11.9983 8.8335H14.1667V7.16683H11.9983C11.8715 6.56003 11.6082 5.99007 11.2283 5.50016H14.1667Z"
-                fill="white"
-              />
-            </svg>
-          </span>
-          <span className="font-bold">{calculatedPrice}</span>
-          <span className="pl-4 font-medium">Proceed To Cart</span>
+          onClick={handleAddToCart}
+          disabled={isAddToCartDisabled}
+          className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
+          isAddToCartDisabled
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-black text-white hover:bg-gray-800"
+            }`}
+          >
+          {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
         </button>
 
         {errorMessage && (
