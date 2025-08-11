@@ -58,20 +58,19 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
       setLoading(true);
       setError("");
       const otpString = otp.join(""); // Ensure the OTP array is joined into a string
-      console.log("OTP string:", otpString); // Verify the correct OTP is being passed
 
       // Verify OTP API call
       const token = await verifyOTP(phoneNumber, otpString);
-      console.log("JWT Token from verifyOTP:", token);
-      // Set JWT token in cookies 
-      document.cookie = `jwtToken=${token}; path=/; max-age=604800; SameSite=Lax; Secure`;
-
+      
       if(!token){
         throw new Error("Invalid Otp");
       }
+      
+      // Set JWT token in cookies 
+      document.cookie = `jwtToken=${token}; path=/; max-age=604800; SameSite=Lax; Secure`;
+
       // Store JWT token in localStorage (or you can use sessionStorage)
       localStorage.setItem("jwtToken", token);
-      console.log("JWT Token stored:", localStorage.getItem("jwtToken"));
 
       console.log("OTP verified successfully! Logging in..."); // Example success message
 
