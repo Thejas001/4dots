@@ -47,13 +47,13 @@ export default async function PageDetails({
   const product = await fetchProductDetails(dataId);
 
   if (!product) {
-    return <p><NetworkErrorPage /></p>;
+    return <NetworkErrorPage />;
   }
 
   const SpecificProductComponent = ProductComponents[id.toLowerCase()];
 
   if (!SpecificProductComponent) {
-    return <p><NetworkErrorPage /></p>;
+    return <NetworkErrorPage />;
   }
 
   return (
@@ -76,13 +76,7 @@ export default async function PageDetails({
       <SpecificProductComponent product={product} />
       
       {/* ✅ Description part moved below the upload section */}
-      {(() => {
-         console.log("Product ID:", product?.id);
-         console.log("Product Name:", product?.name);
-         console.log("Condition check:", product?.id === 1 && product?.name === "Paper Printing");
-         console.log("Should show description:", !(product?.id === 1 && product?.name === "Paper Printing"));
-         return !(product?.id === 1 && product?.name === "Paper Printing") && <ProductDescription product={product} />;
-       })()}
+      {product?.id !== 1 && <ProductDescription product={product} />}
       </Suspense>
     </DefaultLayout>
   );

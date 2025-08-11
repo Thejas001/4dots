@@ -30,14 +30,16 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
       .join(" ");
   };
 
-  const transformedData = products.map((product) => ({
-    id: product.id,
-    name: formatName(product.name),
-  }));
+  const transformedData = React.useMemo(() => 
+    products.map((product) => ({
+      id: product.id,
+      name: formatName(product.name),
+    })), [products]
+  );
   
-  const getProductDetails = (id: number) => {
+  const getProductDetails = React.useCallback((id: number) => {
     return transformedData.find((product) => product.id === id);
-  };
+  }, [transformedData]);
 
   return (
     <>
@@ -83,7 +85,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </Link>
 
           {/* Business Card */}
-          <Link href={`/ProductDetails/business-card?dataId=3`}>
+          <Link href={`/ProductDetails/business-card?dataId=3`} passHref prefetch={true}>
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
@@ -100,7 +102,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </Link>
 
           {/* Letter Head */}
-          <Link href={`/ProductDetails/letter-head?dataId=4`}>
+          <Link href={`/ProductDetails/letter-head?dataId=4`} passHref prefetch={true}>
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
@@ -117,7 +119,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </Link>
 
           {/* Offset Printing */}
-          <Link href={`/ProductDetails/offset-printing?dataId=5`}>
+          <Link href={`/ProductDetails/offset-printing?dataId=5`} passHref prefetch={true}>
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
@@ -134,7 +136,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </Link>
 
           {/* Canvas Printing */}
-          <Link href={`/ProductDetails/canvas-printing?dataId=6`}>
+          <Link href={`/ProductDetails/canvas-printing?dataId=6`} passHref prefetch={true}>
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
@@ -222,7 +224,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         {/**paper print & Business Card*/}
         <div data-id="1" className="col-span-5 grid h-[186px] grid-rows-2 gap-2 overflow-hidden md:h-[522px] md:gap-6 lg:col-span-3">
           <div className=" relative col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
-            <Link href={`/ProductDetails/paper-print?dataId=1`} passHref>
+            <Link href={`/ProductDetails/paper-print?dataId=1`} passHref prefetch={true}>
               <img
                 src="/images/product/paperprint.jpg"
                 alt=""
@@ -246,7 +248,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </div>
 
           <div data-id="3" className=" relative  col-span-12 overflow-hidden rounded-[7.137px] transition-shadow duration-300 hover:shadow-lg md:rounded-[20px]">
-            <Link href={`/ProductDetails/business-card?dataId=3`}>
+            <Link href={`/ProductDetails/business-card?dataId=3`} passHref prefetch={true}>
               <img
                 src="images/product/bussinesscard.jpg"
                 loading="eager"
@@ -272,7 +274,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
 
         {/**Offset Printing*/}
         <div data-id="5" className="relative col-span-4 h-[163.729px] overflow-hidden rounded-[6.017px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg md:h-[522px] md:rounded-[20px] lg:col-span-4">
-          <Link href={`/ProductDetails/offset-printing?dataId=5`}>
+          <Link href={`/ProductDetails/offset-printing?dataId=5`} passHref prefetch={true}>
             <img
               src="/images/product/Flyer.jpg"
               loading="eager"
@@ -299,7 +301,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         {/**Letter Head & Canvas printing*/}
         <div data-id="4" className="col-span-8 grid grid-cols-12 gap-2 md:gap-6 lg:col-span-12">
           <div className="relative col-span-12 h-[78.525px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-8">
-            <Link href={`/ProductDetails/letter-head?dataId=4`}>
+            <Link href={`/ProductDetails/letter-head?dataId=4`} passHref prefetch={true}>
               <img
                 src="/images/product/letterhead.jpg"
                 loading="eager"
@@ -324,7 +326,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
 
           {/**Canvas Printing */}
           <div data-id="6" className="relative col-span-12 h-[79px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[249px] md:rounded-[20px] lg:col-span-4">
-            <Link href={`/ProductDetails/canvas-printing?dataId=6`}>
+            <Link href={`/ProductDetails/canvas-printing?dataId=6`} passHref prefetch={true}>
               <img
                 src="/images/product/canvas.jpg"
                 loading="eager"
@@ -350,7 +352,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
 
         {/**Polaroid cards & NameSlip*/}
         <div data-id="7" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-pink-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
-          <Link href={`/ProductDetails/polaroid-card?dataId=7`} prefetch={true}>
+          <Link href={`/ProductDetails/polaroid-card?dataId=7`} passHref prefetch={true}>
             <img
             
               src="/images/product/polaroidnew.png"
@@ -376,7 +378,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
 
         {/**Name Slip*/}
         <div data-id="8" className="relative col-span-6 h-[139.226px] overflow-hidden rounded-[8.541px] bg-blue-300 transition-shadow duration-300 hover:shadow-lg sm:h-[326px] md:rounded-[20px] lg:col-span-6">
-          <Link href={`ProductDetails/custom-name-slip?dataId=8`} prefetch={true}>
+          <Link href={`/ProductDetails/custom-name-slip?dataId=8`} passHref prefetch={true}>
             <img
               src="/images/product/nameslip1.jpg"
               alt=""

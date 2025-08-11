@@ -14,7 +14,7 @@ export const extractPhotoFramePricingRules = (
   pricingRules: any[],
 ) : PhotoFramePricingRule[] => {
   
-  console.log("Raw PricingRules Data:", pricingRules);
+  // console.log("Raw PricingRules Data:", pricingRules);
  
   const extractedRules =
     pricingRules
@@ -32,14 +32,14 @@ export const extractPhotoFramePricingRules = (
         Price: rule.Price || 0, 
       })) || [];
       
-      console.log("Extracted Photo Frame Pricing Rules:", extractedRules);
+      // console.log("Extracted Photo Frame Pricing Rules:", extractedRules);
       return extractedRules;
 };
 
 export const extractBusinessCardPricingRules = (
   pricingRules: any[],
 ) : BusinessCardPricingRule[] => {
-  console.log("Raw PricingRules Data:", pricingRules);
+  // console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -56,7 +56,7 @@ export const extractBusinessCardPricingRules = (
       Price: rule.Price || 0, // Defaulting price if not available
     })) || [];
     
-  console.log("Extracted Business Card Pricing Rules:", extractedRules);
+  // console.log("Extracted Business Card Pricing Rules:", extractedRules);
   return extractedRules;
 };
 

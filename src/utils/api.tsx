@@ -148,7 +148,7 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
     const response = await API.get(`/products/details-with-pricing/${dataId}`);
     const Data = response.data;
 
-    console.log("API Response Data:", Data);
+    // console.log("API Response Data:", Data);
 
     const formatName = (name: string) =>
       name
@@ -169,18 +169,18 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
       return sizeAttribute?.Values?.map((v: any) => (typeof v === "string" ? v : v.ValueName)) || [];
     };
 
-    // ✅ Extract Pricing Rules separately
-    const PhotoFramePricingRules = extractPhotoFramePricingRules(Data.PricingRules);
-    const PaperPrintingPricingRules = extractPaperPrintingPricingRules(Data.PricingRules, Data.Addons);    
-    const BusinessCardPricingRules = extractBusinessCardPricingRules(Data.PricingRules);
-    const OffsetPrintingPricingRules = extractOffsetPrintingPricingRules(Data.PricingRules);
-    const LetterHeadPricingRules = extractLetterHeadPricingRules(Data.PricingRules);
-    const PolaroidCardPricingRules = extractPolaroidPricingRules(Data.PricingRules);
-    const NameSlipPricingRules = extracNameSlipPricingRules(Data.PricingRules);
-    const CanvasPricingRules = extractCanvasPricingRules(Data.PricingRules);
+    // ✅ Extract Pricing Rules separately - Only extract what's needed based on product type
+    const PhotoFramePricingRules = Data.ProductID === 2 ? extractPhotoFramePricingRules(Data.PricingRules) : [];
+    const PaperPrintingPricingRules = Data.ProductID === 1 ? extractPaperPrintingPricingRules(Data.PricingRules, Data.Addons) : [];    
+    const BusinessCardPricingRules = Data.ProductID === 3 ? extractBusinessCardPricingRules(Data.PricingRules) : [];
+    const OffsetPrintingPricingRules = Data.ProductID === 5 ? extractOffsetPrintingPricingRules(Data.PricingRules) : [];
+    const LetterHeadPricingRules = Data.ProductID === 4 ? extractLetterHeadPricingRules(Data.PricingRules) : [];
+    const PolaroidCardPricingRules = Data.ProductID === 7 ? extractPolaroidPricingRules(Data.PricingRules) : [];
+    const NameSlipPricingRules = Data.ProductID === 8 ? extracNameSlipPricingRules(Data.PricingRules) : [];
+    const CanvasPricingRules = Data.ProductID === 6 ? extractCanvasPricingRules(Data.PricingRules) : [];
 
 
-    console.log(PaperPrintingPricingRules);
+    // console.log(PaperPrintingPricingRules);
 
     // ✅ Map API response to Product model
     const mappedProduct: Product = {
@@ -228,7 +228,7 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
       CanvasPricingRules,
     };
 
-    console.log("Mapped Product:", mappedProduct);
+    // console.log("Mapped Product:", mappedProduct);
     return mappedProduct;
   } catch (error) {
     console.error(`Error fetching product details (ID: ${dataId}):`, error);
