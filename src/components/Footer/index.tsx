@@ -32,9 +32,21 @@ const companyLinks = [
   },
 ];
 
+// Placeholder payment methods - replace src paths with your actual image files
+const paymentMethods: { name: string; src: string; alt?: string }[] = [
+  { name: 'Google Pay', src: '/images/footer/gpay.png' },
+  { name: 'PhonePe', src: '/images/footer/phonepay.jpg' },
+  { name: 'Paytm', src: '/images/footer/paytm.jpg' },
+  { name: 'BHIM UPI', src: '/images/footer/bhim.png' },
+  { name: 'Mastercard', src: '/images/footer/mastercard.jpg' },
+  { name: 'Visa Electron', src: '/images/footer/visa-electron.png' },
+  { name: 'Maestro', src: '/images/footer/maestro.jpg' },
+  { name: 'VISA', src: '/images/footer/visa.svg' },
+];
+
 const Footer = () => {
     return (
-        <footer className="bottom-0 w-full min-h-[100px] md:max-h-[390px] bg-[#242424] py-15 md:py-[110px] text-[#FCFCFC] relative">
+        <footer className="bottom-0 w-full min-h-[100px] md:max-h-[690px] bg-[#242424] py-15 md:py-[110px] text-[#FCFCFC] relative">
         <div className="absolute bottom-0 -left-1.5 pointer-events-none">
             <img src="/images/icon/column-vector.svg" alt="left column icon" />
         </div>
@@ -119,7 +131,7 @@ const Footer = () => {
                 <div className=''>
                     <h4 className="text-lg font-bold mb-3">Company</h4>
                     <ul className="space-y-3 text-base text-[#9CA3AF]">
-                      {companyLinks.map((item, idx) => (
+                      {companyLinks.map((item) => (
                         <li key={item.href}>
                           <Link
                             href={item.href}
@@ -134,6 +146,26 @@ const Footer = () => {
                 </div>
             </div>
         </div>
+
+        {/* Secure Payments - image placeholders */}
+        <div className="mt-12 px-6 md:px-16">
+          <h4 className="text-center text-2xl md:text-3xl font-extrabold tracking-wider">100% SECURE PAYMENTS</h4>
+          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            {paymentMethods.map((method) => (
+              <div key={method.name} className="rounded-2xl h-20 sm:h-24 flex items-center justify-center">
+                <img
+                  src={method.src}
+                  alt={method.alt ?? method.name}
+                  className={`max-h-12 sm:max-h-16 object-contain ${
+                    method.name !== 'PhonePe' && method.name !== 'Visa Electron' ? 'rounded-[5px]' : ''
+                  }`}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+
     </footer>
     
 
