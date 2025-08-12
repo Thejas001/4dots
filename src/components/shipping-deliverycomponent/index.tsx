@@ -60,25 +60,25 @@ const ShippingDeliveryComponent = () => {
                 iconColor: "text-red-500",
                 title: "Processing Time",
                 number: "1",
-                description: "Orders will be processed and dispatched within 4 to 5 working days from the date of order confirmation.",
+                description: "Orders will be delivered within 4 to 5 working days from the date of order confirmation.",
               },
               {
                 iconColor: "text-orange-500",
                 title: "Shipping Method",
                 number: "2",
-                description: "Nameslips will be shipped via India Post – Registered Mail, ensuring tracking and secure delivery.",
+                description: "Orders will be shipped via India Post – Registered Mail or other trusted courier services, ensuring tracking and secure delivery.",
               },
               {
                 iconColor: "text-blue-500",
                 title: "Delivery Time",
                 number: "3",
-                description: "Standard delivery timelines vary based on location but generally take 5 to 10 working days after dispatch.",
+                description: "Delivery timelines may vary depending on location but generally take up to 5 working days.",
               },
               {
                 iconColor: "text-green-500",
                 title: "Address Accuracy",
                 number: "4",
-                description: "Ensure your shipping address is accurate and complete. 4Dots is not responsible for delays due to incorrect or incomplete address details.",
+                description: "Please ensure your shipping address is accurate and complete. 4Dots is not responsible for delays caused by incorrect or incomplete address details.",
               },
             ].map((item, idx) => (
               <div className="py-12 px-6 flex items-start gap-6 max-w-4xl mx-auto text-left" key={idx}>

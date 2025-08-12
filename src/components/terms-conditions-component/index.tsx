@@ -60,19 +60,19 @@ const TermsAndConditionsComponent = () => {
                 iconColor: "text-red-500",
                 title: "Accuracy of Details",
                 number: "1",
-                description: "The names and details provided during the order will be printed exactly as entered. Please ensure spelling, capitalization, and other information are correct before submitting.",
+                description: "All information provided during the order process will be printed exactly as entered. Please double-check spelling, capitalization, layout instructions, and any other details before submitting your order, as we cannot make changes after printing begins.",
               },
               {
                 iconColor: "text-orange-500",
                 title: "Printing Material",
                 number: "2",
-                description: "All nameslips are printed on high-quality sticker paper, designed to be durable and easy to apply.",
+                description: "All products are printed on high-quality materials suited for the selected product, ensuring durability, vibrant colors, and a professional finish.",
               },
               {
                 iconColor: "text-blue-500",
                 title: "Design and Layout",
                 number: "3",
-                description: "While we ensure clear and legible printing, the layout and font style will follow standard format.",
+                description: "We ensure clear and legible printing. The layout and font style will follow standard design practices unless otherwise specified and approved by the customer.",
               },
               {
                 iconColor: "text-green-500",
@@ -84,7 +84,7 @@ const TermsAndConditionsComponent = () => {
                 iconColor: "text-red-500",
                 title: "Usage",
                 number: "5",
-                description: "These nameslips are intended for personal and institutional use. Commercial resale is not permitted without prior agreement with 4Dots.",
+                description: "All printed materials are intended for personal, business, or institutional use. Resale or redistribution for commercial purposes is not permitted without prior agreement with 4Dots.",
               },
             ].map((item, idx) => (
               <div className="py-12 px-6 flex items-start gap-6 max-w-4xl mx-auto text-left" key={idx}>
