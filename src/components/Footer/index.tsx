@@ -34,14 +34,14 @@ const companyLinks = [
 
 // Placeholder payment methods - replace src paths with your actual image files
 const paymentMethods: { name: string; src: string; alt?: string }[] = [
-  { name: 'Google Pay', src: '/images/footer/gpay.png' },
+  { name: 'Google Pay', src: '/images/footer/gpay.jpg' },
   { name: 'PhonePe', src: '/images/footer/phonepay.jpg' },
   { name: 'Paytm', src: '/images/footer/paytm.jpg' },
   { name: 'BHIM UPI', src: '/images/footer/bhim.png' },
   { name: 'Mastercard', src: '/images/footer/mastercard.jpg' },
   { name: 'Visa Electron', src: '/images/footer/visa-electron.png' },
   { name: 'Maestro', src: '/images/footer/maestro.jpg' },
-  { name: 'VISA', src: '/images/footer/visa.svg' },
+  { name: 'VISA', src: '/images/footer/visa.jpg' },
 ];
 
 const Footer = () => {
@@ -157,7 +157,7 @@ const Footer = () => {
                   src={method.src}
                   alt={method.alt ?? method.name}
                   className={`max-h-12 sm:max-h-16 object-contain ${
-                    method.name !== 'PhonePe' && method.name !== 'Visa Electron' ? 'rounded-[5px]' : ''
+                    method.name !== 'Visa Electron' ? 'rounded-[5px]' : ''
                   }`}
                 />
               </div>
