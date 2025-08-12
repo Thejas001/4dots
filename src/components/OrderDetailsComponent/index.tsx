@@ -69,7 +69,6 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
         const data = await getUserAddress();
         setAddress(data); // ✅ Adjust if your API returns nested structure
       } catch (err) {
-        console.error("Failed to fetch address", err);
       } finally {
         setLoading(false);
       }
@@ -84,7 +83,6 @@ const OrderDetailsComponent: React.FC<OrderDetailsComponentProps> = ({
         const data = await fetchUserOrder(); // assuming this fetches all orders
         setOrders(data);
       } catch (error) {
-        console.error("Failed to fetch orders:", error);
       } finally {
         setLoading(false);
       }

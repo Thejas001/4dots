@@ -54,7 +54,6 @@ const OrderPayment = () => {
     } catch (error) {
       setAddressError(true);
       setAddresses([]);
-      console.error("Failed to fetch address:", error);
     } finally {
       setLoadingAddress(false);
     }
@@ -66,7 +65,6 @@ const OrderPayment = () => {
         const data = await fetchUserOrder();
         setOrders(data);
       } catch (error) {
-        console.error("Failed to fetch orders:", error);
       } finally {
         setLoading(false);
       }

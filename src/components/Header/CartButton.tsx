@@ -22,7 +22,6 @@ const CartButton = () => {
         router.push("/auth/signin");
       }
     } catch (error) {
-      console.error("Error accessing localStorage or redirecting:", error);
     }
   };
 

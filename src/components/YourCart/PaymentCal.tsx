@@ -82,7 +82,6 @@ const handlePlaceOrder = async () => {
         // ✅ Redirect after success
         incrementOrderBadge(); // Increment order badge count
         setShowPaymentPopUp({ status: "success" });
-        console.log("✅ Payment successful:", razorpayResponse);
 
       },
       prefill: {
@@ -96,7 +95,6 @@ const handlePlaceOrder = async () => {
       modal: {
         ondismiss: function () {
           setShowPaymentPopUp({ status: "failed" });
-          console.log("❌ Payment popup closed by user.");
         }
       }
     };
@@ -105,7 +103,6 @@ const handlePlaceOrder = async () => {
     razorpay.open();
   } catch (error) {
     setShowPaymentPopUp({ status: "failed" });
-    console.error("Order placement or Razorpay failed:", error);
   }
 };
 

@@ -53,11 +53,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
 
           if (pages !== undefined) {
             setPageCount(pages);
-            console.log("📄 Page Count:", pages);
           }
 
           message.success(`${info.file.name} uploaded successfully`);
-          console.log("📄 Document ID:", documentId);
         } else {
           message.error("Upload failed. Server did not return success.");
         }
@@ -78,9 +76,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
           });
 
           sessionStorage.removeItem("uploadedDocumentId");
-          console.log("🧹 Document removed on unload.");
         } catch (err) {
-          console.error("❌ Failed to delete document on unload:", err);
         }
       }
     };

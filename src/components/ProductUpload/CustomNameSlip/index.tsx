@@ -75,7 +75,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
-    console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
     if (file) {
       setUploadedFile(file);

@@ -416,13 +416,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     try {
       // Debug: Log the values being passed to findLetterHeadPricingRule
-      console.log("🔍 Debug - Values being passed to findLetterHeadPricingRule:");
-      console.log("selectedOption:", selectedOption);
-      console.log("selectedSize:", selectedSize);
-      console.log("selectedQuantity:", selectedQuantity);
-      console.log("selectedQuality:", selectedQuality);
-      console.log("productDetails.LetterHeadPricingRules:", productDetails.LetterHeadPricingRules);
-
       // Use findLetterHeadPricingRule to get the correct pricing rule structure
       const pricingRule = findLetterHeadPricingRule(
         productDetails.LetterHeadPricingRules,
@@ -433,14 +426,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       );
       
       if (!pricingRule) {
-        console.error("❌ Pricing rule not found. Debug info:");
-        console.error("Available pricing rules:", productDetails.LetterHeadPricingRules);
-        console.error("Selected values:", {
-          selectedOption,
-          selectedSize,
-          selectedQuantity,
-          selectedQuality
-        });
         toast.error("Pricing rule not found. Please check your selections.");
         setIsLoading(false);
         return;
@@ -456,7 +441,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       // Don't redirect to cart - let the popup handle navigation
       // router.push("/Cart");
     } catch (error) {
-      console.error("❌ Error in handleAddToCart:", error);
       toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
     }
@@ -469,7 +453,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   useEffect(() => {
     if (isLoggedIn()) {
       processPendingCartItem((cart: any) => {
-        console.log("Cart updated:", cart);
       });
     }
   }, []);

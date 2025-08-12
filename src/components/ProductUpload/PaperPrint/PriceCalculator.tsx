@@ -49,13 +49,7 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
       noOfCopies <= 0
     ) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn("❌ PriceCalculator: Invalid inputs", {
-          pricingRulesLength: pricingRules?.length,
-          selectedSize,
-          selectedColor,
-          pageCount,
-          noOfCopies
-        });
+
       }
       onPriceUpdate(null);
       return;
@@ -68,31 +62,12 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     const isPageCountValidForSelection = isPageCountValid(pricingRules, selectedSize, mappedColor, pageCount);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔍 PriceCalculator inputs:", {
-        selectedSize,
-        selectedColor,
-        mappedColor,
-        pageCount,
-        noOfCopies,
-        doubleSided,
-        isPageCountValidForSelection
-      });
-      console.log("📋 Available pricing rules:", pricingRules.map(rule => ({
-        size: rule.PaperSize?.ValueName,
-        color: rule.ColorType?.ValueName,
-        pageRange: rule.PageRange?.ValueName,
-        price: rule.PricePerPage
-      })));
     }
 
     // If page count is not valid, log warning but continue with fallback pricing
     if (!isPageCountValidForSelection) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn("⚠️ Page count not exactly matched, will try fallback pricing:", {
-          pageCount,
-          selectedSize,
-          mappedColor
-        });
+
       }
       // Don't return null - let the findPricingRule function handle fallback
     }
@@ -107,32 +82,14 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     const totalSheets = effectivePageCount * noOfCopies;
     
     if (process.env.NODE_ENV === 'development') {
-      console.log("📊 Sheet calculation:", {
-        originalPageCount: pageCount,
-        effectivePageCount,
-        noOfCopies,
-        totalSheets,
-        doubleSided
-      });
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log("📊 Page count calculation:", {
-        originalPageCount: pageCount,
-        effectivePageCount,
-        doubleSided,
-        totalSheets
-      });
     }
 
     // ✅ Use total sheets to find correct pricing slab
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔍 Calling findPricingRule with:", {
-        selectedSize,
-        mappedColor,
-        totalSheets,
-        pricingRulesLength: pricingRules.length
-      });
+
     }
     
     const result = findPricingRule(
@@ -144,24 +101,12 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
 
     if (!result) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn("❌ No matching pricing rule found for:", {
-          selectedSize,
-          mappedColor,
-          totalSheets,
-          availableRules: pricingRules.map(r => ({
-            size: r.PaperSize?.ValueName,
-            color: r.ColorType?.ValueName,
-            pageRange: r.PageRange?.ValueName,
-            price: r.PricePerPage
-          }))
-        });
       }
       onPriceUpdate(null);
       return;
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log("✅ Found pricing rule:", result);
     }
 
     // ✅ Calculate base price
@@ -177,12 +122,7 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     
     const basePrice = pricePerUnit * totalSheets;
     if (process.env.NODE_ENV === 'development') {
-      console.log("💰 Base price calculation:", {
-        pricePerUnit: pricePerUnit,
-        totalSheets,
-        basePrice,
-        doubleSided
-      });
+
     }
 
     // ✅ Calculate addon price if applicable
@@ -191,7 +131,6 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     // Calculate binding addon price
     if (selectedBindingType) {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔗 Calculating binding addon price for:", selectedBindingType);
       }
       
       const addonRule = findAddonPrice(
@@ -205,10 +144,6 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
       if (addonRule) {
         const pricePerAddon = parseAddonPrice(addonRule.Price);
         if (process.env.NODE_ENV === 'development') {
-          console.log("📦 Binding addon rule found:", {
-            addonRule,
-            pricePerAddon
-          });
         }
 
         if (!isNaN(pricePerAddon)) {
@@ -223,21 +158,11 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
 
           addonPrice += pricePerAddon * addonBookCount;
           if (process.env.NODE_ENV === 'development') {
-            console.log("🔗 Binding addon price calculation:", {
-              pricePerAddon,
-              addonBookCount,
-              addonPrice
-            });
           }
         }
       } else {
         if (process.env.NODE_ENV === 'development') {
-          console.warn("❌ No binding addon rule found for:", {
-            selectedBindingType,
-            selectedSize,
-            mappedColor,
-            pageCount
-          });
+
         }
       }
     }
@@ -245,7 +170,6 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     // Calculate lamination addon price
     if (selectedLaminationType) {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔗 Calculating lamination addon price for:", selectedLaminationType);
       }
       
       const addonRule = findAddonPrice(
@@ -259,10 +183,6 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
       if (addonRule) {
         const pricePerAddon = parseAddonPrice(addonRule.Price);
         if (process.env.NODE_ENV === 'development') {
-          console.log("📦 Lamination addon rule found:", {
-            addonRule,
-            pricePerAddon
-          });
         }
 
         if (!isNaN(pricePerAddon)) {
@@ -271,21 +191,10 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
 
           addonPrice += pricePerAddon * totalPageCount;
           if (process.env.NODE_ENV === 'development') {
-            console.log("🔗 Lamination addon price calculation:", {
-              pricePerAddon,
-              totalPageCount,
-              addonPrice
-            });
           }
         }
       } else {
         if (process.env.NODE_ENV === 'development') {
-          console.warn("❌ No lamination addon rule found for:", {
-            selectedLaminationType,
-            selectedSize,
-            mappedColor,
-            pageCount
-          });
         }
       }
     }
@@ -293,11 +202,6 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     // ✅ Calculate total price and update parent
     const totalPrice = basePrice + addonPrice;
     if (process.env.NODE_ENV === 'development') {
-      console.log("💵 Final price calculation:", {
-        basePrice,
-        addonPrice,
-        totalPrice
-      });
     }
     
     onPriceUpdate(totalPrice);

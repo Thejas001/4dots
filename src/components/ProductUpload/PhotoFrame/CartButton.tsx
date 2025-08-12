@@ -85,7 +85,6 @@ const CartButton: React.FC<CartButtonProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 1000));
       router.push("/Cart");
     } catch (error) {
-      console.error("Error in processPendingCartItem:", error);
       setErrorMessage("Failed to process pending cart item. Please try again.");
       setIsLoading(false);
     }
@@ -183,7 +182,6 @@ const CartButton: React.FC<CartButtonProps> = ({
         if (result?.Data?.Id) {
           documentIds.push(result.Data.Id);
         } else {
-          console.error("❌ No document ID found in API response:", result);
         }
       }
 
@@ -216,7 +214,6 @@ const CartButton: React.FC<CartButtonProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 1000));
     setShowCartPopUp(true);
     } catch (error) {
-      console.error("Cart error:", error);
       toast.error("Failed to add to cart. Please try again.");
       setIsLoading(false);
     }

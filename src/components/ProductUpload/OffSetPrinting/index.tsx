@@ -257,7 +257,6 @@ const ProductUpload = ({ product }: { product: any }) => {
           );
         }
       } catch (error) {
-        console.error("Error loading quality rules:", error);
       }
     }
 
@@ -319,14 +318,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     };
 
 const handleAddToCart = async () => {
-  console.log("handleAddToCart called with:", {
-    productDetails,
-    selectedSize,
-    selectedQuality,
-    selectedQuantity,
-    uploadedDocumentId,
-  });
-
   if (!productDetails || !selectedSize || !selectedQuality || !selectedQuantity) {
     setErrorMessage("Please select all options before adding to the cart.");
     showErrorToast("Please select all options before adding to the cart.");
@@ -360,12 +351,6 @@ const handleAddToCart = async () => {
   }
 
   try {
-    console.log("Calling addToCartOffSetPrinting with:", {
-      dataId,
-      pricingRule,
-      selectedQuantity,
-      uploadedDocumentId,
-    });
     await addToCartOffSetPrinting(
       dataId,
       pricingRule,
@@ -376,7 +361,6 @@ const handleAddToCart = async () => {
     incrementCart();
     toast.success("Product added to cart successfully!");
   } catch (error) {
-    console.error("Add to cart error:", error);
     toast.error("Failed to add to cart. Please try again.");
   } finally {
     setIsLoading(false);

@@ -72,7 +72,6 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
       // Store JWT token in localStorage (or you can use sessionStorage)
       localStorage.setItem("jwtToken", token);
 
-      console.log("OTP verified successfully! Logging in..."); // Example success message
 
       // Dispatch custom event for login success
       window.dispatchEvent(new CustomEvent("userLoggedIn", { detail: { token } }));

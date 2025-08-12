@@ -6,7 +6,6 @@ declare global {
 
 const retryPayment = (paymentData: any, onSuccess?: () => void) => {
   if (typeof window.Razorpay === "undefined") {
-    console.warn("Razorpay SDK not loaded. Trying to load it manually...");
 
     // Avoid loading the script multiple times
     const existingScript = document.querySelector(
@@ -19,7 +18,6 @@ const retryPayment = (paymentData: any, onSuccess?: () => void) => {
       script.async = true;
 
       script.onload = () => {
-        console.log("Razorpay SDK loaded successfully.");
         launchRazorpay(paymentData, onSuccess);
       };
 
@@ -29,7 +27,6 @@ const retryPayment = (paymentData: any, onSuccess?: () => void) => {
 
       document.body.appendChild(script);
     } else {
-      console.log("Razorpay script is already loading. Please wait...");
     }
   } else {
     launchRazorpay(paymentData, onSuccess);
@@ -39,8 +36,6 @@ const retryPayment = (paymentData: any, onSuccess?: () => void) => {
 const launchRazorpay = (razorpayData: any, onSuccess?: () => void) => {
   // Defensive checks
   if (!razorpayData?.RazorpayKey || !razorpayData?.RazorpayOrderId || !razorpayData?.AmountInPaise) {
-    console.error("Missing required Razorpay data:", razorpayData);
-    alert("Payment details are incomplete. Cannot proceed.");
     return;
   }
 
@@ -50,7 +45,6 @@ const launchRazorpay = (razorpayData: any, onSuccess?: () => void) => {
     currency: razorpayData.Currency || "INR",
     order_id: razorpayData.RazorpayOrderId,
     handler: (response: any) => {
-      console.log("✅ Payment successful", response);
       if (onSuccess) onSuccess();
       // TODO: call your backend API to confirm payment if needed
     },
@@ -67,8 +61,6 @@ const launchRazorpay = (razorpayData: any, onSuccess?: () => void) => {
   rzp.open();
 
   rzp.on("payment.failed", function (response: any) {
-    console.error("❌ Payment failed", response);
-    alert("Payment failed. Please try again.");
   });
 };
 

@@ -33,7 +33,6 @@ const ProfileComponent = () => {
     } catch (error) {
       setAddressError(true);
       setAddresses([]);
-      console.error("Failed to fetch address:", error);
     } finally {
       setLoadingAddress(false);
     }
@@ -47,7 +46,6 @@ const ProfileComponent = () => {
         setUserDetails(data);
       }
     } catch (err) {
-      console.error("Failed to refresh user:", err);
     }
   };
 
@@ -138,7 +136,7 @@ const ProfileComponent = () => {
             <div className="mt-4 sm:mt-0 sm:ml-auto">
               <button
                 onClick={() => setIsOpen(true)}
-                className="flex items-center gap-2 rounded-lg border border-[#B5B5B5] bg-[#F7F7F7] px-3 py-1.5 text-sm sm:px-5 sm:py-2.5 sm:text-sm text-xs"
+                className="flex items-center gap-2 rounded-lg border border-[#B5B5B5] bg-[#F7F7F7] px-3 py-1.5 sm:px-5 sm:py-2.5 sm:text-sm text-xs"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

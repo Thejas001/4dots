@@ -174,7 +174,6 @@ const CartButton: React.FC<CartButtonProps> = ({
         if (result?.Data?.Id) {
           documentIds.push(result.Data.Id);
         } else {
-          console.error("❌ No document ID found in API response:", result);
         }
       }
       if (!isLoggedIn()) {
@@ -287,7 +286,6 @@ const handleAddToCart = async () => {
     toast.success("Product added to cart!");
     setShowCartPopUp(true);
   } catch (error) {
-    console.error("Error adding to cart:", error);
     showErrorToast("Failed to add to cart");
   } finally {
     setIsLoading(false);

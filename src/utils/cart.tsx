@@ -7,14 +7,12 @@ import { API } from "./api";
 export const fetchCartItems = async (): Promise<CartData> => {
   try {
     const response = await API.get(`/cart`);
-    console.log("Fetched Cart Data:", response.data); // Debugging output
 
     return {
       Items: response.data?.data?.Items ?? [],
       TotalPrice: response.data?.data?.TotalPrice ?? 0,
     };
   } catch (error: any) {
-    console.error("Error fetching cart items:", error.response?.data || error.message);
     return { Items: [], TotalPrice: 0 }; // ✅ Ensure a valid return type
   }
 };
@@ -25,7 +23,6 @@ export const deleteCartItem = async (cartItemId: number): Promise<boolean> => {
     await API.delete(`/cart/items/${cartItemId}`);
     return true; // ✅ No need to check response.ok (Axios throws error on failure)
   } catch (error: any) {
-    console.error("Error deleting cart item:", error.response?.data || error.message);
     return false; // ✅ Ensures a valid return type
   }
 };
@@ -66,13 +63,10 @@ export const addToCart = async (
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
-  console.log("Corrected Cart Data:", JSON.stringify(cartItem, null, 2));
 
   try {
     const response = await addToCartApi(cartItem);
-    console.log("Successfully added to cart:", response);
   } catch (error) {
-    console.log("Failed to add to cart. Please try again.");
   }
 };
 
@@ -108,13 +102,10 @@ export const addToCartPolaroidCard = async (
     CartItemDocumentIds: documentIds ?? [],
   };
 
-  console.log("Polaroid Card Cart Data:", JSON.stringify(cartItem, null, 2));
 
   try {
     const response = await addToCartApi(cartItem); // Fixed variable name
-    console.log("✅ Successfully added Polaroid Card to cart:", response);
   } catch (error) {
-    console.log("Failed to add Polaroid Card to cart. Please try again.");
   }
 };
 
@@ -150,14 +141,11 @@ export const addToCartNameSlip = async (
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
-  console.log("🛒 Name Slip Cart Data:", JSON.stringify(cartItem, null, 2));
 
   try {
     const response = await addToCartApi(cartItem); // Corrected variable name
-    console.log("Successfully added Name Slip to cart:", response);
-    console.log("Name Slip added to cart!");
+
   } catch (error) {
-    console.log("Failed to add Name Slip to cart. Please try again.");
   }
 };
 
@@ -198,14 +186,11 @@ export const addToCartOffSetPrinting = async (
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
   console .log("selectedQuantity", selectedQuantity);
-  console.log("🧾 Document IDs:", cartItem.CartItemDocumentIds);
-  console.log("🛒 Offset printing Data:", JSON.stringify(cartItem, null, 2));
+
 
   try {
     const response = await addToCartApi(cartItem);
-    console.log("✅ Successfully added Offset printing Data to cart:", response);
   } catch (error) {
-    console.log("❌ Failed to add Offset printing Data to cart. Please try again.");
   }
 };
 
@@ -236,14 +221,11 @@ export const addToCartBusinessCard = async (
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
-  console.log("🛒 Offset printing Data:", JSON.stringify(cartItem, null, 2));
 
   try {
     const response = await addToCartApi(cartItem); // Corrected variable name
-    console.log("Successfully added Offset printing Data to cart:", response);
-    console.log("Offset printing Data added to cart!");
+
   } catch (error) {
-    console.log("Failed to add Offset printing Data to cart. Please try again.");
   }
 };
 
@@ -275,14 +257,11 @@ export const addToCartCanvasPrinting = async (
 
   };
 
-  console.log("🛒 Canvas Printing Data:", JSON.stringify(cartItem, null, 2));
 
   try {
     const response = await addToCartApi(cartItem); // Corrected variable name
-    console.log("Successfully added Canvas Printing Data to cart:", response);
-    console.log("Canvas Printing Data added to cart!");
+
   } catch (error) {
-    console.log("Failed to add Canvas Printing Data to cart. Please try again.");
   }
 };
 
@@ -330,15 +309,11 @@ export const addToCartPhotoFrame = async (
 
   };
 
-  console.log("🛒 PhotoFrame Data Sent to API:", JSON.stringify(cartItem, null, 2));
 
   try {
     const response = await addToCartApi(cartItem);
-    console.log("Successfully added PhotoFrame Data to cart:", response);
-    console.log("Photo Frame added to cart!");
+
   } catch (error) {
-    console.error("Failed to add to cart:", error);
-    console.log("Failed to add to cart. Please try again.");
   }
 };
 
@@ -433,15 +408,10 @@ const resolvedLaminationAddonId = selectedLaminationType
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
-  console.log("🛒 Cart Item:", JSON.stringify(cartItem, null, 2));
-  console.log("Selected Binding Type:", selectedBindingType);
-  console.log("Addon Rule:", addonRule);
+
 
   try {
     const response = await addToCartApi(cartItem);
-    console.log("Successfully added to cart:", response);
-    console.log("Item added to cart!");
   } catch (error) {
-    console.log("Failed to add item to cart. Please try again.");
   }
 };

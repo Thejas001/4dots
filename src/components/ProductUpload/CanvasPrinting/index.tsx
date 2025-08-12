@@ -84,7 +84,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
     const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
-      console.log("Received Document ID from child:", documentId);
       setUploadedDocumentId(documentId);
       if (file) {
         setUploadedFile(file);
@@ -120,7 +119,6 @@ const ProductUpload = ({ product }: { product: any }) => {
           incrementCart();
         }
       } catch (error) {
-        console.error("Error processing pending cart item:", error);
         showErrorToast("Failed to add item to cart");
       }
     };
@@ -183,7 +181,6 @@ const ProductUpload = ({ product }: { product: any }) => {
           router.push("/Cart");
         }
       } catch (error) {
-        console.error("Error proceeding to cart:", error);
         showErrorToast("Failed to proceed to cart");
       } finally {
         setIsLoading(false);

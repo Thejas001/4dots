@@ -36,17 +36,6 @@ export const isBindingAllowed = (
   const isColor = colorType === "Color";
 
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 Binding check:", {
-      paperSize: normalizedPaperSize,
-      normalizedSize,
-      isA4Size,
-      isA3Size,
-      is12x18Size,
-      is13x19Size,
-      bindingName,
-      pageCount,
-      colorType
-    });
   }
 
   // A4 rules (already present)

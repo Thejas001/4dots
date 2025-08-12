@@ -45,7 +45,6 @@ export const updateUserName = async (userName: string) => {
     const response = await API.put("/account/update-name", { name: userName });
     return response.data; // Assuming the API returns updated user details directly
   } catch (error: any) {
-    console.error("Error updating user name:", error);
     throw error.response?.data?.message || "Failed to update user name";
   }
 }
@@ -54,7 +53,6 @@ export const getUserAddress = async () => {
     const response = await API.get("/address");
     return response.data; // Assuming the API returns user address directly
   } catch (error: any) {
-    console.error("Error fetching user address:", error);
     throw error.response?.data?.message || "Failed to fetch user address";
   }
 }
@@ -64,7 +62,6 @@ export const addUserAddress = async (address: any) => {
     const response = await API.post("/address", address);
     return response.data; // Assuming the API returns user address directly
   } catch (error: any) {
-    console.error("Error adding user address:", error);
     throw error.response?.data?.message || "Failed to add user address";
   }
 }
@@ -74,7 +71,6 @@ export const updateUserDetails = async (userDetails: any) => {
     const response = await API.put("/account/update-name", userDetails);
     return response.data; // Assuming the API returns updated user details directly
   } catch (error: any) {
-    console.error("Error updating user details:", error);
     throw error.response?.data?.message || "Failed to update user details";
   }
 }
@@ -85,7 +81,6 @@ export const updateOrderStatus = async (orderId: number, status: number) => {
     });
     return response.data; // Adjust as per your API's response structure
   } catch (error: any) {
-    console.error(`Error updating order ${orderId} status:`, error);
     throw error.response?.data?.message || "Failed to update order status";
   }
 };
@@ -103,7 +98,6 @@ export const updateOrderStatus = async (orderId: number, status: number) => {
         throw new Error(response.data?.message ||"Failed to send OTP");
       }
     } catch (error: any) {
-      console.error("Error sending OTP:", error.response ? error.response.data : error.message);
       throw new Error("Failed to send OTP");
     }
   };
@@ -118,7 +112,6 @@ export const updateOrderStatus = async (orderId: number, status: number) => {
       const response = await API.post("/Account/verify-otp", { phoneNumber: formattedPhoneNumber, otp });
       return response.data.token; // API should return auth token
     } catch (error: any) {
-      console.error("Error verifying OTP:", error);
       throw error.response?.data?.message || "Invalid OTP";
     }
   };
@@ -136,7 +129,6 @@ export const updateOrderStatus = async (orderId: number, status: number) => {
   
       return transformed;
     } catch (error) {
-      console.error("Error fetching products:", error);
       return [];
     }
   };
@@ -148,7 +140,6 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
     const response = await API.get(`/products/details-with-pricing/${dataId}`);
     const Data = response.data;
 
-    // console.log("API Response Data:", Data);
 
     const formatName = (name: string) =>
       name
@@ -180,7 +171,6 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
     const CanvasPricingRules = Data.ProductID === 6 ? extractCanvasPricingRules(Data.PricingRules) : [];
 
 
-    // console.log(PaperPrintingPricingRules);
 
     // ✅ Map API response to Product model
     const mappedProduct: Product = {
@@ -228,10 +218,8 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
       CanvasPricingRules,
     };
 
-    // console.log("Mapped Product:", mappedProduct);
     return mappedProduct;
   } catch (error) {
-    console.error(`Error fetching product details (ID: ${dataId}):`, error);
     return null;
   }
 };
@@ -244,10 +232,8 @@ export const addToCartApi = async (cartItem: CartItems) => {
   try {
     const response = await API.post(`/cart/items`, cartItem);
 
-    console.log("✅ Successfully added to cart:", response.data);
     return response.data; // No need for response.json()
   } catch (error: any) {
-    console.error("Error adding to cart:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Failed to add item to cart");
   }
 };
@@ -267,7 +253,6 @@ export const placeOrder = async (
 
     return response.data;
   } catch (error: any) {
-    console.error("Error placing order:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Failed to place order");
   }
 };
@@ -284,7 +269,6 @@ export const fetchUserOrder = async () => {
       throw new Error(response.data?.message || "Failed to fetch orders");
     }
   } catch (error: any) {
-    console.error("Error fetching orders:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Failed to fetch orders");
   }
 };
@@ -292,12 +276,9 @@ export const fetchUserOrder = async () => {
 export const fetchPaymentRetry = async (orderId: number) => {
   try {
     const response = await API.get(`/order/retry-payment/${orderId}`);
-    console.log("API Response Data:", response.data); // Keep this for debugging
-
     // Return the actual response data directly
     return response.data;
   } catch (error: any) {
-    console.error("Error fetching orders:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Failed to fetch orders");
   }
 };

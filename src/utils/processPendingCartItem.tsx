@@ -19,7 +19,6 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
   if (!pendingCartItem) return; // Exit if no pending item
 
   try {
-    console.log("🔍 Raw pendingCartItem:", pendingCartItem);
     const parsedItem = JSON.parse(pendingCartItem);
     let { 
       productType, 
@@ -51,14 +50,10 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     addonBookCount = addonBookCount ? Number(addonBookCount) : 0;
 
 
-    console.log("Processing pending item:", parsedItem);
-    console.log("📄 Uploaded Document ID:", uploadedDocumentId);
+
     
     if (productType === "photoFrame") {
-      console.log("PhotoFrame extra fields:", {
-        documentIds: parsedItem.documentIds,
-        selectedFrameColor: parsedItem.selectedFrameColor,
-      });
+
     }
 
     // Remove from sessionStorage BEFORE API call to prevent duplicate processing
@@ -78,7 +73,6 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     const needsSquareFeetRange = selectedPricingRule?.SquareFeetRange?.ValueID == null && isCanvas;
 
     if (!productType || !finalDataId || !selectedPricingRule || needsSquareFeetRange || needsSqft || needsQuantity) {
-      console.error("❌ Invalid pending cart item data", parsedItem);
       return;
     }
 
@@ -91,7 +85,6 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     );
 
     if (alreadyInCart) {
-      console.log("✅ Product already in cart. Skipping addition.");
       return;
     }
 
@@ -143,7 +136,6 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
         );
         break;
       default:
-        console.error("❌ Unknown product type:", productType);
         return;
     }
 
@@ -154,7 +146,6 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
     // Show success message
     toast.success("Product added to cart after login!");
   } catch (error) {
-    console.error("❌ Failed to process pending cart item:", error);
     toast.error("❌ Failed to add product to cart after login");
   }
 };

@@ -128,7 +128,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
-    console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
     if (file) {
       // Clean up previous URL if it exists
@@ -183,7 +182,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     if (!productDetails || !selectedCard || !selectedSurface) return;
 
     if (errorMessage) {
-      console.warn("Pricing rule not fetched due to validation error.");
       return;
     }
 
@@ -194,13 +192,10 @@ const ProductUpload = ({ product }: { product: any }) => {
     );
 
     setSelectedPricingRule(pricingRule);
-    console.log("**********PricingRule**********", pricingRule);
 
     if (pricingRule) {
-      console.log("Matched Pricing Rule:", pricingRule);
       setPrice(pricingRule.Price);
     } else {
-      console.warn("No matching pricing rule found.");
       setPrice(null);
     }
   }, [selectedCard, selectedSurface, productDetails, errorMessage]);
@@ -275,7 +270,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   useEffect(() => {
     if (isLoggedIn()) {
       processPendingCartItem((cart: any) => {
-        console.log("Cart updated:", cart);
       });
     }
   }, []);

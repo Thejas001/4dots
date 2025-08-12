@@ -46,7 +46,6 @@ const UserProfileOrder = () => {
                 const data = await fetchUserOrder();
                 setOrders(data);
             } catch (error) {
-                console.error("Failed to fetch orders:", error);
             } finally {
                 setLoading(false);
             }

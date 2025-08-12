@@ -146,17 +146,12 @@ const AddOnService = ({
     return [...allowedBindingTypes, ...laminationTypes];
   }, [allowedBindingTypes, laminationTypes]);
 
-  // Debug log
-  console.log("allowedBindingTypes", allowedBindingTypes, { pageCount, paperSize, colorType });
-  console.log("laminationTypes", laminationTypes);
-
   const isSelectionComplete = !!paperSize && !!colorType && pageCount > 0;
 
   // Validate customCopies whenever noOfCopies changes or customCopies changes
   useEffect(() => {
     const numValue = parseInt(customCopies);
     if (customCopies && !isNaN(numValue) && numValue > noOfCopies) {
-      console.log('useEffect: Clearing invalid customCopies value', numValue, 'max:', noOfCopies);
       setCustomCopies('');
       onCustomCopiesChange('');
     }

@@ -94,7 +94,6 @@ useEffect(() => {
         const data = await fetchCartItems();
         setCartData(data);
       } catch (error) {
-        console.error("Error loading cart items:", error);
       } finally {
         setIsLoading(false);
       }

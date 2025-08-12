@@ -43,7 +43,6 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           sessionStorage.setItem("uploadedDocumentId", documentId);
           onUploadSuccess(documentId, selectedFile); // Pass preview URL to parent
           message.success(`${info.file.name} uploaded successfully`);
-          console.log("📄 Document ID:", documentId);
         } else {
           message.error("Upload failed. Server did not return success.");        }
       } else if (info.file.status === "error") {
@@ -63,9 +62,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           });
   
           sessionStorage.removeItem("uploadedDocumentId");
-          console.log("🧹 Document removed on unload.");
         } catch (err) {
-          console.error("❌ Failed to delete document on unload:", err);
         }
       }
     };

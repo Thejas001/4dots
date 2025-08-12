@@ -41,11 +41,7 @@ const findPageRange = (
   pricingRules: PaperPrintingPricingRule[],
 ) => {
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 findPageRange called with:", {
-      pageCount,
-      pricingRulesLength: pricingRules.length,
-      availableRanges: pricingRules.map(r => r.PageRange?.ValueName).filter(Boolean)
-    });
+;
   }
   
 
@@ -60,7 +56,6 @@ const findPageRange = (
       const min = parseInt(pageRangeStr.split("-")[0]);
       const matches = pageCount >= min;
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 Checking range "${pageRangeStr}": ${pageCount} >= ${min} = ${matches}`);
       }
       return matches;
     }
@@ -69,14 +64,12 @@ const findPageRange = (
     const [min, max] = pageRangeStr.split("-").map(Number);
     const matches = pageCount >= min && pageCount <= max;
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🔍 Checking range "${pageRangeStr}": ${pageCount} >= ${min} && ${pageCount} <= ${max} = ${matches}`);
     }
     return matches;
   });
 
   const result = matchingRule ? matchingRule.PageRange.ValueName : null;
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 findPageRange result:", result);
   }
   return result;
 };
@@ -135,29 +128,18 @@ export const isDoubleSidedAvailable = (
 ): boolean => {
   if (!pricingRules || pricingRules.length === 0) {
     if (process.env.NODE_ENV === 'development') {
-      console.log("❌ No pricing rules available - temporarily allowing all options");
     }
     return true; // Temporarily allow all options when no pricing rules
   }
 
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 Available pricing rules:", pricingRules.map(rule => ({
-      size: rule.PaperSize?.ValueName,
-      color: rule.ColorType?.ValueName,
-      pageRange: rule.PageRange?.ValueName,
-      price: rule.PricePerPage
-    })));
+
     
     // Check specifically for 13*19 rules
     const thirteenNineteenRules = pricingRules.filter(rule => 
       rule.PaperSize?.ValueName?.toLowerCase().includes('13')
     );
-    console.log("🔍 13*19 specific rules:", thirteenNineteenRules.map(rule => ({
-      size: rule.PaperSize?.ValueName,
-      color: rule.ColorType?.ValueName,
-      pageRange: rule.PageRange?.ValueName,
-      price: rule.PricePerPage
-    })));
+
   }
 
   // Normalize size names for better matching
@@ -182,25 +164,14 @@ export const isDoubleSidedAvailable = (
   const totalSheets = sheetCount * noOfCopies;
   
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 isDoubleSidedAvailable inputs:", {
-      selectedSize,
-      normalizedSelectedSize,
-      selectedColor,
-      pageCount,
-      sheetCount,
-      noOfCopies,
-      totalSheets
-    });
+
   }
   
   // For 13*19 double side: check if total sheets >= 100
   if (selectedSize.toLowerCase().includes('13') && selectedSize.toLowerCase().includes('double')) {
     if (totalSheets < 100) {
       if (process.env.NODE_ENV === 'development') {
-        console.log("❌ 13*19 double side not available: total sheets < 100", {
-          totalSheets,
-          minimum: 100
-        });
+ 
       }
       return false;
     }
@@ -209,10 +180,7 @@ export const isDoubleSidedAvailable = (
   // For 13*19 single side: not available for B/W
   if (selectedSize.toLowerCase().includes('13') && !selectedSize.toLowerCase().includes('double') && selectedColor === "BlackAndWhite") {
     if (process.env.NODE_ENV === 'development') {
-      console.log("❌ 13*19 single side not available for B/W", {
-        selectedSize,
-        selectedColor
-      });
+
     }
     return false;
   }
@@ -225,23 +193,17 @@ export const isDoubleSidedAvailable = (
   const matchedPageRange = findPageRange(sheetCount, pricingRules);
   
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 Checking double-sided availability:", {
-      originalPageCount: pageCount,
-      sheetCount: sheetCount,
-      matchedPageRange: matchedPageRange
-    });
+
   }
   
   if (!matchedPageRange) {
     // No page range found for this sheet count - hide the option
     if (process.env.NODE_ENV === 'development') {
-      console.log("❌ No page range found for sheet count:", sheetCount);
     }
     
     // If no pricing rules exist at all, show the option for debugging
     if (pricingRules.length === 0) {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔍 No pricing rules found - showing option for debugging");
       }
       return true;
     }
@@ -326,7 +288,6 @@ export const findPricingRule = (
 ) => {
 
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No pricing rules available.");
     return null;
   }
 
@@ -349,28 +310,16 @@ export const findPricingRule = (
   
   // Only log in development mode to improve performance
   if (process.env.NODE_ENV === 'development') {
-    console.log("🔍 Searching for pricing rule:");
-    console.log("Selected Size:", selectedSize);
-    console.log("Normalized Size:", normalizedSelectedSize);
-    console.log("Selected Color:", selectedColor);
-    console.log("Page Count:", pageCount);
-    console.log("📋 Available rules:", pricingRules.map(rule => ({
-      size: rule.PaperSize?.ValueName,
-      color: rule.ColorType?.ValueName,
-      pageRange: rule.PageRange?.ValueName,
-      price: rule.PricePerPage
-    })));
+
   }
 
   // Find the correct page range based on user input
   const matchedPageRange = findPageRange(pageCount, pricingRules);
   
   if (process.env.NODE_ENV === 'development') {
-    console.log("Matched Page Range:", matchedPageRange);
   }
 
   if (!matchedPageRange) {
-    console.warn(`No matching page range found for ${pageCount} pages.`);
     return null;
   }
 
@@ -387,15 +336,11 @@ export const findPricingRule = (
       
       // Only log in development mode
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Rule check: ${ruleSize} === ${normalizedSelectedSize} (${sizeMatch}), ${ruleColor} === ${selectedColor} (${colorMatch}), ${rulePageRange} === ${matchedPageRange} (${pageRangeMatch})`);
         if (!sizeMatch) {
-          console.log(`❌ Size mismatch: "${ruleSize}" vs "${normalizedSelectedSize}"`);
         }
         if (!colorMatch) {
-          console.log(`❌ Color mismatch: "${ruleColor}" vs "${selectedColor}"`);
         }
         if (!pageRangeMatch) {
-          console.log(`❌ Page range mismatch: "${rulePageRange}" vs "${matchedPageRange}"`);
         }
       }
       
@@ -406,13 +351,11 @@ export const findPricingRule = (
 
 
   if (process.env.NODE_ENV === 'development') {
-    console.log("Matched Pricing Rule:", rule);
   }
 
   if (!rule) {
     // Only show detailed debugging in development
     if (process.env.NODE_ENV === 'development') {
-      console.warn("No matching pricing rule found.");
     }
     
     // No fallback pricing - only use exact matches
@@ -423,21 +366,16 @@ export const findPricingRule = (
     const sheetCount = Math.ceil(pageCount / 2);
     
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔄 Double-sided calculation:", {
-        originalPageCount: pageCount,
-        sheetCount: sheetCount
-      });
+
     }
     
     // Find the correct page range based on sheet count (same process as single-sided)
     const matchedPageRange = findPageRange(sheetCount, pricingRules);
     
     if (process.env.NODE_ENV === 'development') {
-      console.log("Matched Page Range for sheets:", matchedPageRange);
     }
 
     if (!matchedPageRange) {
-      console.warn(`No matching page range found for ${sheetCount} sheets.`);
       return null;
     }
 
@@ -453,7 +391,6 @@ export const findPricingRule = (
         const pageRangeMatch = rulePageRange === matchedPageRange;
         
         if (process.env.NODE_ENV === 'development') {
-          console.log(`Double-sided rule check: ${ruleSize} === ${normalizedSelectedSize} (${sizeMatch}), ${ruleColor} === ${selectedColor} (${colorMatch}), ${rulePageRange} === ${matchedPageRange} (${pageRangeMatch})`);
         }
         
         return sizeMatch && colorMatch && pageRangeMatch;
@@ -461,21 +398,15 @@ export const findPricingRule = (
     ) || null;
 
     if (rule) {
-      console.log("✅ Found double-sided pricing rule:", rule);
       return rule;
     } else {
-      console.log("❌ No double-sided pricing rule found");
       return null;
     }
   }
 
   // No hardcoded fallbacks - only use actual pricing rules
   if (process.env.NODE_ENV === 'development') {
-    console.log("❌ No pricing rule found for:", {
-      selectedSize,
-      selectedColor,
-      pageCount
-    });
+
     }
     
     return null;
@@ -501,7 +432,6 @@ export const findPricingRule = (
   };
   
   if (process.env.NODE_ENV === 'development') {
-    console.log("extracted Attribute IDs & Value Names:", extractedData);
   }
   
   return extractedData;
@@ -514,7 +444,6 @@ export const checkMissingPricingRules = (
 ) => {
   if (!pricingRules || !availableSizes) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn("Cannot check missing pricing rules - insufficient data");
     }
     return;
   }
@@ -541,11 +470,9 @@ export const checkMissingPricingRules = (
 
   if (missingSizes.length > 0) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn("🚨 Missing pricing rules for sizes:", missingSizes);
     }
   } else {
     if (process.env.NODE_ENV === 'development') {
-      console.log("✅ All UI sizes have corresponding pricing rules");
     }
   }
 
@@ -562,14 +489,9 @@ export const findAddonPrice = (
   selectedColor: string,
   pageCount: number
 ) => {
-  console.log("Starting addonPriceFinder...");
-  console.log("Binding Type:", selectedBindingType);
-  console.log("Selected Size:", selectedSize);
-  console.log("Selected Color:", selectedColor);
-  console.log("Page Count:", pageCount);
+
 
   if (!addons || addons.length === 0) {
-    console.warn("No addons available.");
     return null;
   }
 
@@ -577,7 +499,6 @@ export const findAddonPrice = (
   const addon = addons.find((addon) => addon.AddonName === selectedBindingType);
 
   if (!addon) {
-    console.warn(`No addon found for binding type: ${selectedBindingType}`);
     return null;
   }
 
@@ -586,10 +507,8 @@ export const findAddonPrice = (
 
   // Find the correct page range
   const pageRange = findAddonPageRange(pageCount, Rules); // ✅ Pass AddonRule[]
-  console.log("Matched Page Range:", pageRange);
 
   if (!pageRange) {
-    console.warn("No matching page range found.");
     return null;
   }
 
@@ -601,10 +520,8 @@ export const findAddonPrice = (
       rule.PageRange === pageRange // ✅ Match the calculated pageRange
   ) || null;
 
-  console.log("Matched Addon Rule:", matchedRule);
 
   if (!matchedRule) {
-    console.warn("No matching addon rule found.");
     return null;
   }
     //const numericPrice = parseFloat(matchedRule.Price.split("/")[0]);
@@ -621,7 +538,6 @@ export const findPhotoFramePricingRule = (
   selectedQuantity: string
 ) => {
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No photo frame pricing rules available.");
     return null;
   }
 
@@ -678,7 +594,6 @@ export const findPhotoFramePricingRule = (
     };
   }
 
-  console.warn("No exact match found for selected size and quantity.");
   return null;
 };
 
@@ -691,7 +606,6 @@ export const findBusinessCardPricingRule = (
   selectedFinish: string,
 ) => {
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No business card pricing rules available.");
     return null;
   }
 
@@ -703,7 +617,6 @@ export const findBusinessCardPricingRule = (
         rule.Finish?.ValueName === selectedFinish,
     ) || null;
 
-  console.log("Matched Business Card Pricing Rule:", rule);
   if (!rule) {
     return null; // Return null if no rule is found
   }
@@ -721,7 +634,6 @@ export const findBusinessCardPricingRule = (
       ValueID: rule.Finish?.ValueID || 0,
     },
   };
-  console.log("Extracted Attribute IDs & Value Names:", extractedData);
   return extractedData;
 };
 
@@ -733,7 +645,6 @@ export const findOffsetPrintingPricingRule = (
   selectedQuality: string,
 ) => {
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No Offset Printing pricing rules available.");
     return null;
   }
 
@@ -744,7 +655,6 @@ export const findOffsetPrintingPricingRule = (
         rule.Quality?.ValueName.trim() === selectedQuality.trim() &&
         rule.Quantity?.ValueName.trim() === "1000",    ) || null;
 
-  console.log("✅ Matched Offset Printing Pricing Rule:", rule);
   if (!rule) {
     return null; // Return null if no rule is found
   }
@@ -766,7 +676,6 @@ export const findOffsetPrintingPricingRule = (
        ValueID: rule.Quantity?.ValueID || 0,
       },
   };
-  console.log("extracted Attribute IDs & Value Names:", extractedData);
   return extractedData;
 };
 
@@ -780,16 +689,10 @@ export const findLetterHeadPricingRule = (
 ): LetterHeadPricingRule | null => {
   // Ensure correct return type
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No Letterhead pricing rules available.");
     return null;
   }
 
-  console.log("🔍 findLetterHeadPricingRule called with:");
-  console.log("selectedService:", selectedService);
-  console.log("selectedSize:", selectedSize);
-  console.log("selectedQuantity:", selectedQuantity);
-  console.log("selectedQuality:", selectedQuality);
-  console.log("Available pricing rules:", pricingRules);
+
 
   // Map selected service to possible pricing rule values
   const getServiceMapping = (service: string) => {
@@ -803,9 +706,6 @@ export const findLetterHeadPricingRule = (
   const possibleServices = getServiceMapping(selectedService);
 
   if (selectedService === "B/W" && selectedQuantity < 500) {
-    console.warn(
-      "B/W printing is only available for quantities of 500 or more.",
-    );
     return null; // No valid pricing rule if below 500 quantity
   }
 
@@ -818,28 +718,16 @@ export const findLetterHeadPricingRule = (
         const sizeMatch = rule.Size?.ValueName.trim().toLowerCase() === selectedSize.trim().toLowerCase();
         const qualityMatch = rule.Quality?.ValueName.trim().toLowerCase() === selectedQuality.trim().toLowerCase();
         const quantityMatch = rule.Quantity?.ValueName.trim() === selectedQuantity.toString().trim();
-        
-        console.log("🔍 Rule comparison:");
-        console.log("Service:", rule.Service?.ValueName.trim(), "in", possibleServices, "=", serviceMatch);
-        console.log("Size:", rule.Size?.ValueName.trim(), "===", selectedSize.trim(), "=", sizeMatch);
-        console.log("Quality:", rule.Quality?.ValueName.trim(), "===", selectedQuality.trim(), "=", qualityMatch);
-        console.log("Quantity:", rule.Quantity?.ValueName.trim(), "===", selectedQuantity.toString().trim(), "=", quantityMatch);
+  
         
         return serviceMatch && sizeMatch && qualityMatch && quantityMatch;
       }
     ) || null;
 
-  console.log("✅ Matched Letterhead Pricing Rule:", rule);
 
   if (!rule) {
-    console.error("❌ No matching rule found. Available rules:");
     pricingRules.forEach((rule, index) => {
-      console.log(`Rule ${index}:`, {
-        Service: rule.Service?.ValueName,
-        Size: rule.Size?.ValueName,
-        Quality: rule.Quality?.ValueName,
-        Quantity: rule.Quantity?.ValueName
-      });
+
     });
     return null; // Return null if no rule is found
   }
@@ -869,7 +757,6 @@ export const findLetterHeadPricingRule = (
     },
   };
 
-  console.log("✅ Extracted Attribute IDs & Value Names:", extractedData);
   return extractedData;
 };
 
@@ -879,13 +766,10 @@ export const findPolaroidCardPricingRule = (
   selectedQuantity: string | number,
 ): PolaroidCardPricingRule | null => {
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No Polaroid Card pricing rules available.");
     return null;
   }
 
-  console.log("Checking Against Selected Values:");
-  console.log("| Size:", selectedSize, "| Quantity:", selectedQuantity);
-  console.log("Available Pricing Rules:", pricingRules);
+
 
   // Ensure `selectedQuantity` is a number
   const selectedQty =
@@ -893,7 +777,6 @@ export const findPolaroidCardPricingRule = (
       ? Number(selectedQuantity)
       : selectedQuantity;
   if (isNaN(selectedQty)) {
-    console.error("❌ Invalid quantity format:", selectedQuantity);
     return null;
   }
 
@@ -910,10 +793,8 @@ export const findPolaroidCardPricingRule = (
       );
     }) || null;
 
-  console.log("✅ Matched Polaroid Card Pricing Rule:", rule);
 
   if (!rule) {
-    console.warn("❌ No matching rule found.");
     return null;
   }
 
@@ -932,7 +813,6 @@ export const findPolaroidCardPricingRule = (
     },
   };
 
-  console.log("📦 Extracted Pricing Rule Data:", extractedData);
   return extractedData;
 };
 
@@ -942,13 +822,9 @@ export const findNameSlipPricingRule = (
   selectedQuantity: number, // ✅ Now taking quantity as a number
 ) => {
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No NameSlip pricing rules available.");
     return null;
   }
 
-  console.log("Checking Against Selected Values:");
-  console.log("| Size:", selectedSize, "| Quantity:", selectedQuantity);
-  console.log("Available Pricing Rules:", pricingRules);
 
   const rule =
     pricingRules.find((rule) => {
@@ -963,7 +839,6 @@ export const findNameSlipPricingRule = (
       );
     }) || null;
 
-  console.log("✅ Matched NameSlip Pricing Rule:", rule);
 
   if (!rule) return null; // 🔹 Return null if no rule is found
 
@@ -982,7 +857,6 @@ export const findNameSlipPricingRule = (
     },
   };
 
-  console.log("Extracted Pricing Rule Data:", extractedData);
   return extractedData;
 };
 
@@ -993,12 +867,10 @@ export const findCanvasPricingRule = (
   sqftRange: number
 ) => {
   if (!pricingRules || pricingRules.length === 0) {
-    console.warn("No Canvas pricing rules available.");
     return null;
   }
 
-  console.log("Checking Against Square Feet Value:", sqftRange);
-  console.log("Available Pricing Rules:", pricingRules);
+
 
   const rule =
     pricingRules.find((rule) => {
@@ -1029,7 +901,6 @@ export const findCanvasPricingRule = (
       return false;
     }) || null;
 
-  console.log("✅ Matched Canvas Pricing Rule:", rule);
 
   if (!rule) return null;
 
@@ -1042,6 +913,5 @@ export const findCanvasPricingRule = (
     },
   };
 
-  console.log("Extracted Pricing Rule Data:", extractedData);
   return extractedData;
 };

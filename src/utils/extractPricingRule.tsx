@@ -14,7 +14,6 @@ export const extractPhotoFramePricingRules = (
   pricingRules: any[],
 ) : PhotoFramePricingRule[] => {
   
-  // console.log("Raw PricingRules Data:", pricingRules);
  
   const extractedRules =
     pricingRules
@@ -32,14 +31,12 @@ export const extractPhotoFramePricingRules = (
         Price: rule.Price || 0, 
       })) || [];
       
-      // console.log("Extracted Photo Frame Pricing Rules:", extractedRules);
       return extractedRules;
 };
 
 export const extractBusinessCardPricingRules = (
   pricingRules: any[],
 ) : BusinessCardPricingRule[] => {
-  // console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -56,7 +53,6 @@ export const extractBusinessCardPricingRules = (
       Price: rule.Price || 0, // Defaulting price if not available
     })) || [];
     
-  // console.log("Extracted Business Card Pricing Rules:", extractedRules);
   return extractedRules;
 };
 
@@ -66,7 +62,6 @@ export const extractPaperPrintingPricingRules = (
   addons: any[]
 ): PaperPrintingPricingRule[] => {
   if (!pricingRules || !Array.isArray(pricingRules)) {
-    console.warn("Invalid pricing rules input:", pricingRules);
     return [];
   }
 
@@ -76,7 +71,6 @@ export const extractPaperPrintingPricingRules = (
       .filter((addon) => {
         // Ensure addon.Rules exists and is an array
         if (!addon.Id ||!addon.Rules || !Array.isArray(addon.Rules)) {
-          console.warn("Invalid addon.Rules for addon:", addon);
           return false;
         }
         return true;
@@ -120,14 +114,12 @@ export const extractPaperPrintingPricingRules = (
     };
   });
 
-  console.log("Extracted PaperPrint Pricing Rules with Addons:", extractedRules);
   return extractedRules;
 };
 
 export const extractOffsetPrintingPricingRules = (
   pricingRules: any[],
 ): OffsetPrintingPricingRule[] => {
-  console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -149,14 +141,12 @@ export const extractOffsetPrintingPricingRules = (
       Price: rule.Price || 0,
     })) || [];
 
-  console.log("Extracted Offset Printing Pricing Rules:", extractedRules);
   return extractedRules;
 };
 
 export const extractLetterHeadPricingRules = (
   pricingRules: any[],
 ): LetterHeadPricingRule[] => {
-  console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -186,14 +176,12 @@ export const extractLetterHeadPricingRules = (
       Price: rule.Price || 0,
     })) || [];
 
-  console.log("Extracted Letterhead Pricing Rules:", extractedRules);
   return extractedRules;
 };
 
 export const extractPolaroidPricingRules = (
   pricingRules: any[],
 ): PolaroidCardPricingRule[] => {
-  console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -210,14 +198,12 @@ export const extractPolaroidPricingRules = (
       Price: rule.Price || 0,
     })) || [];
 
-  console.log("Extracted Polaroid Pricing Rules:", extractedRules);
   return extractedRules;
 };
 
 export const extracNameSlipPricingRules = (
   pricingRules: any[],
 ): NameSlipPricingRule[] => {
-  console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -234,14 +220,12 @@ export const extracNameSlipPricingRules = (
       Price: rule.Price || 0,
     })) || [];
 
-  console.log("Extracted Polaroid Pricing Rules:", extractedRules);
   return extractedRules;
 };
 
 export const extractCanvasPricingRules = (
   pricingRules: any[]
 ): CanvasPricingRule[] => {
-  console.log("Raw PricingRules Data:", pricingRules);
 
   const extractedRules =
     pricingRules?.map((rule) => ({
@@ -253,7 +237,6 @@ export const extractCanvasPricingRules = (
       PricePerSquareFoot : rule.PricePerSquareFoot  || 0, // FIXED: Correct key
     })) || [];
 
-  console.log("Extracted Canvas Pricing Rules:", extractedRules);
   return extractedRules;
 };
 

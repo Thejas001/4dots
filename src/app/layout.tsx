@@ -32,7 +32,6 @@ export default function RootLayout({
     const pendingCartItem = sessionStorage.getItem("pendingCartItem");
     
     if (token && pendingCartItem) {
-      console.log("🔄 Processing pending cart item after login...");
       processPendingCartItem(setCartData);
     }
 
@@ -40,7 +39,6 @@ export default function RootLayout({
     const handleUserLogin = () => {
       const pendingCartItem = sessionStorage.getItem("pendingCartItem");
       if (pendingCartItem) {
-        console.log("🔄 Processing pending cart item after login (custom event)...");
         // Add a small delay to ensure page navigation completes
         setTimeout(() => {
           processPendingCartItem(setCartData);
@@ -54,7 +52,6 @@ export default function RootLayout({
         // JWT token was just added (user logged in)
         const pendingCartItem = sessionStorage.getItem("pendingCartItem");
         if (pendingCartItem) {
-          console.log("🔄 Processing pending cart item after login (storage event)...");
           processPendingCartItem(setCartData);
         }
       }

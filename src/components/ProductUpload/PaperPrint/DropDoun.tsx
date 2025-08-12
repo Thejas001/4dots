@@ -44,7 +44,6 @@ const DropDown = ({
     );
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🔍 Checking double-sided availability for ${option}:`, isAvailable);
     }
     
     return isAvailable;
@@ -52,8 +51,6 @@ const DropDown = ({
   
   // Debug logging for available sizes
   if (process.env.NODE_ENV === 'development') {
-    console.log("📋 All size options:", allSizeOptions);
-    console.log("📋 Filtered size options:", sizeOptions);
   }
   const copiesOptions = ["1", "2", "3", "4", "5"];
 
@@ -96,7 +93,6 @@ const DropDown = ({
                   
                   // Debug logging for selected size
                   if (process.env.NODE_ENV === 'development') {
-                    console.log("🎯 Selected size:", option);
                   }
                 }}
               >

@@ -118,22 +118,9 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       );
       
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔍 getSizePrice for", size, ":", {
-          mappedColor,
-          totalSheets,
-          pricingRule: pricingRule ? "Found" : "Not found",
-          pricePerPage: pricingRule?.PricePerPage
-        });
         
         // Additional debugging for 13*19
         if (size.toLowerCase().includes('13')) {
-          console.log("🔍 13*19 getSizePrice details:", {
-            size,
-            pageCount,
-            noOfCopies,
-            totalSheets,
-            pricingRuleFound: !!pricingRule
-          });
         }
       }
       
@@ -214,7 +201,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   };
 
   const handleBindingTypeChange = (bindingType: string) => {
-    console.log("Selected Binding Type:", bindingType);
     setSelectedBindingType(bindingType);
   };
 
@@ -227,7 +213,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   };
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
-    console.log("Received Document ID from child:", documentId);
     setUploadedDocumentId(documentId);
     if (file) {
       // Clean up previous URL if it exists
@@ -254,12 +239,10 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
   // Function to get the correct pricing rule
   useEffect(() => {
-    console.log("useEffect triggered");
     if (!productDetails || !selectedSize || !selectedOption || !pageCount)
       return;
 
     if (errorMessage) {
-      console.warn("Pricing rule not fetched due to validation error.");
       return;
     }
 
@@ -273,12 +256,9 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     );
 
     setSelectedPricingRule(pricingRule);
-    console.log("**********PricingRule**********", pricingRule);
 
     if (pricingRule) {
-      console.log("Matched Pricing Rule:", pricingRule);
     } else {
-      console.warn("No matching pricing rule found.");
     }
 
     const combinedAddons = getCombinedAddons(productDetails.Addons);
@@ -302,7 +282,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       : null;
 
     setSelectedAddonRule(addonRule);
-    console.log("Addon Rule:", addonRule);
   }, [selectedSize, selectedOption, productDetails, pageCount, errorMessage, selectedBindingType, selectedLaminationType]);
 
   // Check for missing pricing rules on component load
@@ -314,8 +293,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       );
       
       if (missingSizes && missingSizes.length > 0) {
-        console.error("🚨 Missing pricing rules detected for sizes:", missingSizes);
-        console.error("Please ensure these sizes have pricing rules configured in the backend.");
       }
     }
   }, [productDetails]);
@@ -430,7 +407,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       // Show popup for logged-in users instead of directly going to cart
       setShowCartPopUp(true);
     } catch (error) {
-      console.error("Failed to add to cart:", error);
     }
     setIsLoading(false);
   };
@@ -488,7 +464,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
           toast.success("Product added to cart successfully!");
       router.push("/Cart");
     } catch (error) {
-      console.error("Failed to add to cart:", error);
     }
     setIsLoading(false);
   };
@@ -573,11 +548,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     const allSizes = productDetails.sizes || [];
     
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔍 Product details:", {
-        sizes: allSizes,
-        pricingRules: productDetails.PaperPrintingPricingRules,
-        pricingRulesLength: productDetails.PaperPrintingPricingRules?.length
-      });
+
     }
     
     // Filter sizes based on conditions
@@ -585,10 +556,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       // For 13*19 single side: hide when print type is B/W
       if (size.toLowerCase().includes('13') && !size.toLowerCase().includes('double') && selectedOption === "B/W") {
         if (process.env.NODE_ENV === 'development') {
-          console.log("🔍 13*19 single side B/W: hiding (not available for B/W)", {
-            size,
-            selectedOption
-          });
         }
         return false; // Hide 13*19 single side for B/W
       }
@@ -607,10 +574,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     // ❗ Hide for B/W completely
     if (selectedOption === "B/W") {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔍 13*19 double side B/W: hiding (not available for B/W)", {
-          size,
-          selectedOption
-        });
       }
       return false;
     }
@@ -620,13 +583,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     const shouldShow = totalSheets >= 100;
     
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔍 13*19 double side check:", {
-        size,
-        pageCount,
-        noOfCopies,
-        totalSheets,
-        shouldShow
-      });
     }
     
     return shouldShow;
@@ -643,7 +599,6 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   );
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(`🔍 Checking double-sided availability for ${size}:`, isAvailable);
   }
 
   return isAvailable;

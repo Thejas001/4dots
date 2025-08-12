@@ -207,7 +207,6 @@ useEffect(() => {
       incrementCart();
       setShowCartPopUp(true);
     } catch (error) {
-      console.error("Error adding to cart:", error);
       showErrorToast("Failed to add to cart");
     } finally {
       setIsLoading(false);

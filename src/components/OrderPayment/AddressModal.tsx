@@ -49,11 +49,9 @@ const AddressModal = ({ isOpen, onClose, onAddressAdded }: AddressModalProps) =>
     setIsSubmitting(true);
     try {
       const response = await addUserAddress(formData);
-      console.log("Address added successfully:", response); // Log the response
       onClose();
       if (onAddressAdded) onAddressAdded();
     } catch (error) {
-      console.error("Failed to add address:", error);
       alert("Failed to add address. Please try again.");
     } finally {
       setIsSubmitting(false);
