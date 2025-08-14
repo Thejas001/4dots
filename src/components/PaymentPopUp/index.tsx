@@ -1,7 +1,7 @@
 // PaymentPopUp/index.tsx
 
 import React, {useState} from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface PaymentPopUpProps {
   status: "success" | "failed";
@@ -18,6 +18,7 @@ interface PaymentPopUpProps {
 const PaymentPopUp: React.FC<PaymentPopUpProps> = ({ status, onClose, product }) => {
   const isSuccess = status === "success";
   const [showDesignModal, setShowDesignModal] = useState(false);
+  const router = useRouter();
 
   const handleViewDesign = (item: {
     Documents?: { ContentType: string; DocumentUrl: string }[];
@@ -31,82 +32,70 @@ const PaymentPopUp: React.FC<PaymentPopUpProps> = ({ status, onClose, product })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-[320px] text-center relative">
-        {/* Status Icon (PURE PATH SVGs) */}
-        <div className="flex justify-center mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-[340px] sm:w-[420px] text-center relative">
+        <div className={`mx-auto mb-4 sm:mb-6 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-inner ${isSuccess ? 'bg-green-50' : 'bg-red-50'}`}>
           {isSuccess ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-green-500" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-                   10-4.48 10-10S17.52 2 12 2zm-1.41 14.59L6.7 12.7l1.41-1.41
-                   2.48 2.48 5.3-5.3 1.41 1.41-6.71 6.71z"
-                fill="currentColor"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" viewBox="0 0 24 24" fill="none">
+              <path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10Z" fill="currentColor" opacity="0.15"/>
+              <path d="M16.59 8.59 10 15.17l-2.59-2.58L6 14l4 4 8-8-1.41-1.41Z" fill="currentColor"/>
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-red-500" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-                   10-4.48 10-10S17.52 2 12 2zm4.24 13.66L13.66 12l2.59-2.59L15.24 8
-                   12 11.24 8.76 8 7.17 9.41 9.76 12l-2.59 2.59L8.76 16
-                   12 12.76 15.24 16l1.41-1.41z"
-                fill="currentColor"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" viewBox="0 0 24 24" fill="none">
+              <path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10Z" fill="currentColor" opacity="0.15"/>
+              <path d="M15.54 8.46 12 12l-3.54-3.54L7.04 9.88 10.59 13.41 7.05 16.95 8.46 18.36 12 14.83l3.54 3.53 1.41-1.41-3.53-3.54 3.53-3.53-1.41-1.42Z" fill="currentColor"/>
             </svg>
           )}
         </div>
 
-        {/* Status Text */}
-        <h2 className="text-lg font-medium mb-2">
-          {isSuccess ? "Payment Success" : "Payment Failed"}
+        <h2 className={`text-xl sm:text-2xl font-extrabold mb-2 ${isSuccess ? 'text-green-700' : 'text-red-700'}`}>
+          {isSuccess ? 'Payment Successful' : 'Payment Failed'}
         </h2>
+        <p className="text-sm text-gray-600 mb-6">
+          {isSuccess ? 'Thank you! Your payment has been processed.' : 'Something went wrong while processing the payment.'}
+        </p>
 
-        {/* Product Info */}
-        <div className="text-black text-base font-semibold mb-1">{product.name}</div>
-        <div className="text-sm mb-1">
-          Selected Size: <span className="font-medium">{product.size}</span>
-        </div>
-        <div className="text-sm mb-1">
-          Quantity: <span className="font-medium">{product.quantity} pcs</span>
-        </div>
-
-
-        {/* Action Buttons */}
         {isSuccess ? (
-          <div className="flex flex-col gap-2">
-            <Link href="/Order" className="block w-full bg-black text-white py-2 rounded-full font-semibold">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button 
+              onClick={() => {
+                onClose();
+                router.push("/Order");
+              }}
+              className="flex-1 bg-black text-white py-2.5 rounded-full font-semibold text-sm sm:text-base text-center"
+            >
               View Your Order
-            </Link>
-            <Link href="/" className="block w-full bg-gray-200 text-black py-2 rounded-full font-semibold">
+            </button>
+            <button 
+              onClick={() => {
+                onClose();
+                router.push("/");
+              }}
+              className="flex-1 bg-gray-200 text-black py-2.5 rounded-full font-semibold text-sm sm:text-base text-center"
+            >
               Go to Home
-            </Link>
+            </button>
           </div>
         ) : (
-          <>
-            <Link href="/Order" className="block w-full bg-black text-white py-2 rounded-full font-semibold">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button 
+              onClick={() => {
+                onClose();
+                router.push("/Order");
+              }}
+              className="flex-1 bg-black text-white py-2.5 rounded-full font-semibold text-sm sm:text-base text-center"
+            >
               Go to Order
-            </Link>
-            <Link href="/" className="block w-full bg-gray-200 text-black py-2 rounded-full font-semibold">
+            </button>
+            <button 
+              onClick={() => {
+                onClose();
+                router.push("/");
+              }}
+              className="flex-1 bg-gray-200 text-black py-2.5 rounded-full font-semibold text-sm sm:text-base text-center"
+            >
               Go to Home
-            </Link>
-          </>
-        )}
-        {showDesignModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded shadow-lg max-w-lg w-full relative">
-              <button
-                onClick={() => setShowDesignModal(false)}
-                className="absolute top-2 right-2 text-lg"
-              >
-                &times;
-              </button>
-              {product.designLink.endsWith(".pdf") ? (
-                <embed src={product.designLink} type="application/pdf" width="100%" height="500px" />
-              ) : (
-                <img src={product.designLink} alt="Uploaded Design" className="max-w-full max-h-[500px] mx-auto" />
-              )}
-            </div>
+            </button>
           </div>
         )}
       </div>
