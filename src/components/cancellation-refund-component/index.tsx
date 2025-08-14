@@ -51,13 +51,18 @@ const ReturnRefundComponent = () => {
               number: "1",
               iconColor: "text-red-500",
               title: "Non-Refundable Items",
-              description: "Since each nameslip is custom printed and cannot be reused, cancellations or refunds are not possible once the printing process has started."
+              description: "No refunds will be issued for printed orders, as these products are custom-made and cannot be reused."
             }, {
               number: "2",
               iconColor: "text-orange-500",
+              title: "Cancellation",
+              description: "Cancellations can only be made before printing begins. Once production has started, the order cannot be cancelled or refunded."
+            }, {
+              number: "3",
+              iconColor: "text-orange-500",
               title: "Damaged Items",
-              description: "In the rare case of damage during shipping or a printing error from our side, we will reprint and resend the nameslips at no extra cost. Proof of damage must be shared within 24 hours of delivery."
-            },  ].map((item, idx) => (
+              description: "In case of damage during shipping, customers must inform us within 48 hours of delivery with photographic proof for assessment."
+            }, ].map((item, idx) => (
               
               <div className="py-12 px-6 flex items-start gap-6 max-w-4xl mx-auto text-left" key={idx}>
                 <div className="min-w-[64px] min-h-[64px] flex items-center justify-center border-2 border-black rounded-xl text-2xl font-bold">

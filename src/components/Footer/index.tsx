@@ -150,16 +150,16 @@ const Footer = () => {
         {/* Secure Payments - image placeholders */}
         <div className="mt-12 px-6 md:px-16">
           <h4 className="text-center text-2xl md:text-3xl font-extrabold tracking-wider">100% SECURE PAYMENTS</h4>
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          <div className="mt-8 grid grid-cols-8 gap-2 sm:gap-3 max-w-4xl mx-auto">
             {paymentMethods.map((method) => (
-              <div key={method.name} className="rounded-2xl h-20 sm:h-24 flex items-center justify-center">
-                <img
-                  src={method.src}
-                  alt={method.alt ?? method.name}
-                  className={`max-h-12 sm:max-h-16 object-contain ${
-                    method.name !== 'Visa Electron' ? 'rounded-[5px]' : ''
-                  }`}
-                />
+              <div key={method.name} className="flex items-center justify-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white overflow-hidden flex items-center justify-center shadow">
+                  <img
+                    src={method.src}
+                    alt={method.alt ?? method.name}
+                    className="w-7 h-7 sm:w-9 sm:h-9 object-contain"
+                  />
+                </div>
               </div>
             ))}
           </div>

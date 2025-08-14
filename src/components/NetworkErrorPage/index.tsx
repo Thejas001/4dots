@@ -123,7 +123,7 @@ const NetworkErrorPage = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.6 }}
           >
-            <p>Need assistance? Contact <span className="text-gray-700">support@domain.com</span></p>
+            <p>Need assistance? Contact <span className="text-gray-700">4dotsclt@gmail.com</span></p>
           </motion.div>
         </motion.div>
       </div>

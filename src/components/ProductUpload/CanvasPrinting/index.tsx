@@ -144,7 +144,7 @@ const ProductUpload = ({ product }: { product: any }) => {
           await addToCartCanvasPrinting(dataId, selectedPricingRule!, Number(sqftRange), uploadedDocumentId ?? undefined);
           incrementCart();
           toast.success("Product added to cart!");
-          router.push("/"); // ✅ Redirect to Cart page after adding
+          setShowCartPopUp(true);
         } catch (error) {
           alert("Failed to add to cart. Please try again.");
         }
