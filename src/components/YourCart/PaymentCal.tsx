@@ -18,8 +18,8 @@ const PaymentCal: React.FC<PaymentCalProps> = ({cartItemIds, totalPrice, deliver
   // Placeholder product info (replace with real data as needed)
   const product = {
     name: "Product Name",
-    size: "A4",
-    quantity: 1,
+    size: "",
+    quantity: 0,
     color: "#000000",
     designLink: "#",
   };

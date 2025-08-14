@@ -29,6 +29,7 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
       sqftRange, 
       pageCount, 
       selectedBindingType, 
+      selectedBinderColor, // ✅ Add binder color extraction
       selectedAddonRule, 
       addonBookCount,
       uploadedDocumentId,
@@ -129,10 +130,12 @@ export const processPendingCartItem = async (setCartData: (cart: any) => void) =
           pageCount,
           noOfCopies,
           selectedBindingType,
-          undefined,
+          selectedBinderColor, // ✅ Add the binder color parameter
+          undefined, // selectedLaminationType
           selectedAddonRule,
           addonBookCount,
-          uploadedDocumentId
+          uploadedDocumentId,
+          parsedItem.calculatedPrice
         );
         break;
       default:

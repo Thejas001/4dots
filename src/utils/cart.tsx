@@ -324,16 +324,19 @@ export const addToCartPaperPrint = async (
   pricingRule: {
     PaperSize: { AttributeID: number; ValueID: number };
     ColorType: { AttributeID: number; ValueID: number };
+    PageRange: { AttributeID: number; ValueID: number };
     PricePerPage: number;
   },
   pageCount: number,
   noOfCopies: number,
   selectedBindingType?: string,
+  selectedBinderColor?: string,
   selectedLaminationType?: string,
   addonRule?: any,
   addonBookCount?: number,
   
   documentId?: number,
+  calculatedPrice?: number,
 ) => {
 
   // ✅ Map binding type to AddonID
@@ -358,9 +361,30 @@ const resolvedLaminationAddonId = selectedLaminationType
   : null; // explicitly set to null if undefined
 
 
+  const dynamicAttributes = [
+    {
+      AttributeName: "PageCount",
+      AttributeValue: pageCount.toString(),
+    },
+    {
+      AttributeName: "NumberOfCopies",
+      AttributeValue: noOfCopies.toString(), // Convert to string as per API format
+    }
+  ];
+
+  // ✅ Include binder color only for Hard Binding when provided
+  if (selectedBindingType === "Hard Binding") {
+    // If no specific color is selected, default to "Black"
+    const binderColor = selectedBinderColor || "Black";
+    dynamicAttributes.push({
+      AttributeName: "BinderColor",
+      AttributeValue: binderColor,
+    });
+  }
+
   const cartItem: CartItems = {
     ProductID: productId,
-    Price: pricingRule.PricePerPage,
+    Price: typeof calculatedPrice === 'number' ? calculatedPrice : pricingRule.PricePerPage,
     Attributes: [
       {
         AttributeId: pricingRule.PaperSize.AttributeID,
@@ -369,6 +393,10 @@ const resolvedLaminationAddonId = selectedLaminationType
       {
         AttributeId: pricingRule.ColorType.AttributeID,
         AttributeValueId: pricingRule.ColorType.ValueID,
+      },
+      {
+        AttributeId: pricingRule.PageRange.AttributeID,
+        AttributeValueId: pricingRule.PageRange.ValueID,
       },
     ],
     Addons: (() => {
@@ -395,23 +423,31 @@ const resolvedLaminationAddonId = selectedLaminationType
       return addons;
     })(),
 
-    DynamicAttributes: [
-      {
-        AttributeName: "PageCount",
-        AttributeValue: pageCount.toString(),
-      },
-      {
-        "AttributeName": "NumberOfCopies",
-        "AttributeValue": noOfCopies.toString(), // Convert to string as per API format
-      }
-    ],
+    DynamicAttributes: dynamicAttributes,
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
-
+  // ✅ Console log the API request payload
+  console.log("🚀 PaperPrint API Request Payload:", {
+    productId,
+    pricingRule,
+    pageCount,
+    noOfCopies,
+    selectedBindingType,
+    selectedBinderColor,
+    selectedLaminationType,
+    addonRule,
+    addonBookCount,
+    documentId,
+    cartItem
+  });
 
   try {
     const response = await addToCartApi(cartItem);
+    console.log("✅ PaperPrint API Response:", response);
+    return response;
   } catch (error) {
+    console.error("❌ PaperPrint API Error:", error);
+    throw error;
   }
 };

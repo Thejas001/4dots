@@ -35,6 +35,15 @@ const AddOnService = ({
   const [showBindingOptions, setShowBindingOptions] = useState(false);
   const [laminationType, setLaminationType] = useState("");
 
+  // ✅ Ensure initial binder color is communicated to parent
+  useEffect(() => {
+    if (bindingType === "Hard Binding") {
+      // If no specific color is selected, default to "Black"
+      const colorToSend = binderColor || "Black";
+      onBinderColorChange(colorToSend);
+    }
+  }, [bindingType, binderColor, onBinderColorChange]);
+
   // Add lamination addons to the existing addons
   const laminationAddons = [
     {
@@ -160,6 +169,11 @@ const AddOnService = ({
   const handleBindingTypeChange = (selectedType: string) => {
     setBindingType(selectedType);
     onBindingTypeChange(selectedType);
+    
+    // ✅ When Hard Binding is selected, ensure binder color is set
+    if (selectedType === "Hard Binding") {
+      onBinderColorChange(binderColor);
+    }
   };
 
   const handleLaminationTypeChange = (selectedType: string) => {

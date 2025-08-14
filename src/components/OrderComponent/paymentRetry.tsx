@@ -49,8 +49,8 @@ const launchRazorpay = (razorpayData: any, onSuccess?: () => void) => {
       // TODO: call your backend API to confirm payment if needed
     },
     prefill: {
-      name: "Customer Name", // optional: replace with actual customer name
-      email: "customer@example.com" // optional: replace with actual email
+      name: "", // optional: replace with actual customer name
+      email: "" // optional: replace with actual email
     },
     theme: {
       color: "black"

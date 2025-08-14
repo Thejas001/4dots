@@ -68,7 +68,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [selectedBindingType, setSelectedBindingType] = useState("");
-  const [selectedBinderColor, setSelectedBinderColor] = useState("");
+  const [selectedBinderColor, setSelectedBinderColor] = useState("Black");
   const [selectedLaminationType, setSelectedLaminationType] = useState("");
   const [copySelection, setCopySelection] = useState<string>("");
   const [customCopies, setCustomCopies] = useState<number>(0);
@@ -316,6 +316,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       selectedPricingRule: pendingPricingRule,
       pageCount: pendingPageCount,
       selectedBindingType: pendingBindingType,
+      selectedBinderColor: pendingBinderColor,
       selectedLaminationType: pendingLaminationType,
       selectedAddonRule: pendingAddonRule,
       addonBookCount: pendingAddonBookCount,
@@ -330,6 +331,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         pendingPageCount,
         pendingNoOfCopies,
         pendingBindingType,
+        pendingBinderColor,
         pendingLaminationType,
         pendingAddonRule,
         pendingAddonBookCount,
@@ -362,12 +364,14 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedPricingRule,
         pageCount: apiPageCount,
         selectedBindingType,
+        selectedBinderColor,
         selectedLaminationType,
         selectedAddonRule,
         addonBookCount:
           copySelection === "all" ? noOfCopies : customCopies || 0,
           noOfCopies, 
         uploadedDocumentId,
+        calculatedPrice,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
       router.push(`/auth/signin?redirect=/`);
@@ -394,10 +398,12 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         apiPageCount,
         noOfCopies,
         selectedBindingType,
+        selectedBinderColor,
         selectedLaminationType,
         selectedAddonRule,
         addonBookCount,
-        uploadedDocumentId ?? undefined
+        uploadedDocumentId ?? undefined,
+        calculatedPrice ?? undefined
         
       );
       
@@ -407,6 +413,8 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
       // Show popup for logged-in users instead of directly going to cart
       setShowCartPopUp(true);
     } catch (error) {
+      const message = (error as any)?.message || "Failed to add to cart";
+      toast.error(message);
     }
     setIsLoading(false);
   };
@@ -423,6 +431,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         selectedPricingRule,
         pageCount: apiPageCount,
         selectedBindingType,
+        selectedBinderColor,
         selectedLaminationType,
         selectedAddonRule,
         noOfCopies,
@@ -455,15 +464,19 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
         apiPageCount,
         noOfCopies,
         selectedBindingType,
+        selectedBinderColor,
         selectedLaminationType,
         selectedAddonRule,
         addonBookCount,
-        uploadedDocumentId ?? undefined
+        uploadedDocumentId ?? undefined,
+        calculatedPrice ?? undefined
       );
           incrementCart();
           toast.success("Product added to cart successfully!");
       router.push("/Cart");
     } catch (error) {
+      const message = (error as any)?.message || "Failed to add to cart";
+      toast.error(message);
     }
     setIsLoading(false);
   };
@@ -998,7 +1011,7 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
                                                        onClick={() => {
                               setBindingChoice(null);
                               setSelectedBindingType("");
-                              setSelectedBinderColor("");
+                              setSelectedBinderColor("Black");
                               setCopySelection("");
                               setCustomCopies(0);
                             }}
