@@ -427,20 +427,10 @@ const resolvedLaminationAddonId = selectedLaminationType
     CartItemDocumentIds: documentId !== undefined ? [documentId] : [],
   };
 
-  // ✅ Console log the API request payload
-  console.log("🚀 PaperPrint API Request Payload:", {
-    productId,
-    pricingRule,
-    pageCount,
-    noOfCopies,
-    selectedBindingType,
-    selectedBinderColor,
-    selectedLaminationType,
-    addonRule,
-    addonBookCount,
-    documentId,
-    cartItem
-  });
+  console.log("🛒 Cart Item:", JSON.stringify(cartItem, null, 2));
+  
+  console.log("Selected Binding Type:", selectedBindingType);
+console.log("Addon Rule:", addonRule);
 
   try {
     const response = await addToCartApi(cartItem);

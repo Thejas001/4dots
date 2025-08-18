@@ -147,21 +147,23 @@ const Footer = () => {
             </div>
         </div>
 
-        {/* Secure Payments - image placeholders */}
-        <div className="mt-12 px-6 md:px-16">
-          <h4 className="text-center text-2xl md:text-3xl font-extrabold tracking-wider">100% SECURE PAYMENTS</h4>
-          <div className="mt-8 grid grid-cols-8 gap-2 sm:gap-3 max-w-4xl mx-auto">
-            {paymentMethods.map((method) => (
-              <div key={method.name} className="flex items-center justify-center">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white overflow-hidden flex items-center justify-center shadow">
-                  <img
-                    src={method.src}
-                    alt={method.alt ?? method.name}
-                    className="w-7 h-7 sm:w-9 sm:h-9 object-contain"
-                  />
+        {/* Secure Payments - smaller section at bottom */}
+        <div className="mt-8 px-6 md:px-16">
+          <div className="text-center">
+            <h5 className="text-xs font-medium tracking-wide text-gray-400 mb-4">100% SECURE PAYMENT</h5>
+            <div className="flex justify-center items-center gap-2 sm:gap-3 max-w-md mx-auto">
+              {paymentMethods.map((method) => (
+                <div key={method.name} className="flex items-center justify-center">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-md">
+                    <img
+                      src={method.src}
+                      alt={method.alt ?? method.name}
+                      className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 

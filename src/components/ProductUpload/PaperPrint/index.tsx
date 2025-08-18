@@ -392,6 +392,21 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
 
     try {
       
+console.log("📤 handleAddToCart → Payload before API call:", {
+  dataId,
+  selectedPricingRule,
+  apiPageCount,
+  noOfCopies,
+  selectedBindingType,
+  selectedBinderColor,
+  selectedLaminationType,
+  selectedAddonRule,
+  addonBookCount,
+  uploadedDocumentId,
+  calculatedPrice,
+});
+
+      
       await addToCartPaperPrint(
         dataId,
         selectedPricingRule!,

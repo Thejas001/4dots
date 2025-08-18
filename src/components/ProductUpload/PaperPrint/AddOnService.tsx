@@ -44,70 +44,6 @@ const AddOnService = ({
     }
   }, [bindingType, binderColor, onBinderColorChange]);
 
-  // Add lamination addons to the existing addons
-  const laminationAddons = [
-    {
-      Id: 4,
-      AddonName: "Lamination Matt",
-      Rules: [
-        {
-          PaperSize: "13*19 SINGLE SIDE",
-          ColorName: "Color",
-          PageRange: "101-500",
-          Price: "7/page"
-        },
-        {
-          PaperSize: "13*19 SINGLE SIDE",
-          ColorName: "Color",
-          PageRange: "501 and above",
-          Price: "6/page"
-        },
-        {
-          PaperSize: "13*19 DOUBLE SIDE",
-          ColorName: "Color",
-          PageRange: "101-500",
-          Price: "7/page"
-        },
-        {
-          PaperSize: "13*19 DOUBLE SIDE",
-          ColorName: "Color",
-          PageRange: "501 and above",
-          Price: "6/page"
-        }
-      ]
-    },
-    {
-      Id: 5,
-      AddonName: "Lamination Glossy",
-      Rules: [
-        {
-          PaperSize: "13*19 SINGLE SIDE",
-          ColorName: "Color",
-          PageRange: "101-500",
-          Price: "7/page"
-        },
-        {
-          PaperSize: "13*19 SINGLE SIDE",
-          ColorName: "Color",
-          PageRange: "501 and above",
-          Price: "6/page"
-        },
-        {
-          PaperSize: "13*19 DOUBLE SIDE",
-          ColorName: "Color",
-          PageRange: "101-500",
-          Price: "7/page"
-        },
-        {
-          PaperSize: "13*19 DOUBLE SIDE",
-          ColorName: "Color",
-          PageRange: "501 and above",
-          Price: "6/page"
-        }
-      ]
-    }
-  ];
-
   // Combine existing addons with lamination addons
   const allAddons = useMemo(() => {
     return getCombinedAddons(productDetails?.Addons);
@@ -132,9 +68,11 @@ const AddOnService = ({
       const isPageCountValid = pageCount >= 101;
       
       // Only available for Color (not B/W)
-      const isColorType = colorType === "Color";
+      const isColorTypeValid = colorType === "Color" || colorType === "color";
       
-      return isPageCountValid && isColorType;
+
+      
+      return isPageCountValid && isColorTypeValid;
     };
     
     // Only show lamination types if conditions are met
@@ -206,7 +144,7 @@ const AddOnService = ({
       return 0;
     }
 
-    const mappedColor = colorType === "B/W" ? "BlackAndWhite" : "Color";
+    const mappedColor = (colorType === "B/W" || colorType === "b/w") ? "BlackAndWhite" : "Color";
     
     // For lamination, calculate based on total page count (uploaded PDF pages × quantity)
     const totalPageCount = pageCount * noOfCopies;
@@ -218,7 +156,10 @@ const AddOnService = ({
         .replace(/\s+/g, ' ')
         .trim()
         .replace(/SINGLE SIDED/g, 'SINGLE SIDE')
-        .replace(/DOUBLE SIDED/g, 'DOUBLE SIDE');
+        .replace(/DOUBLE SIDED/g, 'DOUBLE SIDE')
+        .replace(/ONE SIDE/g, 'SINGLE SIDE')
+        .replace(/TWO SIDE/g, 'DOUBLE SIDE')
+        .replace(/BOTH SIDE/g, 'DOUBLE SIDE');
     };
 
     const normalizedPaperSize = normalizePaperSize(paperSize);
@@ -256,6 +197,8 @@ const AddOnService = ({
       rule.PageRange === pageRange
     );
 
+
+
     if (addonPricingRule) {
       // Parse the price from string format like "7/page"
       const priceString = addonPricingRule.Price.toString();
@@ -263,7 +206,8 @@ const AddOnService = ({
       
       if (priceString.includes('/page')) {
         pricePerUnit = parseFloat(priceString.replace('/page', ''));
-        return pricePerUnit * totalPageCount;
+        const finalPrice = pricePerUnit * totalPageCount;
+        return finalPrice;
       } else {
         // Try to parse as a simple number
         pricePerUnit = parseFloat(priceString);
@@ -391,6 +335,7 @@ const AddOnService = ({
                 
                 if (isLaminationType) {
                   addonPrice = calculateLaminationPrice(type);
+                  console.log(`Price for ${type}:`, addonPrice); // Debug log
                 } else {
                   // Calculate binding price
                   const addonRule = productDetails.Addons?.find(addon => addon.AddonName === type);
