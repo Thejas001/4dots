@@ -15,7 +15,7 @@ const agent = new https.Agent({
   rejectUnauthorized: false, // ✅ Allow self-signed certificates
 }); 
 export const API = axios.create({
-  baseURL: "https://fourdotsapp-prod.azurewebsites.net/api", // fourdotsapp.azurewebsites.net
+  baseURL: "https://fourdotsapp.azurewebsites.net/api", // fourdotsapp.azurewebsites.net
   headers: { "Content-Type": "application/json" },
   httpsAgent: agent, // ✅ Use the custom HTTPS agen
 });
@@ -233,6 +233,7 @@ export const addToCartApi = async (cartItem: CartItems) => {
     const response = await API.post(`/cart/items`, cartItem);
 
     return response.data; // No need for response.json()
+    console.log("Item added to cart:", response.data);
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to add item to cart");
   }
