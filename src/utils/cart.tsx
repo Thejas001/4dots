@@ -403,7 +403,7 @@ const resolvedLaminationAddonId = selectedLaminationType
       const addons = [];
       
       // Add binding addon if selected
-      if (addonRule && selectedBindingType && resolvedAddonId !== null) {
+      if ( selectedBindingType && resolvedAddonId !== null) {
         addons.push({
           AddonID: resolvedAddonId,
           IsDeleted: false,

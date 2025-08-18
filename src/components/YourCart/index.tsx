@@ -121,23 +121,24 @@ useEffect(() => {
     }
   };
 
-  const handleViewDesign = (item: {
-    Documents?: { ContentType: string; DocumentUrl: string }[];
-    ProductName: string;
-  }) => {
-    if (item.Documents && item.Documents.length > 0) {
-      setSelectedDesigns(
-        item.Documents.map((doc) => ({
-          url: doc.DocumentUrl,
-          isPdf: doc.ContentType === "application/pdf",
-          productName: item.ProductName,
-        }))
-      );
-      setIsDesignModalOpen(true);
-    } else {
-      alert("No uploaded design available for this item.");
-    }
-  };
+const handleViewDesign = (item: {
+  Documents?: { ContentType: string; DocumentUrl: string }[];
+  ProductName: string;
+}) => {
+  if (item.Documents && item.Documents.length > 0) {
+    setSelectedDesigns(
+      item.Documents.map((doc) => ({
+        url: doc.DocumentUrl,
+        isPdf: doc.ContentType === "application/pdf",
+        productName: item.ProductName,
+      }))
+    );
+    setIsDesignModalOpen(true);
+  } else {
+    alert("No uploaded design available for this item.");
+  }
+};
+
 
   const cartItemIds = cartData.Items.map(item => item.CartItemId);
 
@@ -332,7 +333,7 @@ useEffect(() => {
                           onClick={() => handleViewDesign(item)}
                           className="text-[#0075FF] italic underline text-base font-medium leading-6 tracking-[-0.2px] cursor-pointer"
                         >
-                          Uploaded Design
+                          View Uploaded File
                         </span>
                         {/**   <button className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded">Edit</button>*/}  
                         <span className="ml-auto text-lg text-[#242424] font-semibold leading-6 tracking-tighter-[-0.2px]">₹ {item.ItemPrice}</span>

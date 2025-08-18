@@ -14,13 +14,25 @@ export const getLaminationAddons = () => {
         {
           PaperSize: "12*18 SINGLE SIDE",
           ColorName: "Color",
+          PageRange: "101-500",
+          Price: "7/page"
+        },
+        {
+          PaperSize: "12*18 SINGLE SIDE",
+          ColorName: "Color",
           PageRange: "501 and above",
           Price: "6/page"
         },
         {
           PaperSize: "12*18 DOUBLE SIDE",
           ColorName: "Color",
-          PageRange: "100-100",
+          PageRange: "0-100",
+          Price: "7/page"
+        },
+        {
+          PaperSize: "12*18 DOUBLE SIDE",
+          ColorName: "Color",
+          PageRange: "101-500",
           Price: "7/page"
         },
         {
@@ -91,5 +103,19 @@ export const getLaminationAddons = () => {
 };
 
 export const getCombinedAddons = (originalAddons: any[] = []): any[] => {
-  return [...originalAddons, ...getLaminationAddons()];
-}; 
+  const laminationAddons = getLaminationAddons();
+
+  const normalize = (name: string) => name.replace(/\s+/g, " ").trim().toLowerCase();
+
+  return [
+    ...originalAddons,
+    ...laminationAddons.filter(
+      lam =>
+        !originalAddons.some(
+          orig => normalize(orig.AddonName) === normalize(lam.AddonName)
+        )
+    ),
+  ];
+};
+
+

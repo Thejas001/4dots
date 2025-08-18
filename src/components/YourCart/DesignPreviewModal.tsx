@@ -19,12 +19,33 @@ const DesignPreviewModal: React.FC<DesignPreviewModalProps> = ({
         <div className="flex flex-wrap gap-4 justify-center">
           {designs.map((design, idx) =>
             design.isPdf ? (
-              <a key={idx} href={design.url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center">
-                <img src="/images/product/pdf.png" alt="PDF" className="w-32 h-32 object-contain" />
+              <div key={idx} className="flex flex-col items-center">
+                {/* PDF Icon */}
+                <a href={design.url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src="/images/product/pdf.png"
+                    alt="PDF"
+                    className="w-32 h-32 object-contain"
+                  />
+                </a>
                 <div className="mt-2 text-sm text-center">{design.productName}</div>
-              </a>
+
+                {/* Download Button */}
+                <a
+                  href={design.url}
+                  download
+                  className="mt-2 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                >
+                  Click Here 
+                </a>
+              </div>
             ) : (
-              <img key={idx} src={design.url} alt={design.productName} className="w-32 h-32 object-cover rounded" />
+              <img
+                key={idx}
+                src={design.url}
+                alt={design.productName}
+                className="w-32 h-32 object-cover rounded"
+              />
             )
           )}
         </div>
