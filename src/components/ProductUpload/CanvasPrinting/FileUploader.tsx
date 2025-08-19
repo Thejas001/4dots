@@ -30,7 +30,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const props: UploadProps = {
     name: "document",
     accept: ".jpg,.jpeg,.bmp,.png,.gif,.heic,.svg,.webp,.pdf,.psd",
-    action: "https://fourdotsapp-prod.azurewebsites.net/api/document/upload",
+    action: "https://fourdotsapp.azurewebsites.net/api/document/upload",
     method: "POST",
     headers: {
       authorization: "authorization-text",
@@ -73,7 +73,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   
       if (docId) {
         try {
-          await fetch(`https://fourdotsapp-prod.azurewebsites.net/api/document/delete/${docId}`, {
+          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
             method: "DELETE",
           });
   
