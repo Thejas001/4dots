@@ -38,6 +38,13 @@ const AddressModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         {/* Address Form */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
+          <div className="sm:col-span-2">
+            <label className="block text-base font-normal  mb-2.5">
+              Your Name <span className="text-gray-500 italic"></span>
+            </label>
+            <input type="text" className="w-full md:h-11.5  p-1 rounded-md border border-gray-300 bg-white" placeholder="Enter landmark" />
+          </div>
+
           <div className="relative w-full sm:col-span-2">
             <label className="block text-base font-normal  mb-2.5">
               Address
