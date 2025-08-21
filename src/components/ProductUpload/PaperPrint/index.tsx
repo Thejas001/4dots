@@ -99,6 +99,12 @@ const [selectedOption, setSelectedOption] = useState<"" | "B/W" | "Color">("");
     return isPageCountValid(productDetails.PaperPrintingPricingRules, selectedSize, mappedColor, pageCount);
   }, [selectedSize, selectedOption, pageCount, productDetails?.PaperPrintingPricingRules]);
 
+// In parent component
+const featureType =
+  selectedSize === "13*19 SINGLE SIDE" || selectedSize === "13*19 DOUBLE SIDE"
+    ? "Lamination"
+    : "Binding";
+
   // Memoized pricing calculation to improve performance
   const getSizePrice = useMemo(() => {
     return (size: string) => {
@@ -971,8 +977,14 @@ console.log("📤 handleAddToCart → Payload before API call:", {
                    {/* Step 4: Binding Question - Only show after size selection */}
                    {showBindingQuestion && bindingChoice === null && (
                      <div id="binding-section" className="bg-gray-50 rounded-xl p-6">
-                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Binding Feature</h3>
-                       <p className="text-sm text-gray-600 mb-6">Do you want binding feature in your printing?</p>
+                       <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            {featureType} Feature
+                        </h3>
+                       <p className="text-sm text-gray-600 mb-6">
+                         {featureType === "Lamination"
+                            ? "Do you want lamination for your printing?"
+                            : "Do you want binding feature in your printing?"}
+                        </p>
                        
                        <div className="space-y-3">
                          <button
@@ -990,8 +1002,16 @@ console.log("📤 handleAddToCart → Payload before API call:", {
                          >
                            <div className="flex items-center justify-between">
                              <div>
-                               <div className="font-medium text-gray-900">Yes, I want binding</div>
-                               <div className="text-sm text-gray-600">Add professional binding to your documents</div>
+                               <div className="font-medium text-gray-900">
+                                  {featureType === "Lamination"
+                                      ? "Yes, I want Lamination"
+                                      : "Yes, I want Binding"}
+                                </div>
+                               <div className="text-sm text-gray-600">
+                                {featureType === "Lamination"
+                                      ? "Add professional lamination to your documents"
+                                      : "Add professional binding to your documents"}
+                                </div>
                              </div>
                              <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
@@ -1005,7 +1025,11 @@ console.log("📤 handleAddToCart → Payload before API call:", {
                          >
                            <div className="flex items-center justify-between">
                              <div>
-                               <div className="font-medium text-gray-900">No, skip binding</div>
+                               <div className="font-medium text-gray-900">
+                                {featureType === "Lamination"
+                                      ? "No, skip Lamination"
+                                      : "No, skip Binding"}
+                                </div>
                                <div className="text-sm text-gray-600">Proceed directly to cart</div>
                              </div>
                              <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
@@ -1038,8 +1062,7 @@ console.log("📤 handleAddToCart → Payload before API call:", {
                            </svg>
                          </button>
                        </div>
-                       <p className="text-sm text-gray-600 mb-4">Optional binding and finishing options</p>
-                       
+     
               <AddOnService
                 productDetails={productDetails}
                 onBindingTypeChange={handleBindingTypeChange}
@@ -1050,7 +1073,8 @@ console.log("📤 handleAddToCart → Payload before API call:", {
                 pageCount={pageCount}
                 paperSize={selectedSize}
                 colorType={selectedOption}
-                         noOfCopies={noOfCopies}
+                noOfCopies={noOfCopies}
+                featureType={featureType}
               />
             </div>
                    )}

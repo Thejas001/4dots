@@ -14,6 +14,7 @@ interface AddOnServiceProps {
   paperSize: string;
   colorType: string;
   noOfCopies: number;
+  featureType: "Binding" | "Lamination";
 }
 
 const AddOnService = ({
@@ -35,6 +36,20 @@ const AddOnService = ({
   const [showBindingOptions, setShowBindingOptions] = useState(false);
   const [laminationType, setLaminationType] = useState("");
 
+      const normalizePaperSize = (size: string) => {
+      return size
+        .toUpperCase()
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/SINGLE SIDED/g, 'SINGLE SIDE')
+        .replace(/DOUBLE SIDED/g, 'DOUBLE SIDE')
+        .replace(/ONE SIDE/g, 'SINGLE SIDE')
+        .replace(/TWO SIDE/g, 'DOUBLE SIDE')
+        .replace(/BOTH SIDE/g, 'DOUBLE SIDE');
+    };
+
+    const normalizedPaperSize = normalizePaperSize(paperSize);
+
   // ✅ Ensure initial binder color is communicated to parent
   useEffect(() => {
     if (bindingType === "Hard Binding") {
@@ -43,6 +58,19 @@ const AddOnService = ({
       onBinderColorChange(colorToSend);
     }
   }, [bindingType, binderColor, onBinderColorChange]);
+
+  useEffect(() => {
+  // Reset binding and lamination selections if paper size changes
+  setBindingType("");
+  setLaminationType("");
+
+  // Optional: reset copy selection for non-13x19
+  if (normalizedPaperSize === "13*19 SINGLE SIDE" || normalizedPaperSize === "13*19 DOUBLE SIDE") {
+    setCopySelection(""); // or leave as is
+    setCustomCopies("");
+  }
+}, [normalizedPaperSize]);
+
 
   // Combine existing addons with lamination addons
   const allAddons = useMemo(() => {
@@ -92,6 +120,22 @@ const AddOnService = ({
   const allBindingAndLaminationTypes = useMemo(() => {
     return [...allowedBindingTypes, ...laminationTypes];
   }, [allowedBindingTypes, laminationTypes]);
+
+  // Filter types based on paper size
+const filteredAddons = allBindingAndLaminationTypes.filter(type => {
+  if (normalizedPaperSize === "13*19 SINGLE SIDE" || normalizedPaperSize === "13*19 DOUBLE SIDE") {
+    // For 13*19, include lamination only
+    return laminationTypes.includes(type);
+  } else {
+    // For other sizes, include binding only if binding rules exist for this paper size
+    const addonRule = productDetails.Addons?.find(a => a.AddonName === type);
+    if (!addonRule) return false;
+
+    // Check if a pricing rule exists for this paper size
+    return addonRule.Rules?.some(rule => rule.PaperSize === paperSize);
+  }
+});
+
 
   const isSelectionComplete = !!paperSize && !!colorType && pageCount > 0;
 
@@ -150,19 +194,7 @@ const AddOnService = ({
     const totalPageCount = pageCount * noOfCopies;
 
     // Normalize paper size for matching
-    const normalizePaperSize = (size: string) => {
-      return size
-        .toUpperCase()
-        .replace(/\s+/g, ' ')
-        .trim()
-        .replace(/SINGLE SIDED/g, 'SINGLE SIDE')
-        .replace(/DOUBLE SIDED/g, 'DOUBLE SIDE')
-        .replace(/ONE SIDE/g, 'SINGLE SIDE')
-        .replace(/TWO SIDE/g, 'DOUBLE SIDE')
-        .replace(/BOTH SIDE/g, 'DOUBLE SIDE');
-    };
 
-    const normalizedPaperSize = normalizePaperSize(paperSize);
 
     // Find the correct page range for the total page count
     const findAddonPageRange = (pageCount: number, rules: any[]) => {
@@ -218,10 +250,16 @@ const AddOnService = ({
     return 0;
   };
 
+  const showAddonOptions =
+  (normalizedPaperSize === "13*19 SINGLE SIDE" || normalizedPaperSize === "13*19 DOUBLE SIDE") ||
+  (allBindingAndLaminationTypes.length > 0 && copySelection);
+
 
   return (
     <div className="space-y-6">
       {/* Step 1: Copy Selection */}
+      {(normalizedPaperSize !== "13*19 SINGLE SIDE" && normalizedPaperSize !== "13*19 DOUBLE SIDE" )&& (
+
       <div className="bg-gray-50 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Binding Application</h3>
         <p className="text-sm text-gray-600 mb-4">Choose how many copies to bind</p>
@@ -229,7 +267,7 @@ const AddOnService = ({
         <div className="space-y-4">
           {/* All Copies Option */}
           <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-all duration-200 cursor-pointer">
-                                                   <input
+            <input
                 type="radio"
                 name="copy-selection"
                 value="all"
@@ -252,7 +290,7 @@ const AddOnService = ({
 
           {/* Custom Copies Option */}
           <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-all duration-200 cursor-pointer">
-                                                   <input
+              <input
                 type="radio"
                 name="copy-selection"
                 value="custom"
@@ -303,8 +341,6 @@ const AddOnService = ({
                         Maximum allowed is {noOfCopies} copies.
                       </div>
                     )}
-
-
                  </div>
                )}
             </div>
@@ -312,21 +348,30 @@ const AddOnService = ({
         </div>
 
         {/* Continue Button - Removed to auto-proceed */}
-      </div>
+      </div>)}
 
       {/* Step 2: Binding and Lamination Type Selection */}
-      {copySelection && (
+
+    {showAddonOptions && (
         <div className="bg-gray-50 rounded-xl p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Binding & Lamination Options</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {normalizedPaperSize === "13*19 SINGLE SIDE" || normalizedPaperSize === "13*19 DOUBLE SIDE"
+                ? "Lamination Options"
+                : "Binding Options"}
+            </h3>          
           </div>
-          <p className="text-sm text-gray-600 mb-4">Select your preferred binding and lamination options</p>
+          <p className="text-sm text-gray-600 mb-4">
+            {normalizedPaperSize === "13*19 SINGLE SIDE" || normalizedPaperSize === "13*19 DOUBLE SIDE"
+              ? "Select your preferred lamination option"
+              : "Select your preferred binding options"}
+          </p>          
           
           {!isSelectionComplete ? (
             <div className="text-gray-500 font-medium">Please select paper size, color, and upload your file.</div>
-          ) : allBindingAndLaminationTypes.length > 0 ? (
+          ) : filteredAddons.length > 0 ? (
             <div className="space-y-3">
-              {allBindingAndLaminationTypes.map((type, index) => {
+              {filteredAddons.map((type, index) => {
                 const isSelected = bindingType === type || laminationType === type;
                 const isLaminationType = laminationTypes.includes(type);
                 
@@ -408,7 +453,7 @@ const AddOnService = ({
                         {addonPrice > 0 ? (
                           <div className="text-sm font-semibold text-gray-900">
                             ₹{addonPrice.toFixed(2)}
-                          </div>
+                         </div>
                         ) : (
                           <div className="text-sm text-gray-500">
                             {isSelected ? "Selected" : "Click to select"}
@@ -424,7 +469,7 @@ const AddOnService = ({
             <div className="text-gray-500 font-medium">No binding or lamination available for this selection.</div>
           )}
         </div>
-      )}
+      )} 
 
       {/* Binder Color - Only for Hard Binding */}
       {bindingType === "Hard Binding" && (
