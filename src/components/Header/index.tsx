@@ -21,15 +21,6 @@ const Header = () => {
     setIsOpen((prevState) => !prevState);
   };
 
-  // Refresh cart on initial mount
-  useEffect(() => {
-    refreshCart();
-  }, [refreshCart]);
-
-  
-
-  
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {

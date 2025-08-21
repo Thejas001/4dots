@@ -11,6 +11,7 @@ import { useCartStore } from "@/utils/store/cartStore";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { ModalProvider } from "@/contexts/ModalContext";
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,13 +19,22 @@ export default function RootLayout({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const { setCartData } = useCartStore();
+const { setCartData, refreshCart } = useCartStore();
 
   // const pathname = usePathname();
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, []);
+  
+useEffect(() => {
+  const token = localStorage.getItem("jwtToken");
+  if (token) {
+    refreshCart();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
   // Global pending cart item processing after login
   useEffect(() => {
