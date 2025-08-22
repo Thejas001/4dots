@@ -157,7 +157,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       maxAllowed = 16;
     } else if (pageCount === "8") {
       minRequired = 16;
-      maxAllowed = 32;
+      maxAllowed = 34; // Updated to match API: "16-34"
     }
 
     if (imageCount < minRequired) {
@@ -182,13 +182,28 @@ const ProductUpload = ({ product }: { product: any }) => {
     // Reset file list when page count changes
     setFileList([]);
     setSelectedQuantity(1);
-    setCalculatedPrice(null);
-    setSelectedPricingRule(null);
+    
+    // Calculate initial price for the selected page count with minimum required images
+    const minImages = pageCount === "4" ? 8 : 16;
+    const pricingRule = findOnamAlbumPricingRule(
+      productDetails.PricingRules,
+      pageCount,
+      minImages
+    );
+    
+    if (pricingRule) {
+      setCalculatedPrice(pricingRule.Price);
+      setSelectedPricingRule(pricingRule);
+    } else {
+      setCalculatedPrice(null);
+      setSelectedPricingRule(null);
+    }
+    
     setImageCountValidation({
       isValid: false,
       message: "",
       minRequired: pageCount === "4" ? 8 : 16,
-      maxAllowed: pageCount === "4" ? 16 : 32
+      maxAllowed: pageCount === "4" ? 16 : 34
     });
   };
 
@@ -199,16 +214,42 @@ const ProductUpload = ({ product }: { product: any }) => {
       setImageCountValidation(validation);
       
       // Update quantity to match file count
-      setSelectedQuantity(fileList.length);
+      const newQuantity = fileList.length;
+      setSelectedQuantity(newQuantity);
+      
+      // Recalculate price based on new quantity
+      const pricingRule = findOnamAlbumPricingRule(
+        productDetails.PricingRules,
+        selectedSize,
+        newQuantity
+      );
+      
+      if (pricingRule) {
+        setCalculatedPrice(pricingRule.Price);
+        setSelectedPricingRule(pricingRule);
+      }
     } else if (fileList.length === 0) {
       setImageCountValidation({
         isValid: false,
         message: "",
         minRequired: selectedSize === "4" ? 8 : 16,
-        maxAllowed: selectedSize === "4" ? 16 : 32
+        maxAllowed: selectedSize === "4" ? 16 : 34
       });
+      
+      // Reset to initial price for minimum required images
+      const minImages = selectedSize === "4" ? 8 : 16;
+      const pricingRule = findOnamAlbumPricingRule(
+        productDetails.PricingRules,
+        selectedSize,
+        minImages
+      );
+      
+      if (pricingRule) {
+        setCalculatedPrice(pricingRule.Price);
+        setSelectedPricingRule(pricingRule);
+      }
     }
-  }, [fileList.length, selectedSize, pageCountSelected, validateImageCount]);
+  }, [fileList.length, selectedSize, pageCountSelected, validateImageCount, productDetails.PricingRules]);
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
     setUploadedDocumentId(documentId);
@@ -332,9 +373,9 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     return productDetails.sizes.map((size: string, index: number) => {
       const pricingRule = findOnamAlbumPricingRule(
-        productDetails.OnamAlbumPricingRules,
+        productDetails.PricingRules,
         size,
-        selectedQuantity.toString()
+        selectedQuantity
       );
 
       const totalPrice = pricingRule ? pricingRule.Price : 0;
@@ -375,7 +416,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         </div>
       );
     });
-  }, [productDetails?.sizes, selectedQuantity, selectedSize]);
+  }, [productDetails?.sizes, selectedQuantity, selectedSize, productDetails?.PricingRules]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -457,9 +498,19 @@ const ProductUpload = ({ product }: { product: any }) => {
                           <div className="text-center">
                             <div className="text-2xl font-bold text-gray-900 mb-2">4 Pages</div>
                             <div className="text-sm text-gray-600 mb-3">Perfect for small collections</div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 mb-2">
                               Requires 8-16 images
                             </div>
+                                                         <div className="text-xs text-blue-600 font-medium">
+                               Starting from ₹{(() => {
+                                                                 const pricingRule = findOnamAlbumPricingRule(
+                                  productDetails.PricingRules,
+                                  "4",
+                                  8
+                                );
+                                 return pricingRule ? pricingRule.Price.toFixed(2) : "N/A";
+                               })()}
+                             </div>
                           </div>
                         </div>
                         
@@ -474,9 +525,19 @@ const ProductUpload = ({ product }: { product: any }) => {
                           <div className="text-center">
                             <div className="text-2xl font-bold text-gray-900 mb-2">8 Pages</div>
                             <div className="text-sm text-gray-600 mb-3">Great for larger collections</div>
-                            <div className="text-xs text-gray-500">
-                              Requires 16-32 images
-                            </div>
+                                                         <div className="text-xs text-gray-500 mb-2">
+                               Requires 16-34 images
+                             </div>
+                                                         <div className="text-xs text-blue-600 font-medium">
+                               Starting from ₹{(() => {
+                                                                 const pricingRule = findOnamAlbumPricingRule(
+                                  productDetails.PricingRules,
+                                  "8",
+                                  16
+                                );
+                                 return pricingRule ? pricingRule.Price.toFixed(2) : "N/A";
+                               })()}
+                             </div>
                           </div>
                         </div>
                       </div>
@@ -624,17 +685,27 @@ const ProductUpload = ({ product }: { product: any }) => {
                           </div>
 
                           {/* Pricing */}
-                          {calculatedPrice && (
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
-                              <div className="space-y-2">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                            <div className="space-y-2">
+                              {calculatedPrice ? (
+                                <>
+                                  <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                    <span className="text-lg font-semibold text-gray-900">Total Price</span>
+                                    <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 text-center">
+                                    Price for {selectedQuantity} images in {selectedSize}-page album
+                                  </div>
+                                </>
+                              ) : (
                                 <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
                                   <span className="text-lg font-semibold text-gray-900">Total Price</span>
-                                  <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                                  <span className="text-lg font-bold text-gray-900 text-gray-500">Price not available</span>
                                 </div>
-                              </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
                       </div>
                     </div>
