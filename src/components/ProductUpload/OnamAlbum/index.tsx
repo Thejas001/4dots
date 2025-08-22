@@ -105,6 +105,21 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [price, setPrice] = useState<number | null>(null);
 
+  // New flow states
+  const [pageCountSelected, setPageCountSelected] = useState<boolean>(false);
+  const [showPageCountSelection, setShowPageCountSelection] = useState<boolean>(true);
+  const [imageUploadEnabled, setImageUploadEnabled] = useState<boolean>(false);
+  const [imageCountValidation, setImageCountValidation] = useState<{
+    isValid: boolean;
+    message: string;
+    minRequired: number;
+    maxAllowed: number;
+  }>({
+    isValid: false,
+    message: "",
+    minRequired: 0,
+    maxAllowed: 0
+  });
 
   // Progressive disclosure states
   const [showSizeSelection, setShowSizeSelection] = useState<boolean>(false);
@@ -131,6 +146,70 @@ const ProductUpload = ({ product }: { product: any }) => {
     setShowCartPopUp(false);
   };
 
+  // Validate image count based on selected page count
+  const validateImageCount = useCallback((imageCount: number, pageCount: string) => {
+    let minRequired = 0;
+    let maxAllowed = 0;
+    let message = "";
+
+    if (pageCount === "4") {
+      minRequired = 8;
+      maxAllowed = 16;
+    } else if (pageCount === "8") {
+      minRequired = 16;
+      maxAllowed = 32;
+    }
+
+    if (imageCount < minRequired) {
+      message = `For ${pageCount}-page album, you need at least ${minRequired} images. You have uploaded ${imageCount} images.`;
+      return { isValid: false, message, minRequired, maxAllowed };
+    } else if (imageCount > maxAllowed) {
+      message = `For ${pageCount}-page album, you can upload maximum ${maxAllowed} images. You have uploaded ${imageCount} images.`;
+      return { isValid: false, message, minRequired, maxAllowed };
+    } else {
+      message = `Perfect! ${imageCount} images for ${pageCount}-page album (${minRequired}-${maxAllowed} images required).`;
+      return { isValid: true, message, minRequired, maxAllowed };
+    }
+  }, []);
+
+  // Handle page count selection
+  const handlePageCountSelection = (pageCount: string) => {
+    setSelectedSize(pageCount);
+    setPageCountSelected(true);
+    setShowPageCountSelection(false);
+    setImageUploadEnabled(true);
+    
+    // Reset file list when page count changes
+    setFileList([]);
+    setSelectedQuantity(1);
+    setCalculatedPrice(null);
+    setSelectedPricingRule(null);
+    setImageCountValidation({
+      isValid: false,
+      message: "",
+      minRequired: pageCount === "4" ? 8 : 16,
+      maxAllowed: pageCount === "4" ? 16 : 32
+    });
+  };
+
+  // Update image count validation when fileList changes
+  useEffect(() => {
+    if (pageCountSelected && selectedSize && fileList.length > 0) {
+      const validation = validateImageCount(fileList.length, selectedSize);
+      setImageCountValidation(validation);
+      
+      // Update quantity to match file count
+      setSelectedQuantity(fileList.length);
+    } else if (fileList.length === 0) {
+      setImageCountValidation({
+        isValid: false,
+        message: "",
+        minRequired: selectedSize === "4" ? 8 : 16,
+        maxAllowed: selectedSize === "4" ? 16 : 32
+      });
+    }
+  }, [fileList.length, selectedSize, pageCountSelected, validateImageCount]);
+
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
     setUploadedDocumentId(documentId);
     if (file) {
@@ -142,17 +221,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     // Show size selection after file upload
     setShowSizeSelection(true);
   };
-
-useEffect(() => {
-  if (fileList.length > 0) {
-    setShowSizeSelection(true);
-    setSelectedQuantity(fileList.length); // keep quantity in sync with uploaded files
-  } else {
-    setShowSizeSelection(false);
-    setSelectedQuantity(0); // or 1, depending on your default
-  }
-}, [fileList]);
-
 
   const handleNext = () => {
     if (fileList.length > 1) {
@@ -194,6 +262,12 @@ useEffect(() => {
         return;
       }
 
+      if (!imageCountValidation.isValid) {
+        showErrorToast(imageCountValidation.message);
+        setIsLoading(false);
+        return;
+      }
+
       // Get document IDs from uploaded files
       const documentIds = fileList.map(file => file.documentId).filter(id => id !== null) as number[];
 
@@ -218,8 +292,14 @@ useEffect(() => {
   };
 
   const validateSelections = () => {
+    if (!pageCountSelected) {
+      return "Please select a page count first";
+    }
     if (fileList.length === 0) {
       return "Please upload at least one file";
+    }
+    if (!imageCountValidation.isValid) {
+      return imageCountValidation.message;
     }
     if (!selectedSize) {
       return "Please select a size";
@@ -241,7 +321,7 @@ useEffect(() => {
   };
 
   const isAddToCartDisabled = () => {
-    return fileList.length === 0 || !selectedSize;
+    return !pageCountSelected || fileList.length === 0 || !imageCountValidation.isValid || !selectedSize;
   };
 
   // Memoized size options with pricing
@@ -313,21 +393,37 @@ useEffect(() => {
             <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
-                <p className="text-gray-600">Upload your files to see a preview</p>
+                <p className="text-gray-600">
+                  {!imageUploadEnabled 
+                    ? "Select page count first to upload images" 
+                    : "Upload your files to see a preview"
+                  }
+                </p>
               </div>
               
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <div className="w-full max-w-md">
-                  <FileUploader 
-                    onUploadSuccess={handleUploadSuccess}
-                    quantity={selectedQuantity}
-                    uploadedImages={fileList}
-                    setUploadedImages={setFileList}
-                    currentImageIndex={currentImageIndex}
-                    handleNext={handleNext}
-                    handlePrevious={handlePrevious}
-                  />
+                  {!imageUploadEnabled ? (
+                    <div className="text-center py-12">
+                      <div className="bg-gray-200 rounded-lg p-8">
+                        <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <p className="text-gray-600">Please select page count first</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <FileUploader 
+                      onUploadSuccess={handleUploadSuccess}
+                      quantity={selectedQuantity}
+                      uploadedImages={fileList}
+                      setUploadedImages={setFileList}
+                      currentImageIndex={currentImageIndex}
+                      handleNext={handleNext}
+                      handlePrevious={handlePrevious}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -336,39 +432,112 @@ useEffect(() => {
             <div className="p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
               <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Polaroid Card</h1>
-                  <p className="text-gray-600">Configure your print settings</p>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Onam Memories Album</h1>
+                  <p className="text-gray-600">Configure your album settings</p>
                 </div>
 
                 {/* Configuration Steps */}
                 <div className="space-y-4">
                   
-                  {/* Step 1: Upload Message - Always show first */}
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Images</h3>
-                    <p className="text-sm text-gray-600 mb-4">Upload your images for printing</p>
-                    
-                    {fileList.length === 0 ? (
-                      <div className="text-center py-8">
-                        <p className="text-gray-500">Please upload images in the left column first</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
-                        <ImageSection
-                          uploadedImages={fileList}
-                          setUploadedImages={setFileList}
-                          setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 1)}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Step 2: Size Selection - Only show after file upload */}
-                  {showSizeSelection && fileList.length > 0 && (
+                  {/* Step 1: Page Count Selection - Always show first */}
+                  {showPageCountSelection && (
                     <div className="bg-gray-50 rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Onam Memories Album</h3>
-                      <p className="text-sm text-gray-600 mb-4">Select your preferred page count</p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Album Page Count</h3>
+                      <p className="text-sm text-gray-600 mb-6">Choose how many pages you want in your album</p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div
+                          className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            selectedSize === "4"
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-white hover:border-gray-300"
+                          }`}
+                          onClick={() => handlePageCountSelection("4")}
+                        >
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-gray-900 mb-2">4 Pages</div>
+                            <div className="text-sm text-gray-600 mb-3">Perfect for small collections</div>
+                            <div className="text-xs text-gray-500">
+                              Requires 8-16 images
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div
+                          className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            selectedSize === "8"
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-white hover:border-gray-300"
+                          }`}
+                          onClick={() => handlePageCountSelection("8")}
+                        >
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-gray-900 mb-2">8 Pages</div>
+                            <div className="text-sm text-gray-600 mb-3">Great for larger collections</div>
+                            <div className="text-xs text-gray-500">
+                              Requires 16-32 images
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Image Upload - Only show after page count selection */}
+                  {imageUploadEnabled && (
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Images</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Upload images for your {selectedSize}-page album
+                      </p>
+                      
+                      {/* Image Count Validation */}
+                      {fileList.length > 0 && (
+                        <div className={`mb-4 p-4 rounded-lg ${
+                          imageCountValidation.isValid 
+                            ? 'bg-green-50 border border-green-200' 
+                            : 'bg-yellow-50 border border-yellow-200'
+                        }`}>
+                          <div className="flex items-center">
+                            <div className={`w-4 h-4 rounded-full mr-3 ${
+                              imageCountValidation.isValid ? 'bg-green-500' : 'bg-yellow-500'
+                            }`}></div>
+                            <div>
+                              <p className={`text-sm font-medium ${
+                                imageCountValidation.isValid ? 'text-green-800' : 'text-yellow-800'
+                              }`}>
+                                {imageCountValidation.message}
+                              </p>
+                              <p className="text-xs text-gray-600 mt-1">
+                                Uploaded: {fileList.length} images | Required: {imageCountValidation.minRequired}-{imageCountValidation.maxAllowed} images
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {fileList.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">Please upload images in the left column</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
+                          <ImageSection
+                            uploadedImages={fileList}
+                            setUploadedImages={setFileList}
+                            setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 1)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Step 3: Size Selection - Only show after file upload */}
+                  {showSizeSelection && fileList.length > 0 && imageCountValidation.isValid && (
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Album Specifications</h3>
+                      <p className="text-sm text-gray-600 mb-4">Confirm your album specifications</p>
                       
                       {!showSizeOptions ? (
                         <button
@@ -416,7 +585,7 @@ useEffect(() => {
                   )}
 
                   {/* Order Summary - Only show after all selections are made */}
-                  {selectedSize && fileList.length > 0 && (
+                  {selectedSize && fileList.length > 0 && imageCountValidation.isValid && (
                     <div id="order-summary" className="bg-gray-50 rounded-xl p-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
                       
@@ -445,7 +614,7 @@ useEffect(() => {
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
                                 <span className="text-gray-600">Page Count</span>
-                                <span className="font-medium text-gray-900">{selectedSize}</span>
+                                <span className="font-medium text-gray-900">{selectedSize} pages</span>
                               </div>
                               <div className="flex justify-between items-center">
                                 <span className="text-gray-600">Quantity</span>
@@ -472,7 +641,7 @@ useEffect(() => {
                   )}
 
                   {/* Proceed to Cart Button */}
-                  {selectedSize && fileList.length > 0 && (
+                  {selectedSize && fileList.length > 0 && imageCountValidation.isValid && (
                     <div className="bg-gray-50 rounded-xl p-6">
                       <CartButton
                         selectedPricingRule={selectedPricingRule}
