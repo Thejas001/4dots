@@ -9,6 +9,7 @@ import { extractPhotoFramePricingRules,
         extractPolaroidPricingRules,
         extracNameSlipPricingRules,
         extractCanvasPricingRules,
+        extractOnamAlbumPricingRules
       } from "@/utils/extractPricingRule";
 import { CartItems } from "@/app/models/CartItems";
 const agent = new https.Agent({  
@@ -169,7 +170,7 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
     const PolaroidCardPricingRules = Data.ProductID === 7 ? extractPolaroidPricingRules(Data.PricingRules) : [];
     const NameSlipPricingRules = Data.ProductID === 8 ? extracNameSlipPricingRules(Data.PricingRules) : [];
     const CanvasPricingRules = Data.ProductID === 6 ? extractCanvasPricingRules(Data.PricingRules) : [];
-
+    const OnamAlbumPricingRules = Data.ProductID === 9 ? extractOnamAlbumPricingRules(Data.PricingRules) : [];
 
 
     // ✅ Map API response to Product model
@@ -216,6 +217,7 @@ export const fetchProductDetails = async (dataId: number): Promise<Product | nul
       PolaroidCardPricingRules,
       NameSlipPricingRules,
       CanvasPricingRules,
+      OnamAlbumPricingRules
     };
 
     return mappedProduct;
