@@ -336,7 +336,7 @@ useEffect(() => {
             <div className="p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
               <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Polaroid Card</h1>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Onam Memories Album</h1>
                   <p className="text-gray-600">Configure your print settings</p>
                 </div>
 
