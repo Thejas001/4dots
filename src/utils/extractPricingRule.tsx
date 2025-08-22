@@ -8,6 +8,7 @@ import {
   CanvasPricingRule,
   PaperPrintingPricingRule,
   PaperPrintAddonRule,
+  OnamAlbumPricingRule
 } from "@/app/models/products";
 
 export const extractPhotoFramePricingRules = (
@@ -235,6 +236,28 @@ export const extractCanvasPricingRules = (
         ValueID: rule.SquareFeetRange?.ValueID || 0,
       },
       PricePerSquareFoot : rule.PricePerSquareFoot  || 0, // FIXED: Correct key
+    })) || [];
+
+  return extractedRules;
+};
+
+export const extractOnamAlbumPricingRules = (
+  pricingRules: any[],
+): OnamAlbumPricingRule[] => {
+
+  const extractedRules =
+    pricingRules?.map((rule) => ({
+      Size: {
+        ValueName: rule.Size?.ValueName || "",
+        AttributeID: rule.Size?.AttributeID || 0,
+        ValueID: rule.Size?.ValueID || 0,
+      },
+      QuantityRange: {
+        ValueName: rule.QuantityRange?.ValueName || "",
+        AttributeID: rule.QuantityRange?.AttributeID || 0,
+        ValueID: rule.QuantityRange?.ValueID || 0,
+      }, // 🔄 Keep as string
+      Price: rule.Price || 0,
     })) || [];
 
   return extractedRules;

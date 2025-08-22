@@ -9,6 +9,7 @@ import LetterHead from "@/components/ProductUpload/LetterHead";
 import CanvasPrinting from "@/components/ProductUpload/CanvasPrinting";
 import PolaroidCard from "@/components/ProductUpload/PolaroidCard";
 import CustomNameSlip from "@/components/ProductUpload/CustomNameSlip";
+import OnamMemoriesAlbum from "@/components/ProductUpload/OnamAlbum";
 import { Metadata } from "next";
 import NetworkErrorPage from "@/components/NetworkErrorPage";
 import { Suspense } from "react";
@@ -31,6 +32,8 @@ const ProductComponents: Record<string, React.FC<{ product: any }>> = {
   "canvas-printing": CanvasPrinting,
   "polaroid-card": PolaroidCard,
   "custom-name-slip": CustomNameSlip,
+  "onam-memories-album": OnamMemoriesAlbum
+
 };
 
 export default async function PageDetails({

@@ -109,6 +109,40 @@ export const addToCartPolaroidCard = async (
   }
 };
 
+export const addToCartOnamAlbum = async (
+  productId: number,
+  pricingRule: {
+    Size: { AttributeID: number; ValueID: number };
+    QuantityRange: { AttributeID: number; ValueID: number };
+    Price: number;
+  },
+  selectedQuantity: number, //"NumberOfCards" as a dynamic attribute
+  documentIds?: number[]
+) => {
+  const cartItem: CartItems = {
+    ProductID: productId, //Matches expected key format
+    Price: pricingRule.Price, //Price included
+    Attributes: [
+      {
+        AttributeId: pricingRule.Size.AttributeID,
+        AttributeValueId: pricingRule.Size.ValueID,
+      },
+      {
+        AttributeId: pricingRule.QuantityRange.AttributeID,
+        AttributeValueId: pricingRule.QuantityRange.ValueID,
+      },
+    ],
+    DynamicAttributes: [],
+    CartItemDocumentIds: documentIds ?? [],
+  };
+
+
+  try {
+    const response = await addToCartApi(cartItem); // Fixed variable name
+  } catch (error) {
+  }
+};
+
 export const addToCartNameSlip = async (
   productId: number,
   pricingRule: {

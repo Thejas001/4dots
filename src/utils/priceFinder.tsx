@@ -8,6 +8,7 @@ import {
   PolaroidCardPricingRule,
   CanvasPricingRule,
   PaperPrintAddonRule,
+  OnamAlbumPricingRule
 } from "@/app/models/products";
 
 
@@ -910,6 +911,62 @@ export const findCanvasPricingRule = (
       ValueName: rule.SquareFeetRange?.ValueName || "",
       AttributeID: rule.SquareFeetRange?.AttributeID || 0,
       ValueID: rule.SquareFeetRange?.ValueID || 0,
+    },
+  };
+
+  return extractedData;
+};
+
+
+
+export const findOnamAlbumPricingRule = (
+    pricingRules: OnamAlbumPricingRule[] | undefined,
+  selectedSize: string,
+  selectedQuantity: string | number,
+): OnamAlbumPricingRule | null => {
+  if (!pricingRules || pricingRules.length === 0) {
+    return null;
+  }
+
+  // Ensure `selectedQuantity` is a number
+  const selectedQty =
+    typeof selectedQuantity === "string"
+      ? Number(selectedQuantity)
+      : selectedQuantity;
+  if (isNaN(selectedQty)) {
+    return null;
+  }
+
+  const rule =
+    pricingRules.find((rule) => {
+      if (!rule.QuantityRange?.ValueName) return false;
+
+      const [min, max] = rule.QuantityRange.ValueName.split("-").map(Number);
+
+      return (
+        rule.Size?.ValueName.trim() === selectedSize.trim() &&
+        selectedQty >= min &&
+        (isNaN(max) || selectedQty <= max)
+      );
+    }) || null;
+
+
+  if (!rule) {
+    return null;
+  }
+
+  // ✅ Extract IDs correctly
+  const extractedData: OnamAlbumPricingRule = {
+    Price: rule.Price,
+    Size: {
+      ValueName: rule.Size?.ValueName || "",
+      AttributeID: rule.Size?.AttributeID ?? -1, // Ensure IDs are not missing
+      ValueID: rule.Size?.ValueID ?? -1,
+    },
+    QuantityRange: {
+      ValueName: rule.QuantityRange?.ValueName || "",
+      AttributeID: rule.QuantityRange?.AttributeID ?? -1, // Ensure IDs are not missing
+      ValueID: rule.QuantityRange?.ValueID ?? -1,
     },
   };
 

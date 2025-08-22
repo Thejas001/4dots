@@ -46,6 +46,12 @@ export interface NameSlipPricingRule {
   Price: number;
 }
 
+export interface OnamAlbumPricingRule {
+  Size: AttributeDetail;
+  QuantityRange: AttributeDetail; 
+  Price: number;
+}
+
 export interface PaperPrintingPricingRule {
   PaperSize: AttributeDetail;
   ColorType: AttributeDetail;
@@ -115,4 +121,5 @@ export interface Product {
   NameSlipPricingRules?: NameSlipPricingRule[];
   CanvasPricingRules?: CanvasPricingRule[];
   PaperPrintAddonRules?: PaperPrintAddonRule[]; // Should match the fixed interface
+  OnamAlbumPricingRules?: OnamAlbumPricingRule[];
 }
