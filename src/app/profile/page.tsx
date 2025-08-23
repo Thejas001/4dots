@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const Profile = () => {
   return ( 
-    <DefaultLayout >
+    <DefaultLayout>
       <ProfileComponent />
     </DefaultLayout>
     

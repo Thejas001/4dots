@@ -72,9 +72,9 @@ const ProfileComponent = () => {
   }
 
   return (
-    <div className="bg-[#fff] h-full grid grid-rows-[auto,1fr]">
+    <div className="bg-[#fff] h-full">
       {/* Top Section */}
-      <div className="flex flex-wrap items-center gap-4 sm:gap-8 px-4 sm:px-10 md:px-20 py-4">
+      <div className="flex flex-wrap items-center gap-4 sm:gap-8 px-6 md:px-16 py-4">
         <div className="border rounded-[4px] border-[#242424] p-1">
           <Link href="/">
             <img
@@ -113,7 +113,7 @@ const ProfileComponent = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 px-4 sm:px-10 md:px-20 pb-10">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 px-6 md:px-16 pb-10">
         {/* Left Column */}
         <div className="flex flex-col gap-6">
           <div className="flex flex-row gap-4 items-start rounded-[10px] border border-[#ECECEC] p-5 w-full">
