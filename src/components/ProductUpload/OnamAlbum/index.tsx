@@ -128,6 +128,38 @@ const ProductUpload = ({ product }: { product: any }) => {
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
 
+  // Debug: Log product details when component mounts
+  useEffect(() => {
+    console.log("=== ONEM ALBUM DEBUG ===");
+    console.log("Product:", product);
+    console.log("Product Details:", productDetails);
+    console.log("Product Keys:", Object.keys(productDetails || {}));
+    console.log("Pricing Rules:", productDetails?.PricingRules);
+    console.log("OnamAlbumPricingRules:", productDetails?.OnamAlbumPricingRules);
+    console.log("All product properties:", JSON.stringify(productDetails, null, 2));
+    if (productDetails?.PricingRules) {
+      productDetails.PricingRules.forEach((rule: any, index: number) => {
+        console.log(`Pricing Rule ${index}:`, {
+          size: rule.Size,
+          quantityRange: rule.QuantityRange,
+          price: rule.Price,
+          fullRule: rule
+        });
+      });
+    }
+    if (productDetails?.OnamAlbumPricingRules) {
+      productDetails.OnamAlbumPricingRules.forEach((rule: any, index: number) => {
+        console.log(`OnamAlbum Pricing Rule ${index}:`, {
+          size: rule.Size,
+          quantityRange: rule.QuantityRange,
+          price: rule.Price,
+          fullRule: rule
+        });
+      });
+    }
+    console.log("=== END DEBUG ===");
+  }, [product, productDetails]);
+
   const isLoggedIn = () => {
     return typeof window !== "undefined" && localStorage.getItem("token");
   };
@@ -174,6 +206,9 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   // Handle page count selection
   const handlePageCountSelection = (pageCount: string) => {
+    console.log("Product Details:", productDetails);
+    console.log("Pricing Rules:", productDetails?.PricingRules);
+    
     setSelectedSize(pageCount);
     setPageCountSelected(true);
     setShowPageCountSelection(false);
@@ -185,18 +220,46 @@ const ProductUpload = ({ product }: { product: any }) => {
     
     // Calculate initial price for the selected page count with minimum required images
     const minImages = pageCount === "4" ? 8 : 16;
-    const pricingRule = findOnamAlbumPricingRule(
-      productDetails.PricingRules,
-      pageCount,
-      minImages
-    );
+    const sizeToSearch = pageCount === "4" ? "4 Pages" : "8 Pages";
+    console.log("Looking for pricing rule:", { pageCount, sizeToSearch, minImages });
     
-    if (pricingRule) {
-      setCalculatedPrice(pricingRule.Price);
-      setSelectedPricingRule(pricingRule);
-    } else {
+    // Try to find pricing rules in different possible locations
+    const pricingRules = productDetails?.PricingRules || 
+                        productDetails?.OnamAlbumPricingRules || 
+                        productDetails?.pricingRules ||
+                        productDetails?.onamAlbumPricingRules;
+    
+    console.log("Available pricing rules:", pricingRules);
+    
+    if (!pricingRules) {
+      console.log("No pricing rules available yet");
       setCalculatedPrice(null);
       setSelectedPricingRule(null);
+    } else {
+      // Log each rule to see the structure
+      pricingRules.forEach((rule: any, index: number) => {
+        console.log(`Rule ${index}:`, {
+          size: rule.Size?.ValueName || rule.Size,
+          quantityRange: rule.QuantityRange?.ValueName || rule.QuantityRange,
+          price: rule.Price
+        });
+      });
+      
+      const pricingRule = findOnamAlbumPricingRule(
+        pricingRules,
+        sizeToSearch,
+        minImages
+      );
+      
+      console.log("Found pricing rule:", pricingRule);
+      
+      if (pricingRule) {
+        setCalculatedPrice(pricingRule.Price);
+        setSelectedPricingRule(pricingRule);
+      } else {
+        setCalculatedPrice(null);
+        setSelectedPricingRule(null);
+      }
     }
     
     setImageCountValidation({
@@ -218,9 +281,15 @@ const ProductUpload = ({ product }: { product: any }) => {
       setSelectedQuantity(newQuantity);
       
       // Recalculate price based on new quantity
+      const sizeToSearch = selectedSize === "4" ? "4 Pages" : "8 Pages";
+      const pricingRules = productDetails?.PricingRules || 
+                          productDetails?.OnamAlbumPricingRules || 
+                          productDetails?.pricingRules ||
+                          productDetails?.onamAlbumPricingRules;
+      
       const pricingRule = findOnamAlbumPricingRule(
-        productDetails.PricingRules,
-        selectedSize,
+        pricingRules,
+        sizeToSearch,
         newQuantity
       );
       
@@ -238,9 +307,15 @@ const ProductUpload = ({ product }: { product: any }) => {
       
       // Reset to initial price for minimum required images
       const minImages = selectedSize === "4" ? 8 : 16;
+      const sizeToSearch = selectedSize === "4" ? "4 Pages" : "8 Pages";
+      const pricingRules = productDetails?.PricingRules || 
+                          productDetails?.OnamAlbumPricingRules || 
+                          productDetails?.pricingRules ||
+                          productDetails?.onamAlbumPricingRules;
+      
       const pricingRule = findOnamAlbumPricingRule(
-        productDetails.PricingRules,
-        selectedSize,
+        pricingRules,
+        sizeToSearch,
         minImages
       );
       
@@ -249,7 +324,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         setSelectedPricingRule(pricingRule);
       }
     }
-  }, [fileList.length, selectedSize, pageCountSelected, validateImageCount, productDetails.PricingRules]);
+  }, [fileList.length, selectedSize, pageCountSelected, validateImageCount, productDetails]);
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
     setUploadedDocumentId(documentId);
@@ -371,9 +446,14 @@ const ProductUpload = ({ product }: { product: any }) => {
       return [];
     }
 
+    const pricingRules = productDetails?.PricingRules || 
+                        productDetails?.OnamAlbumPricingRules || 
+                        productDetails?.pricingRules ||
+                        productDetails?.onamAlbumPricingRules;
+
     return productDetails.sizes.map((size: string, index: number) => {
       const pricingRule = findOnamAlbumPricingRule(
-        productDetails.PricingRules,
+        pricingRules,
         size,
         selectedQuantity
       );
@@ -416,7 +496,7 @@ const ProductUpload = ({ product }: { product: any }) => {
         </div>
       );
     });
-  }, [productDetails?.sizes, selectedQuantity, selectedSize, productDetails?.PricingRules]);
+  }, [productDetails?.sizes, selectedQuantity, selectedSize, productDetails]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -483,12 +563,25 @@ const ProductUpload = ({ product }: { product: any }) => {
                   {/* Step 1: Page Count Selection - Always show first */}
                   {showPageCountSelection && (
                     <div className="bg-gray-50 rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Album Page Count</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Select Album Page Count</h3>
+                        {pageCountSelected && (
+                          <button
+                            onClick={() => {
+                              setShowPageCountSelection(false);
+                              setImageUploadEnabled(true);
+                            }}
+                            className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                          >
+                            Continue to Upload →
+                          </button>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-600 mb-6">Choose how many pages you want in your album</p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div
-                          className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 relative ${
                             selectedSize === "4"
                               ? "border-blue-500 bg-blue-50"
                               : "border-gray-200 bg-white hover:border-gray-300"
@@ -496,26 +589,24 @@ const ProductUpload = ({ product }: { product: any }) => {
                           onClick={() => handlePageCountSelection("4")}
                         >
                           <div className="text-center">
+                            {selectedSize === "4" && (
+                              <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
                             <div className="text-2xl font-bold text-gray-900 mb-2">4 Pages</div>
                             <div className="text-sm text-gray-600 mb-3">Perfect for small collections</div>
                             <div className="text-xs text-gray-500 mb-2">
                               Requires 8-16 images
                             </div>
-                                                         <div className="text-xs text-blue-600 font-medium">
-                               Starting from ₹{(() => {
-                                                                 const pricingRule = findOnamAlbumPricingRule(
-                                  productDetails.PricingRules,
-                                  "4",
-                                  8
-                                );
-                                 return pricingRule ? pricingRule.Price.toFixed(2) : "N/A";
-                               })()}
-                             </div>
+
                           </div>
                         </div>
                         
                         <div
-                          className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                          className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 relative ${
                             selectedSize === "8"
                               ? "border-blue-500 bg-blue-50"
                               : "border-gray-200 bg-white hover:border-gray-300"
@@ -523,21 +614,19 @@ const ProductUpload = ({ product }: { product: any }) => {
                           onClick={() => handlePageCountSelection("8")}
                         >
                           <div className="text-center">
+                            {selectedSize === "8" && (
+                              <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
                             <div className="text-2xl font-bold text-gray-900 mb-2">8 Pages</div>
                             <div className="text-sm text-gray-600 mb-3">Great for larger collections</div>
-                                                         <div className="text-xs text-gray-500 mb-2">
-                               Requires 16-34 images
-                             </div>
-                                                         <div className="text-xs text-blue-600 font-medium">
-                               Starting from ₹{(() => {
-                                                                 const pricingRule = findOnamAlbumPricingRule(
-                                  productDetails.PricingRules,
-                                  "8",
-                                  16
-                                );
-                                 return pricingRule ? pricingRule.Price.toFixed(2) : "N/A";
-                               })()}
-                             </div>
+                            <div className="text-xs text-gray-500 mb-2">
+                              Requires 16-34 images
+                            </div>
+
                           </div>
                         </div>
                       </div>
@@ -547,7 +636,47 @@ const ProductUpload = ({ product }: { product: any }) => {
                   {/* Step 2: Image Upload - Only show after page count selection */}
                   {imageUploadEnabled && (
                     <div className="bg-gray-50 rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Images</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Upload Images</h3>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setShowPageCountSelection(true);
+                              setImageUploadEnabled(false);
+                              setPageCountSelected(false);
+                              setSelectedSize("");
+                              setFileList([]);
+                              setCalculatedPrice(null);
+                              setSelectedPricingRule(null);
+                              setImageCountValidation({
+                                isValid: false,
+                                message: "",
+                                minRequired: 0,
+                                maxAllowed: 0
+                              });
+                            }}
+                            className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                          >
+                            ← Change Page Count
+                          </button>
+                          <div className="px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg">
+                            Selected: {selectedSize} Pages
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Current Selection Summary */}
+                      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="text-center">
+                          <p className="text-sm font-medium text-blue-900">
+                            {selectedSize}-Page Album Selected
+                          </p>
+                          <p className="text-xs text-blue-700">
+                            Requires {selectedSize === "4" ? "8-16" : "16-34"} images
+                          </p>
+                        </div>
+                      </div>
+                      
                       <p className="text-sm text-gray-600 mb-4">
                         Upload images for your {selectedSize}-page album
                       </p>

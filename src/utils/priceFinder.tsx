@@ -924,7 +924,11 @@ export const findOnamAlbumPricingRule = (
   selectedSize: string,
   selectedQuantity: string | number,
 ): OnamAlbumPricingRule | null => {
+  console.log("findOnamAlbumPricingRule called with:", { selectedSize, selectedQuantity });
+  console.log("Available pricing rules:", pricingRules);
+  
   if (!pricingRules || pricingRules.length === 0) {
+    console.log("No pricing rules provided");
     return null;
   }
 
@@ -934,20 +938,34 @@ export const findOnamAlbumPricingRule = (
       ? Number(selectedQuantity)
       : selectedQuantity;
   if (isNaN(selectedQty)) {
+    console.log("Invalid quantity:", selectedQuantity);
     return null;
   }
 
+  console.log("Searching for rule with size:", selectedSize, "and quantity:", selectedQty);
+
   const rule =
     pricingRules.find((rule) => {
-      if (!rule.QuantityRange?.ValueName) return false;
+      console.log("Checking rule:", {
+        ruleSize: rule.Size?.ValueName,
+        ruleQuantityRange: rule.QuantityRange?.ValueName,
+        rulePrice: rule.Price
+      });
+      
+      if (!rule.QuantityRange?.ValueName) {
+        console.log("Rule has no quantity range");
+        return false;
+      }
 
       const [min, max] = rule.QuantityRange.ValueName.split("-").map(Number);
+      console.log("Quantity range parsed:", { min, max });
 
-      return (
-        rule.Size?.ValueName.trim() === selectedSize.trim() &&
-        selectedQty >= min &&
-        (isNaN(max) || selectedQty <= max)
-      );
+      const sizeMatch = rule.Size?.ValueName.trim() === selectedSize.trim();
+      const quantityMatch = selectedQty >= min && (isNaN(max) || selectedQty <= max);
+      
+      console.log("Matches:", { sizeMatch, quantityMatch });
+      
+      return sizeMatch && quantityMatch;
     }) || null;
 
 
