@@ -830,7 +830,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                               ) : (
                                 <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
                                   <span className="text-lg font-semibold text-gray-900">Total Price</span>
-                                  <span className="text-lg font-bold text-gray-900 text-gray-500">Price not available</span>
+                                  <span className="text-lg font-bold text-gray-900 ">Price not available</span>
                                 </div>
                               )}
                             </div>
