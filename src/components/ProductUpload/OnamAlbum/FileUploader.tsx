@@ -7,6 +7,9 @@ import { Button, message, Upload } from "antd";
 
 const defaultImages = [
 "/images/product/onam-car5.gif",
+"/images/product/onam-car2.jpg",
+"/images/product/onam-car3.jpg",
+"/images/product/onam-car4.jpg"
 ];
 
 interface FileUploaderProps {
