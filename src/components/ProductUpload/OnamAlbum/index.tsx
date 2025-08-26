@@ -189,7 +189,7 @@ const ProductUpload = ({ product }: { product: any }) => {
       maxAllowed = 16;
     } else if (pageCount === "8") {
       minRequired = 16;
-      maxAllowed = 34; // Updated to match API: "16-34"
+      maxAllowed = 34;
     }
 
     if (imageCount < minRequired) {
@@ -223,7 +223,6 @@ const ProductUpload = ({ product }: { product: any }) => {
     const sizeToSearch = pageCount === "4" ? "4 Pages" : "8 Pages";
     console.log("Looking for pricing rule:", { pageCount, sizeToSearch, minImages });
     
-    // Try to find pricing rules in different possible locations
     const pricingRules = productDetails?.PricingRules || 
                         productDetails?.OnamAlbumPricingRules || 
                         productDetails?.pricingRules ||
@@ -236,7 +235,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       setCalculatedPrice(null);
       setSelectedPricingRule(null);
     } else {
-      // Log each rule to see the structure
       pricingRules.forEach((rule: any, index: number) => {
         console.log(`Rule ${index}:`, {
           size: rule.Size?.ValueName || rule.Size,
@@ -436,6 +434,28 @@ const ProductUpload = ({ product }: { product: any }) => {
     await handleProceedToCart();
   };
 
+  // Handle file upload for both mobile and desktop
+  const handleFileUpload = (files: File[]) => {
+    if (files.length > 0) {
+      // Convert files to the format expected by the component
+      const newFiles = files.map((file, index) => ({
+        file,
+        documentId: Date.now() + index, // Temporary ID
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: URL.createObjectURL(file)
+      }));
+      
+      // Update the file list
+      setFileList(prev => [...prev, ...newFiles]);
+      
+      // Update quantity to match file count
+      const totalFiles = fileList.length + newFiles.length;
+      setSelectedQuantity(totalFiles);
+    }
+  };
+
   const isAddToCartDisabled = () => {
     return !pageCountSelected || fileList.length === 0 || !imageCountValidation.isValid || !selectedSize;
   };
@@ -510,14 +530,14 @@ const ProductUpload = ({ product }: { product: any }) => {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
             
-            {/* Left Section - File Preview */}
-            <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
+            {/* Left Section - File Preview - Hidden on mobile, shown on xl+ */}
+            <div className="hidden xl:flex bg-gray-100 p-8 flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
                 <p className="text-gray-600">
                   {!imageUploadEnabled 
                     ? "Select page count first to upload images" 
-                    : "Upload your files to see a preview"
+                    : "Upload your images"
                   }
                 </p>
               </div>
@@ -535,22 +555,141 @@ const ProductUpload = ({ product }: { product: any }) => {
                       </div>
                     </div>
                   ) : (
-                    <FileUploader 
-                      onUploadSuccess={handleUploadSuccess}
-                      quantity={selectedQuantity}
-                      uploadedImages={fileList}
-                      setUploadedImages={setFileList}
-                      currentImageIndex={currentImageIndex}
-                      handleNext={handleNext}
-                      handlePrevious={handlePrevious}
-                    />
+                    <div 
+                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer bg-white hover:bg-gray-50"
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const files = Array.from(e.dataTransfer.files);
+                        handleFileUpload(files);
+                      }}
+                      onClick={() => document.getElementById('sidebar-file-upload')?.click()}
+                    >
+                      <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p className="text-base text-gray-600 mb-2">
+                        <span className="font-medium text-blue-600">Click to upload</span> or drag and drop images
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        PNG, JPG, JPEG up to 10MB
+                      </p>
+                    </div>
                   )}
+                  <input
+                    id="sidebar-file-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (files.length > 0) {
+                        handleFileUpload(files);
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Right Section - Configuration */}
-            <div className="p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
+            {/* Mobile Upload Section - Only show after page count selection */}
+            {imageUploadEnabled && (
+              <div className="xl:hidden bg-gray-50 p-4 border-t border-gray-200">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Images</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Upload your images
+                  </p>
+                </div>
+                
+                {/* Mobile Drag & Drop Upload Area */}
+                <div className="w-full max-w-md mx-auto">
+                  <div 
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer bg-white hover:bg-gray-50"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const files = Array.from(e.dataTransfer.files);
+                      handleFileUpload(files);
+                    }}
+                    onClick={() => document.getElementById('mobile-file-upload')?.click()}
+                  >
+                    <svg className="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="text-sm text-gray-600 mb-2">
+                      <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, JPEG up to 10MB
+                    </p>
+                  </div>
+                  <input
+                    id="mobile-file-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (files.length > 0) {
+                        handleFileUpload(files);
+                      }
+                    }}
+                  />
+                </div>
+                
+                {/* Mobile Image Count Validation - Always show when enabled */}
+                <div className={`mt-4 p-3 rounded-lg ${
+                  fileList.length === 0 
+                    ? 'bg-blue-50 border border-blue-200' 
+                    : imageCountValidation.isValid 
+                      ? 'bg-green-50 border border-green-200' 
+                      : 'bg-yellow-50 border border-yellow-200'
+                }`}>
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${
+                      fileList.length === 0 
+                        ? 'bg-blue-500' 
+                        : imageCountValidation.isValid 
+                          ? 'bg-green-500' 
+                          : 'bg-yellow-500'
+                    }`}></div>
+                    <div>
+                      {fileList.length === 0 ? (
+                        <p className="text-xs font-medium text-blue-800">
+                          Ready to upload images
+                        </p>
+                      ) : (
+                        <p className={`text-xs font-medium ${
+                          imageCountValidation.isValid ? 'text-green-800' : 'text-yellow-800'
+                        }`}>
+                          {imageCountValidation.message}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-600 mt-1">
+                        {fileList.length === 0 
+                          ? `Required: ${imageCountValidation.minRequired}-${imageCountValidation.maxAllowed} images`
+                          : `Uploaded: ${fileList.length} images | Required: ${imageCountValidation.minRequired}-${imageCountValidation.maxAllowed} images`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Right Section - Configuration - Full width on mobile */}
+            <div className="p-4 md:p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
               <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-8">
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">Onam Memories Album</h1>
@@ -583,7 +722,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                         <div
                           className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 relative ${
                             selectedSize === "4"
-                              ? "border-blue-500 bg-blue-50"
+                              ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
                               : "border-gray-200 bg-white hover:border-gray-300"
                           }`}
                           onClick={() => handlePageCountSelection("4")}
@@ -601,14 +740,18 @@ const ProductUpload = ({ product }: { product: any }) => {
                             <div className="text-xs text-gray-500 mb-2">
                               Requires 8-16 images
                             </div>
-
+                            {selectedSize === "4" && (
+                              <div className="mt-3 p-2 bg-blue-100 rounded-lg">
+                                <p className="text-xs font-medium text-blue-800">✓ Selected</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                         
                         <div
                           className={`p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 relative ${
                             selectedSize === "8"
-                              ? "border-blue-500 bg-blue-50"
+                              ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
                               : "border-gray-200 bg-white hover:border-gray-300"
                           }`}
                           onClick={() => handlePageCountSelection("8")}
@@ -626,18 +769,43 @@ const ProductUpload = ({ product }: { product: any }) => {
                             <div className="text-xs text-gray-500 mb-2">
                               Requires 16-34 images
                             </div>
-
+                            {selectedSize === "8" && (
+                              <div className="mt-3 p-2 bg-blue-100 rounded-lg">
+                                <p className="text-xs font-medium text-blue-800">✓ Selected</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
+                      
+                      {/* Mobile Selection Status */}
+                      {pageCountSelected && (
+                        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 bg-green-500 rounded-full mr-2 flex items-center justify-center">
+                              <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-green-800">
+                                {selectedSize}-Page Album Selected
+                              </p>
+                              <p className="text-xs text-green-600 mt-1">
+                                Ready to upload {selectedSize === "4" ? "8-16" : "16-34"} images
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {/* Step 2: Image Upload - Only show after page count selection */}
+                  {/* Step 2: Image Upload Status - Only show after page count selection */}
                   {imageUploadEnabled && (
                     <div className="bg-gray-50 rounded-xl p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">Upload Images</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Uploaded Images</h3>
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
@@ -678,49 +846,51 @@ const ProductUpload = ({ product }: { product: any }) => {
                       </div>
                       
                       <p className="text-sm text-gray-600 mb-4">
-                        Upload images for your {selectedSize}-page album
+                        Upload your images
                       </p>
                       
-                      {/* Image Count Validation */}
-                      {fileList.length > 0 && (
-                        <div className={`mb-4 p-4 rounded-lg ${
-                          imageCountValidation.isValid 
-                            ? 'bg-green-50 border border-green-200' 
-                            : 'bg-yellow-50 border border-yellow-200'
-                        }`}>
-                          <div className="flex items-center">
-                            <div className={`w-4 h-4 rounded-full mr-3 ${
-                              imageCountValidation.isValid ? 'bg-green-500' : 'bg-yellow-500'
-                            }`}></div>
-                            <div>
-                              <p className={`text-sm font-medium ${
-                                imageCountValidation.isValid ? 'text-green-800' : 'text-yellow-800'
-                              }`}>
-                                {imageCountValidation.message}
-                              </p>
-                              <p className="text-xs text-gray-600 mt-1">
-                                Uploaded: {fileList.length} images | Required: {imageCountValidation.minRequired}-{imageCountValidation.maxAllowed} images
-                              </p>
+                      {/* Image Count Validation - Only show on desktop (xl screens) */}
+                      <div className="hidden xl:block">
+                        {fileList.length > 0 && (
+                          <div className={`mb-4 p-4 rounded-lg ${
+                            imageCountValidation.isValid 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'bg-yellow-50 border border-yellow-200'
+                          }`}>
+                            <div className="flex items-center">
+                              <div className={`w-4 h-4 rounded-full mr-3 ${
+                                imageCountValidation.isValid ? 'bg-green-500' : 'bg-yellow-500'
+                              }`}></div>
+                              <div>
+                                <p className={`text-sm font-medium ${
+                                  imageCountValidation.isValid ? 'text-green-800' : 'text-yellow-800'
+                                }`}>
+                                  {imageCountValidation.message}
+                                </p>
+                                <p className="text-xs text-gray-600 mt-1">
+                                  Uploaded: {fileList.length} images | Required: {imageCountValidation.minRequired}-{imageCountValidation.maxAllowed} images
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                      
-                      {fileList.length === 0 ? (
-                        <div className="text-center py-8">
-                          <p className="text-gray-500">Please upload images in the left column</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
-                          <ImageSection
-                            uploadedImages={fileList}
-                            setUploadedImages={setFileList}
-                            setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 1)}
-                          />
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    
+                    {fileList.length === 0 ? (
+                      <div className="text-center py-8">
+                          <p className="text-gray-500">Please upload your images</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
+                        <ImageSection
+                          uploadedImages={fileList}
+                          setUploadedImages={setFileList}
+                          setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 1)}
+                        />
+                      </div>
+                    )}
+                  </div>
                   )}
 
                   {/* Step 3: Size Selection - Only show after file upload */}

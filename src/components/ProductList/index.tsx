@@ -52,6 +52,24 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         </div>
         
         <div className="grid grid-cols-2 gap-4">
+
+                    {/* Onam Album - Full width to balance the layout */}
+                    <Link href={`/ProductDetails/onam-memories-album?dataId=9`} prefetch={true} className="col-span-2">
+            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="relative">
+                <img
+                  src="/images/product/photoframe.jpg"
+                  alt="Onam Memories Album"
+                  className="w-full h-32 object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-[#242424] mb-1">Onam Memories Album</h3>
+                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹550</p>
+              </div>
+            </div>
+          </Link>
+          
           {/* Photo Frame */}
           <Link href={`/ProductDetails/photo-frame?dataId=2`} passHref prefetch={true}>
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
@@ -188,22 +206,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             </div>
           </Link>
 
-          {/* Onam Album - Full width to balance the layout */}
-          <Link href={`/ProductDetails/onam-memories-album?dataId=9`} prefetch={true} className="col-span-2">
-            <div className="bg-white rounded-lg overflow-hidden shadow-sm">
-              <div className="relative">
-                <img
-                  src="/images/product/photoframe.jpg"
-                  alt="Onam Memories Album"
-                  className="w-full h-32 object-cover"
-                />
-              </div>
-              <div className="p-3">
-                <h3 className="font-bold text-sm text-[#242424] mb-1">Onam Memories Album</h3>
-                <p className="text-blue-600 text-sm font-medium">Starting From @ ₹550</p>
-              </div>
-            </div>
-          </Link>
+
         </div>
       </div>
 
@@ -212,6 +215,39 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
         <div className="col-span-12 flex items-center justify-center pb-1 pt-[27px] text-xl font-medium  text-[#242424]">
           Our Product
         </div>
+
+                 {/**Onam Album - New row for desktop */}
+                 <div 
+           data-id="9" 
+           className="relative col-span-12 h-[200px] overflow-hidden rounded-[8.541px] bg-gradient-to-r from-orange-400 to-red-500 transition-shadow duration-300 hover:shadow-lg sm:h-[400px] md:rounded-[20px] lg:col-span-12 cursor-pointer"
+           onClick={() => router.push("/ProductDetails/onam-memories-album?dataId=9")}
+         >
+           <img
+             src="/images/product/photoframe.jpg"
+             alt="Onam Memories Album"
+             loading="eager"
+             className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+           />
+           <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-2 py-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
+           Onam Memories Album
+           </div>
+             <button 
+               onClick={(e) => {
+                 e.stopPropagation();
+                 router.push("/ProductDetails/onam-memories-album?dataId=9");
+               }}
+               className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base"
+             >
+                 <span className="flex items-center">
+                   Starting From @
+                   <span className="flex items-center">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
+                       <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
+                     </svg>550
+                   </span>
+                 </span>
+             </button>
+         </div>
 
                  {/**Photo Frame */}
          <div 
@@ -481,38 +517,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
              </button>
          </div>
 
-         {/**Onam Album - New row for desktop */}
-         <div 
-           data-id="9" 
-           className="relative col-span-12 h-[200px] overflow-hidden rounded-[8.541px] bg-gradient-to-r from-orange-400 to-red-500 transition-shadow duration-300 hover:shadow-lg sm:h-[400px] md:rounded-[20px] lg:col-span-12 cursor-pointer"
-           onClick={() => router.push("/ProductDetails/onam-memories-album?dataId=9")}
-         >
-           <img
-             src="/images/product/photoframe.jpg"
-             alt="Onam Memories Album"
-             loading="eager"
-             className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
-           />
-           <div className="absolute left-[11px] top-[11px] rounded-full bg-[#242424] px-2 py-1 text-[10px] font-medium leading-5 tracking-[0.4px] text-[#fff] md:left-3.5 md:top-3.5 md:px-2 md:py-1 md:text-xl">
-           Onam Memories Album
-           </div>
-             <button 
-               onClick={(e) => {
-                 e.stopPropagation();
-                 router.push("/ProductDetails/onam-memories-album?dataId=9");
-               }}
-               className="absolute bottom-[7.13px] right-[7.27px] flex items-center rounded-full border border-white bg-black bg-opacity-50 px-2 text-[8px] font-medium tracking-[0.096px] text-white transition duration-300 md:bottom-[25px] md:right-8.5 md:p-2.5 md:text-base"
-             >
-                 <span className="flex items-center">
-                   Starting From @
-                   <span className="flex items-center">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 19 19" fill="none">
-                       <path d="M14.1667 5.49967V3.83301H5V5.49967H7.91667C9.00167 5.49967 9.9175 6.19801 10.2625 7.16634H5V8.83301H10.2625C10.0919 9.3193 9.77463 9.74073 9.3545 10.0392C8.93438 10.3377 8.43203 10.4986 7.91667 10.4997H5V12.5113L9.655 17.1663H12.0117L7.01167 12.1663H7.91667C8.87651 12.1646 9.80644 11.8322 10.5499 11.225C11.2933 10.6179 11.8048 9.77315 11.9983 8.83301H14.1667V7.16634H11.9983C11.8715 6.55954 11.6082 5.98958 11.2283 5.49967H14.1667Z" fill="#fff"/>
-                     </svg>550
-                   </span>
-                 </span>
-             </button>
-         </div>
+
       </div>
     </>
   );
