@@ -40,7 +40,7 @@ const paymentMethods: { name: string; src: string; alt?: string }[] = [
   { name: 'BHIM UPI', src: '/images/footer/bhim.png' },
   { name: 'Mastercard', src: '/images/footer/mastercard.jpg' },
   { name: 'Visa Electron', src: '/images/footer/visa-electron.png' },
-  { name: 'Maestro', src: '/images/footer/maestro.jpg' },
+  { name: 'Maestro', src: '/images/footer/maestro.png' },
   { name: 'VISA', src: '/images/footer/visa.jpg' },
 ];
 
