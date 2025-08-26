@@ -545,53 +545,15 @@ const ProductUpload = ({ product }: { product: any }) => {
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <div className="w-full max-w-md">
-                  {!imageUploadEnabled ? (
-                    <div className="text-center py-12">
-                      <div className="bg-gray-200 rounded-lg p-8">
-                        <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        <p className="text-gray-600">Please select the number of pages first</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div 
-                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer bg-white hover:bg-gray-50"
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const files = Array.from(e.dataTransfer.files);
-                        handleFileUpload(files);
-                      }}
-                      onClick={() => document.getElementById('sidebar-file-upload')?.click()}
-                    >
-                      <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <p className="text-base text-gray-600 mb-2">
-                        <span className="font-medium text-blue-600">Click to upload</span> or drag and drop images
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        PNG, JPG, JPEG up to 10MB
-                      </p>
-                    </div>
-                  )}
-                  <input
-                    id="sidebar-file-upload"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      if (files.length > 0) {
-                        handleFileUpload(files);
-                      }
-                    }}
+                                    <FileUploader 
+                    pageCountSelected={pageCountSelected}
+                    onUploadSuccess={handleUploadSuccess}
+                    quantity={selectedQuantity}
+                    uploadedImages={fileList}
+                    setUploadedImages={setFileList}
+                    currentImageIndex={currentImageIndex}
+                    handleNext={handleNext}
+                    handlePrevious={handlePrevious}
                   />
                 </div>
               </div>
