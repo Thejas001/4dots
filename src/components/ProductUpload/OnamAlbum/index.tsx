@@ -514,12 +514,7 @@ const ProductUpload = ({ product }: { product: any }) => {
           <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
             {/* Left Section - File Preview - Hidden on mobile, shown on xl+ */}
             <div className="hidden xl:flex bg-gray-100 p-8 flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
-                <p className="text-gray-600">
-                  {fileList.length === 0 ? "Select page count to upload images" : "Your uploaded images"}
-                </p>
-              </div>
+
 
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
@@ -531,12 +526,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             <div className="p-4 md:p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
               {/* Mobile Slideshow - Always shown in mobile view */}
               <div className="xl:hidden mb-6">
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Document Preview</h3>
-                  <p className="text-sm text-gray-600">
-                    Preview your Onam Memories Album
-                  </p>
-                </div>
+
                 <div className="w-full max-w-md mx-auto h-[50vh]">
                   <FileUploader fileList={fileList} />
                 </div>

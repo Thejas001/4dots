@@ -29,26 +29,48 @@ const FileUploader: React.FC<FileUploaderProps> = () => {
   }, [imagesToShow.length]);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
+    <div className="w-full">
       {imagesToShow.length > 0 ? (
-        <div className="relative w-full h-full flex items-center justify-center">
-          <img
-            src={imagesToShow[currentImageIndex]}
-            alt="Slideshow"
-            className="w-full h-full object-contain rounded-lg"
-          />
-          {/* Navigation dots */}
-          <div className="absolute bottom-4 flex justify-center w-full">
-            {imagesToShow.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full mx-1 ${
-                  index === currentImageIndex ? "bg-blue-500" : "bg-gray-300"
-                }`}
-              />
-            ))}
+        <>
+          {/* Mobile View - Bigger Slideshow with No Blank Space Below */}
+          <div className="md:hidden relative w-full h-64">
+            <img
+              src={imagesToShow[currentImageIndex]}
+              alt="Slideshow"
+              className="w-full h-full object-cover rounded-lg"
+            />
+            {/* Navigation dots */}
+            <div className="absolute bottom-2 flex justify-center w-full">
+              {imagesToShow.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full mx-1 ${
+                    index === currentImageIndex ? "bg-blue-500" : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+          {/* Desktop View - Original Slideshow */}
+          <div className="hidden md:flex relative w-full h-full flex items-center justify-center">
+            <img
+              src={imagesToShow[currentImageIndex]}
+              alt="Slideshow"
+              className="w-full h-full object-contain rounded-lg"
+            />
+            {/* Navigation dots */}
+            <div className="absolute bottom-4 flex justify-center w-full">
+              {imagesToShow.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full mx-1 ${
+                    index === currentImageIndex ? "bg-blue-500" : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </>
       ) : (
         <p className="text-gray-600">No images to display</p>
       )}
