@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
+import NewFileUploader from "./NewFileUploader";
 import FileUploader from "./FileUploader";
 import ImageSection from "./imageSection";
 import { fetchProductDetails } from "@/utils/api";
@@ -545,16 +546,6 @@ const ProductUpload = ({ product }: { product: any }) => {
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <div className="w-full max-w-md">
-                                    <FileUploader 
-                    pageCountSelected={pageCountSelected}
-                    onUploadSuccess={handleUploadSuccess}
-                    quantity={selectedQuantity}
-                    uploadedImages={fileList}
-                    setUploadedImages={setFileList}
-                    currentImageIndex={currentImageIndex}
-                    handleNext={handleNext}
-                    handlePrevious={handlePrevious}
-                  />
                 </div>
               </div>
             </div>
@@ -806,10 +797,17 @@ const ProductUpload = ({ product }: { product: any }) => {
                           </p>
                         </div>
                       </div>
-                      
-                      <p className="text-sm text-gray-600 mb-4">
-                        Upload your images
-                      </p>
+
+                  <FileUploader 
+                    pageCountSelected={pageCountSelected}
+                    onUploadSuccess={handleUploadSuccess}
+                    quantity={selectedQuantity}
+                    uploadedImages={fileList}
+                    setUploadedImages={setFileList}
+                    currentImageIndex={currentImageIndex}
+                    handleNext={handleNext}
+                    handlePrevious={handlePrevious}
+                  />
                       
                       {/* Image Count Validation - Only show on desktop (xl screens) */}
                       <div className="hidden xl:block">
@@ -845,11 +843,18 @@ const ProductUpload = ({ product }: { product: any }) => {
                     ) : (
                       <div className="space-y-4">
                         <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
-                        <ImageSection
+<ImageSection
                           uploadedImages={fileList}
                           setUploadedImages={setFileList}
-                          setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 1)}
+                          selectedSize={selectedSize === "4" ? "8-16" : "16-34"} // Pass the range string
+                          setSelectedSize={setSelectedSize}
+                          maxAllowed={imageCountValidation.maxAllowed} // Pass maxAllowed from validation
                         />
+
+
+
+
+
                       </div>
                     )}
                   </div>

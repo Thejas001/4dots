@@ -1,33 +1,43 @@
 import React, { useState, useEffect } from "react";
 import type { UploadFile } from "antd/es/upload";
-import { CloseCircleOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, LeftOutlined, RightOutlined, PlusOutlined } from "@ant-design/icons";
+import { Upload, message } from "antd";
 
-const ImageSection = ({
-  uploadedImages,
-  setUploadedImages,
-  setSelectedQuantity,
-}: {
+interface ImageSectionProps {
   uploadedImages: UploadFile[];
   setUploadedImages: React.Dispatch<React.SetStateAction<UploadFile[]>>;
-  setSelectedQuantity: (quantity: number | null) => void;
+  selectedSize: string; // e.g., "8-16"
+  setSelectedSize: (size: string) => void;
+  maxAllowed: number; // Added to enforce the max limit from parent
+}
+
+const ImageSection: React.FC<ImageSectionProps> = ({
+  uploadedImages,
+  setUploadedImages,
+  selectedSize,
+  setSelectedSize,
+  maxAllowed,
 }) => {
   const [startIndex, setStartIndex] = useState(0);
-  const maxVisible = 5; // Maximum images shown at a time
+  const maxVisible = 5;
 
+  // Parse selectedSize range
+  const [minSize, maxSize] = selectedSize.split("-").map((v) => Number(v));
+
+  // Handle removing an image
   const handleRemove = (indexToRemove: number) => {
     setUploadedImages((prev) => {
-      const updatedImages = prev.filter((_, index) => index !== indexToRemove);
-      
-      // Update the selected quantity based on the new number of images
-      setSelectedQuantity(updatedImages.length);
-  
+      const updatedImages = prev.filter((_, i) => i !== indexToRemove);
       return updatedImages;
     });
   };
-  
+
+  // Ensure startIndex is within bounds
   useEffect(() => {
-    setStartIndex((prevIndex) => Math.max(0, Math.min(prevIndex, uploadedImages.length - maxVisible)));
-  }, [uploadedImages.length]); 
+    setStartIndex((prevIndex) =>
+      Math.max(0, Math.min(prevIndex, uploadedImages.length - maxVisible))
+    );
+  }, [uploadedImages.length]);
 
   const handleNext = () => {
     if (startIndex + maxVisible < uploadedImages.length) {
@@ -39,6 +49,46 @@ const ImageSection = ({
     if (startIndex > 0) {
       setStartIndex((prev) => prev - 1);
     }
+  };
+
+  // Upload configuration
+  const uploadProps = {
+    accept: ".jpg,.jpeg,.png,.pdf,.psd",
+    multiple: true,
+    showUploadList: false,
+    beforeUpload: (file: File) => {
+      const allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".psd"];
+      const fileExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+
+      if (!allowedExtensions.includes(fileExt)) {
+        message.error("Unsupported file type.");
+        return Upload.LIST_IGNORE;
+      }
+
+      if (uploadedImages.length >= maxAllowed) {
+        message.warning(`You can upload a maximum of ${maxAllowed} files.`);
+        return Upload.LIST_IGNORE;
+      }
+
+      return true;
+    },
+    onChange: (info: any) => {
+      let updated = info.fileList.map((file: UploadFile) => {
+        if (!file.url && file.originFileObj) {
+          file.url = URL.createObjectURL(file.originFileObj);
+        }
+        return file;
+      });
+
+      if (updated.length > maxAllowed) {
+        updated = updated.slice(0, maxAllowed);
+        message.warning(`Only ${maxAllowed} files are allowed.`);
+      }
+
+      setUploadedImages(updated);
+    },
+    fileList: uploadedImages,
+    disabled: uploadedImages.length >= maxAllowed, // Use maxAllowed from props
   };
 
   return (
@@ -58,13 +108,22 @@ const ImageSection = ({
 
       {/* Image Container */}
       <div className="flex gap-3 p-2">
-        {uploadedImages.length > 0 ? (
-          uploadedImages.slice(startIndex, startIndex + maxVisible).map((file, index) => (
+        {uploadedImages
+          .slice(startIndex, startIndex + maxVisible)
+          .map((file, index) => (
             <div key={file.uid || file.name || index} className="relative">
-              {file.url && file.name && file.name.toLowerCase().endsWith('.pdf') ? (
-                <img src="/images/product/pdf.png" alt="PDF" className="w-24 h-24 object-cover rounded-md" />
+              {file.url && file.name && file.name.toLowerCase().endsWith(".pdf") ? (
+                <img
+                  src="/images/product/pdf.png"
+                  alt="PDF"
+                  className="w-24 h-24 object-cover rounded-md"
+                />
               ) : file.url ? (
-                <img src={file.url} alt={file.name} className="w-24 h-24 object-cover rounded-md" />
+                <img
+                  src={file.url}
+                  alt={file.name}
+                  className="w-24 h-24 object-cover rounded-md"
+                />
               ) : (
                 <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded-md">
                   No Image
@@ -72,20 +131,42 @@ const ImageSection = ({
               )}
               <CloseCircleOutlined
                 className="absolute top-0 right-0 text-red-500 cursor-pointer"
-                onClick={() => handleRemove(index)}
+                onClick={() => handleRemove(startIndex + index)}
               />
             </div>
-          ))
-        ) : (
-          <img src="/images/product/Frame4.svg" alt="Placeholder" />
-        )}
+          ))}
+
+        {/* Upload Button */}
+        <Upload {...uploadProps}>
+          <div
+            className={`w-24 h-24 border border-dashed rounded-md flex flex-col items-center justify-center transition
+              ${uploadedImages.length >= maxAllowed
+                ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
+                : "border-gray-400 bg-white text-gray-500 cursor-pointer hover:border-blue-500 hover:bg-blue-50"
+              }`}
+            onClick={(e) => {
+              if (uploadedImages.length >= maxAllowed) {
+                e.preventDefault();
+                e.stopPropagation();
+                message.warning(`Maximum of ${maxAllowed} files reached.`);
+              }
+            }}
+          >
+            <PlusOutlined className="text-2xl" />
+            <span className="text-sm">
+              {uploadedImages.length >= maxAllowed ? "Limit Reached" : "Upload"}
+            </span>
+          </div>
+        </Upload>
       </div>
 
       {/* Right Arrow */}
       {uploadedImages.length > maxVisible && (
         <button
           className={`p-2 bg-white shadow-md rounded-full ${
-            startIndex + maxVisible >= uploadedImages.length ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            startIndex + maxVisible >= uploadedImages.length
+              ? "opacity-50 cursor-not-allowed"
+              : "cursor-pointer"
           }`}
           onClick={handleNext}
           disabled={startIndex + maxVisible >= uploadedImages.length}
