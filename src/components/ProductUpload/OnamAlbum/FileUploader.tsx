@@ -58,7 +58,7 @@ const FileUploader: React.FC<FileUploaderProps> = () => {
             </div>
           </div>
           {/* Desktop View - Original Slideshow */}
-          <div className="hidden md:flex relative w-full h-full flex items-center justify-center">
+          <div className="hidden md:flex relative w-full h-full items-center justify-center">
             <img
               src={imagesToShow[currentImageIndex]}
               alt="Slideshow"
