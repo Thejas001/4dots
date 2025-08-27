@@ -220,7 +220,6 @@ const ProductUpload = ({ product }: { product: any }) => {
         uploadedDocumentId,
       };
       sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-      toast.success("Product added to cart!");
       router.push(`/auth/signin?redirect=/`);
       setIsLoading(false);
       return;

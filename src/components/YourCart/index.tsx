@@ -301,12 +301,22 @@ const handleViewDesign = (item: {
                       </div>
                       <div className="flex flex-row text-[#242424] mt-4 gap-3 flex-wrap">
                         {/* Selected Attributes */}
-                        {item.Attributes.map((attr) => (
-                          <div key={attr.AttributeName} className="text-base font-medium leading-6 tracking-[-0.2px] flex items-center">
+                        {item.Attributes.filter(
+                          (attr) =>
+                            !(
+                              attr.AttributeValue.includes("Range") || // hides all "Range" values
+                              attr.AttributeName.includes("Range")    // also optional safeguard
+                            )
+                        ).map((attr) => (
+                          <div
+                            key={attr.AttributeName}
+                            className="text-base font-medium leading-6 tracking-[-0.2px] flex items-center"
+                          >
                             <span>{attr.AttributeName}:</span>
                             <span className="pl-[9px]">{attr.AttributeValue}</span>
                           </div>
                         ))}
+
                       </div>
                       <div className="flex flex-row text-[#242424] mt-2 gap-3 flex-wrap">
                         {/* Selected Attributes */}
@@ -325,7 +335,6 @@ const handleViewDesign = (item: {
                         >
                           Uploaded Design
                         </span>
-                        <button className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded">Edit</button>
                         <span className="ml-auto text-lg text-[#242424] font-semibold leading-6 tracking-tighter-[-0.2px]">₹ {item.ItemPrice}</span>
                       </div>
                       <div className="hidden sm:flex flex-row justify-start mt-4 items-center">

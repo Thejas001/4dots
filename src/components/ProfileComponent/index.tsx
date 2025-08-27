@@ -61,7 +61,7 @@ const ProfileComponent = () => {
   const handleLogout = () => {
     document.cookie = "jwtToken=; path=/; max-age=0; SameSite=Lax; Secure";
     localStorage.removeItem("jwtToken");
-    router.push("/");
+    window.location.href = "/";
   };
 
   function getInitials(name: string) {

@@ -45,39 +45,56 @@ const FileUploader = ({
     }
   }, [quantity, setUploadedImages]);
 
-  const props: UploadProps = {
-    name: "document",
-    multiple: true,
-    accept:
-      "image/*,.pdf,.psd",
-    showUploadList: false,
-    beforeUpload: (file) => {
-      const allowedExtensions = [
-        ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif",".svg", ".webp", ".pdf", ".psd"
-      ];
-      const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-      if (!allowedExtensions.includes(fileExt)) {
-        message.error("Unsupported file type. Please upload a supported format.");
+const props: UploadProps = {
+  name: "document",
+  multiple: true,
+  accept: "image/*,.pdf,.psd",
+  showUploadList: false,
+
+  beforeUpload: (file, newFileList) => {
+     if (quantity === null || quantity === 0) {
+        message.error("Please select a quantity first.");
         return false;
       }
-      return true; // Allow upload for all allowed types
-    },
-    onChange: (info) => {
-      // Create preview URLs for uploaded files
-      const updatedFileList = info.fileList.map(file => {
-        if (file.originFileObj && !file.url) {
-          // Create preview URL for local files
-          file.url = URL.createObjectURL(file.originFileObj);
-        }
-        return file;
-      });
-      
-      // Update the uploadedImages state when files are added/removed
-      setUploadedImages(updatedFileList);
-    },
-    fileList: uploadedImages,
-    maxCount: quantity ?? undefined,
-  };
+      if (uploadedImages.length + newFileList.length > quantity) {
+        message.error(`You can only upload up to ${quantity} images.`);
+        return false;
+      }
+    const allowedExtensions = [
+      ".jpg", ".jpeg", ".jfif", ".bmp", ".png", ".gif", ".svg", ".webp", ".pdf", ".psd"
+    ];
+    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+    // ✅ File type validation
+    if (!allowedExtensions.includes(fileExt)) {
+      message.error("Unsupported file type. Please upload a supported format.");
+      return Upload.LIST_IGNORE;
+    }
+
+    // ✅ Quantity limit validation (only if quantity is set)
+    if (quantity != null && uploadedImages.length >= quantity) {
+      message.error(`You can only upload up to ${quantity} images.`);
+      return Upload.LIST_IGNORE;
+    }
+
+    return true; // Allow upload if both checks pass
+  },
+
+  onChange: (info) => {
+    const updatedFileList = info.fileList.map(file => {
+      if (file.originFileObj && !file.url) {
+        file.url = URL.createObjectURL(file.originFileObj);
+      }
+      return file;
+    });
+    setUploadedImages(updatedFileList);
+  },
+
+  fileList: uploadedImages,
+  maxCount: quantity ?? undefined,
+};
+
+
 
   useEffect(() => {
     setCurrentImageIndex(0);

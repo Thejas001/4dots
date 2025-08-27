@@ -21,21 +21,21 @@ export const letterHeadVariants = [
   },
   {
     Service: "Color",
-    Quality: "1000GSM",
-    Quantity:  50,
-    Sizes: {
-      "21X28CM": null,
-      "21X29.7CM": "550",
-      "21X35.5CM": null
-    }
-  },
-  {
-    Service: "Color",
     Quality: "100GSM",
     Quantity: 100,
     Sizes: {
       "21X28CM": null,
       "21X29.7CM": "900",
+      "21X35.5CM": null
+    }
+  },
+    {
+    Service: "Color",
+    Quality: "1000GSM",
+    Quantity:  50,
+    Sizes: {
+      "21X28CM": null,
+      "21X29.7CM": "550",
       "21X35.5CM": null
     }
   },

@@ -185,7 +185,7 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
                 <span className="font-medium text-gray-400">+91</span>
               </div>
               <input
-                type="text"
+                type="number"
                 placeholder=""
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -223,7 +223,7 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
                 <input
                   key={index}
                   id={`otp-input-${index}`}
-                  type="text"
+                  type="number"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleOtpChange(e.target.value, index)}
