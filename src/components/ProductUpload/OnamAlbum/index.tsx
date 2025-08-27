@@ -514,8 +514,6 @@ const ProductUpload = ({ product }: { product: any }) => {
           <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
             {/* Left Section - File Preview - Hidden on mobile, shown on xl+ */}
             <div className="hidden xl:flex bg-gray-100 p-8 flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
-
-
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <FileUploader fileList={fileList} />
@@ -525,9 +523,8 @@ const ProductUpload = ({ product }: { product: any }) => {
             {/* Right Section - Configuration and Mobile Slideshow */}
             <div className="p-4 md:p-8 bg-white overflow-y-auto h-screen hide-scrollbar xl:col-span-3">
               {/* Mobile Slideshow - Always shown in mobile view */}
-              <div className="xl:hidden mb-6">
-
-                <div className="w-full max-w-md mx-auto h-[50vh]">
+              <div className="xl:hidden">
+                <div className="w-full h-64">
                   <FileUploader fileList={fileList} />
                 </div>
               </div>
