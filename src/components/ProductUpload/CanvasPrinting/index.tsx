@@ -141,13 +141,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
     
         try {
-                      console.log("Sending AddToCart:", {
-              dataId,
-              selectedPricingRule,
-              sqftRange,
-              uploadedDocumentId
-            });
-
           await addToCartCanvasPrinting(dataId, selectedPricingRule!, Number(sqftRange), uploadedDocumentId ?? undefined);
           incrementCart();
           toast.success("Product added to cart!");
@@ -236,6 +229,12 @@ const ProductUpload = ({ product }: { product: any }) => {
         setShowCartPopUp(true);
       }
     };
+
+      useEffect(() => {
+        if (isLoggedIn()) {
+          processPendingCartItem();
+        }
+      }, []);
 
   return (
       <div className="min-h-screen bg-gray-50">
