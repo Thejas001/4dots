@@ -114,16 +114,17 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   return (
     <div className="flex flex-col bg-[#F7F7F7] h-[571px] w-full md:w-[486px] px-4 md:px-[67px] items-center shadow">
       {/* Upload Button */}
-      {pageCountSelected && (
-        <Upload>
-          <Button
-            icon={<UploadOutlined />}
-            className="flex justify-center mt-5 items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium"
-          >
-            Upload Files
-          </Button>
-        </Upload>
-      )}
+{pageCountSelected && (
+  <Upload {...props}>
+    <Button
+      icon={<UploadOutlined />}
+      className="flex justify-center mt-5 items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium"
+    >
+      Upload Files
+    </Button>
+  </Upload>
+)}
+
 
 
 
