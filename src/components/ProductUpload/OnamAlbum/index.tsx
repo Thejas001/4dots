@@ -797,17 +797,6 @@ const ProductUpload = ({ product }: { product: any }) => {
                           </p>
                         </div>
                       </div>
-
-                  <FileUploader 
-                    pageCountSelected={pageCountSelected}
-                    onUploadSuccess={handleUploadSuccess}
-                    quantity={selectedQuantity}
-                    uploadedImages={fileList}
-                    setUploadedImages={setFileList}
-                    currentImageIndex={currentImageIndex}
-                    handleNext={handleNext}
-                    handlePrevious={handlePrevious}
-                  />
                       
                       {/* Image Count Validation - Only show on desktop (xl screens) */}
                       <div className="hidden xl:block">
@@ -836,27 +825,22 @@ const ProductUpload = ({ product }: { product: any }) => {
                         )}
                       </div>
                     
-                    {fileList.length === 0 ? (
-                      <div className="text-center py-8">
-                          <p className="text-gray-500">Please upload your images</p>
-                      </div>
-                    ) : (
+
                       <div className="space-y-4">
-                        <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
-<ImageSection
-                          uploadedImages={fileList}
-                          setUploadedImages={setFileList}
-                          selectedSize={selectedSize === "4" ? "8-16" : "16-34"} // Pass the range string
-                          setSelectedSize={setSelectedSize}
-                          maxAllowed={imageCountValidation.maxAllowed} // Pass maxAllowed from validation
-                        />
-
-
-
-
-
+{selectedSize && (
+                        <div className="space-y-4">
+                          <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
+                          <ImageSection
+                            uploadedImages={fileList}
+                            setUploadedImages={setFileList}
+                            selectedSize={selectedSize === "4" ? "8-16" : "16-34"}
+                            setSelectedSize={setSelectedSize}
+                            maxAllowed={imageCountValidation.maxAllowed}
+                            showUploadButton={true} // Not used but included for clarity
+                          />
+                        </div>
+                      )}
                       </div>
-                    )}
                   </div>
                   )}
 

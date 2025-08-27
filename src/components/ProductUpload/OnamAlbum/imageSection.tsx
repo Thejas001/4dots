@@ -8,7 +8,8 @@ interface ImageSectionProps {
   setUploadedImages: React.Dispatch<React.SetStateAction<UploadFile[]>>;
   selectedSize: string; // e.g., "8-16"
   setSelectedSize: (size: string) => void;
-  maxAllowed: number; // Added to enforce the max limit from parent
+  maxAllowed: number; // Enforce the max limit from parent
+  showUploadButton: boolean; // Control button visibility (though currently not used)
 }
 
 const ImageSection: React.FC<ImageSectionProps> = ({
@@ -17,6 +18,7 @@ const ImageSection: React.FC<ImageSectionProps> = ({
   selectedSize,
   setSelectedSize,
   maxAllowed,
+  showUploadButton,
 }) => {
   const [startIndex, setStartIndex] = useState(0);
   const maxVisible = 5;
@@ -88,8 +90,11 @@ const ImageSection: React.FC<ImageSectionProps> = ({
       setUploadedImages(updated);
     },
     fileList: uploadedImages,
-    disabled: uploadedImages.length >= maxAllowed, // Use maxAllowed from props
+    disabled: uploadedImages.length >= maxAllowed,
   };
+
+  // Debug log to check rendering
+  console.log("Rendering ImageSection, uploadedImages length:", uploadedImages.length, "selectedSize:", selectedSize, "maxAllowed:", maxAllowed);
 
   return (
     <div className="relative flex items-center w-full">
@@ -107,7 +112,7 @@ const ImageSection: React.FC<ImageSectionProps> = ({
       )}
 
       {/* Image Container */}
-      <div className="flex gap-3 p-2">
+      <div className="flex gap-3 p-2 items-start">
         {uploadedImages
           .slice(startIndex, startIndex + maxVisible)
           .map((file, index) => (
@@ -136,7 +141,7 @@ const ImageSection: React.FC<ImageSectionProps> = ({
             </div>
           ))}
 
-        {/* Upload Button */}
+        {/* Upload Button - Always visible */}
         <Upload {...uploadProps}>
           <div
             className={`w-24 h-24 border border-dashed rounded-md flex flex-col items-center justify-center transition
