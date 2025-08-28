@@ -498,6 +498,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                             selectedPricingRule={selectedPricingRule}
                             selectedFrameColor={selectedFrameColor}
                             selectedSize={selectedSize}
+                            fileList={fileList} 
                           />
                         </div>
                       )}

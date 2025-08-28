@@ -4,6 +4,7 @@ import Loader from "@/components/common/Loader";
 import { addToCartPhotoFrame } from "@/utils/cart";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
+import { useModal } from "@/contexts/ModalContext";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
 
 interface CartButtonProps {
@@ -14,6 +15,8 @@ interface CartButtonProps {
   uploadedImages: any[];
   selectedFrameColor: string;
   selectedSize: string;
+  fileList: { url: string; name: string; type: string }[]; // new
+
 }
 
 const CartButton: React.FC<CartButtonProps> = ({
@@ -24,6 +27,8 @@ const CartButton: React.FC<CartButtonProps> = ({
   uploadedImages,
   selectedFrameColor,
   selectedSize,
+  fileList,
+
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -147,14 +152,28 @@ const CartButton: React.FC<CartButtonProps> = ({
     ));
   };
 
-  const getMissingOptions = () => {
-    const missing = [];
-    if (!selectedSize) missing.push("size");
-    if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
-    if (!selectedFrameColor) missing.push("frame color");
-    if (!uploadedImages || uploadedImages.length === 0) missing.push("image upload");
-    return missing;
-  };
+const getMissingOptions = () => {
+  const missing: string[] = [];
+
+  if (!selectedSize) missing.push("size");
+  if (!selectedQuantity || selectedQuantity <= 0) missing.push("quantity");
+  if (!selectedFrameColor) missing.push("frame color");
+  if (!uploadedImages || uploadedImages.length === 0) missing.push("image upload");
+
+  // ✅ Validate quantity vs uploaded images
+  if (uploadedImages && uploadedImages.length > 0 && selectedQuantity) {
+    const valid =
+      selectedQuantity === uploadedImages.length || // case 1: one-to-one
+      (uploadedImages.length === 1 && selectedQuantity > 1); // case 2: one image for multiple
+
+    if (!valid) {
+      missing.push("image count does not match quantity");
+    }
+  }
+
+  return missing;
+};
+
 
   const handleAddToCart = async () => {
     if (!selectedPricingRule || !selectedQuantity) {
