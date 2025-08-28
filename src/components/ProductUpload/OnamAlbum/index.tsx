@@ -133,13 +133,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   // Debug: Log product details when component mounts
   useEffect(() => {
-    console.log("=== ONAM ALBUM DEBUG ===");
-    console.log("Product:", product);
-    console.log("Product Details:", productDetails);
-    console.log("Product Keys:", Object.keys(productDetails || {}));
-    console.log("Pricing Rules:", productDetails?.PricingRules);
-    console.log("OnamAlbumPricingRules:", productDetails?.OnamAlbumPricingRules);
-    console.log("All product properties:", JSON.stringify(productDetails, null, 2));
     if (productDetails?.PricingRules) {
       productDetails.PricingRules.forEach((rule: any, index: number) => {
         console.log(`Pricing Rule ${index}:`, {
@@ -227,15 +220,12 @@ const ProductUpload = ({ product }: { product: any }) => {
     // Calculate initial price for the selected page count with minimum required images
     const minImages = pageCount === "4" ? 8 : 16;
     const sizeToSearch = pageCount === "4" ? "4 Pages" : "8 Pages";
-    console.log("Looking for pricing rule:", { pageCount, sizeToSearch, minImages });
 
     const pricingRules =
       productDetails?.PricingRules ||
       productDetails?.OnamAlbumPricingRules ||
       productDetails?.pricingRules ||
       productDetails?.onamAlbumPricingRules;
-
-    console.log("Available pricing rules:", pricingRules);
 
     if (!pricingRules) {
       console.log("No pricing rules available yet");
@@ -252,7 +242,6 @@ const ProductUpload = ({ product }: { product: any }) => {
 
       const pricingRule = findOnamAlbumPricingRule(pricingRules, sizeToSearch, minImages);
 
-      console.log("Found pricing rule:", pricingRule);
 
       if (pricingRule) {
         setCalculatedPrice(pricingRule.Price);

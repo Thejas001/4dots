@@ -324,7 +324,7 @@ const handleAddToCart = async () => {
           onProceedToPayment={handleProceedToPayment}
           onClose={handleClosePopUp}
           productInfo={{
-            name: "Polaroid Card",
+            name: "Onam Memories Album",
             size: selectedSize,
             quantity: uploadedImages.length || undefined,
             price: calculatedPrice || undefined
