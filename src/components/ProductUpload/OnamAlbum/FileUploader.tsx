@@ -32,21 +32,27 @@ const FileUploader: React.FC<FileUploaderProps> = () => {
     <div className="w-full">
       {imagesToShow.length > 0 ? (
         <>
-          {/* Mobile View - Bigger Slideshow with No Blank Space Below */}
-          <div className="md:hidden relative w-full h-64">
-            <img
-              src={imagesToShow[currentImageIndex]}
-              alt="Slideshow"
-              className="w-full h-full object-cover rounded-lg"
-            />
+          {/* Mobile View - Bigger Slideshow with Smooth Page Scrolling */}
+          <div className="md:hidden relative w-full h-64 touch-action-auto">
+            {imagesToShow.map((src, index) => (
+              <img
+                key={index}
+                src={src}
+                alt="Slideshow"
+                className={`absolute w-full h-full object-cover rounded-lg transition-opacity duration-500 ease-in-out ${
+                  index === currentImageIndex ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
             {/* Navigation dots */}
             <div className="absolute bottom-2 flex justify-center w-full">
               {imagesToShow.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full mx-1 ${
+                  className={`w-2 h-2 rounded-full mx-1 cursor-pointer ${
                     index === currentImageIndex ? "bg-blue-500" : "bg-gray-300"
                   }`}
+                  onClick={() => setCurrentImageIndex(index)}
                 />
               ))}
             </div>
@@ -63,9 +69,10 @@ const FileUploader: React.FC<FileUploaderProps> = () => {
               {imagesToShow.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full mx-1 ${
+                  className={`w-2 h-2 rounded-full mx-1 cursor-pointer ${
                     index === currentImageIndex ? "bg-blue-500" : "bg-gray-300"
                   }`}
+                  onClick={() => setCurrentImageIndex(index)}
                 />
               ))}
             </div>

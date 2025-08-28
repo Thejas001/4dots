@@ -12,7 +12,30 @@ const ImageSection = ({
   setSelectedQuantity: (quantity: number | null) => void;
 }) => {
   const [startIndex, setStartIndex] = useState(0);
-  const maxVisible = 5; // Maximum images shown at a time
+  const [maxVisible, setMaxVisible] = useState(5); // Default to 5 for desktop
+
+  // Update maxVisible based on screen size
+  useEffect(() => {
+    const updateMaxVisible = () => {
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        setMaxVisible(3); // Show 3 images in mobile view
+      } else {
+        setMaxVisible(5); // Show 5 images in desktop view
+      }
+    };
+
+    // Initial check
+    updateMaxVisible();
+
+    // Listen for window resize
+    window.addEventListener("resize", updateMaxVisible);
+    return () => window.removeEventListener("resize", updateMaxVisible);
+  }, []);
+
+  // Adjust startIndex when uploadedImages.length changes
+  useEffect(() => {
+    setStartIndex((prevIndex) => Math.max(0, Math.min(prevIndex, uploadedImages.length - maxVisible)));
+  }, [uploadedImages.length, maxVisible]);
 
   const handleRemove = (indexToRemove: number) => {
     setUploadedImages((prev) => {
@@ -24,10 +47,6 @@ const ImageSection = ({
       return updatedImages;
     });
   };
-  
-  useEffect(() => {
-    setStartIndex((prevIndex) => Math.max(0, Math.min(prevIndex, uploadedImages.length - maxVisible)));
-  }, [uploadedImages.length]); 
 
   const handleNext = () => {
     if (startIndex + maxVisible < uploadedImages.length) {
@@ -57,10 +76,10 @@ const ImageSection = ({
       )}
 
       {/* Image Container */}
-      <div className="flex gap-3 p-2">
+      <div className="flex gap-4 sm:gap-4 md:gap-3 p-4 sm:p-4 md:p-2 overflow-x-auto">
         {uploadedImages.length > 0 ? (
           uploadedImages.slice(startIndex, startIndex + maxVisible).map((file, index) => (
-            <div key={file.uid || file.name || index} className="relative">
+            <div key={file.uid || file.name || index} className="relative flex-shrink-0">
               {file.url && file.name && file.name.toLowerCase().endsWith('.pdf') ? (
                 <img src="/images/product/pdf.png" alt="PDF" className="w-24 h-24 object-cover rounded-md" />
               ) : file.url ? (
@@ -72,12 +91,12 @@ const ImageSection = ({
               )}
               <CloseCircleOutlined
                 className="absolute top-0 right-0 text-red-500 cursor-pointer"
-                onClick={() => handleRemove(index)}
+                onClick={() => handleRemove(startIndex + index)}
               />
             </div>
           ))
         ) : (
-          <img src="/images/product/Frame4.svg" alt="Placeholder" />
+          <img src="/images/product/Frame4.svg" alt="Placeholder" className="w-24 h-24" />
         )}
       </div>
 

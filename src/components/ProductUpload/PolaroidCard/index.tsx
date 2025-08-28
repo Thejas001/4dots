@@ -100,11 +100,10 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [uploadedImages, setUploadedImages] = useState<any[]>([]);
   const [showImageSection, setShowImageSection] = useState<boolean>(false);
-  const [showCartPopUp, setShowCartPopUp] = useState(false);
+  const [showCartPopUp, setShowCartPopUp] = useState<boolean>(false);
   const [fileList, setFileList] = useState<any[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [price, setPrice] = useState<number | null>(null);
-
 
   // Progressive disclosure states
   const [showSizeSelection, setShowSizeSelection] = useState<boolean>(false);
@@ -143,16 +142,15 @@ const ProductUpload = ({ product }: { product: any }) => {
     setShowSizeSelection(true);
   };
 
-useEffect(() => {
-  if (fileList.length > 0) {
-    setShowSizeSelection(true);
-    setSelectedQuantity(fileList.length); // keep quantity in sync with uploaded files
-  } else {
-    setShowSizeSelection(false);
-    setSelectedQuantity(0); // or 1, depending on your default
-  }
-}, [fileList]);
-
+  useEffect(() => {
+    if (fileList.length > 0) {
+      setShowSizeSelection(true);
+      setSelectedQuantity(fileList.length); // keep quantity in sync with uploaded files
+    } else {
+      setShowSizeSelection(false);
+      setSelectedQuantity(0); // or 1, depending on your default
+    }
+  }, [fileList]);
 
   const handleNext = () => {
     if (fileList.length > 1) {
@@ -415,51 +413,45 @@ useEffect(() => {
                     </div>
                   )}
 
-                  {/* Order Summary - Only show after all selections are made */}
+                  {/* Order Summary - Updated Section for Wider Mobile View with Original Two-Column Grid */}
                   {selectedSize && fileList.length > 0 && (
-                    <div id="order-summary" className="bg-gray-50 rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                    <div id="order-summary" className="bg-gray-50 rounded-xl p-4 sm:p-4 md:p-8 w-full mx-0 sm:mx-0 md:mx-auto md:max-w-6xl">
+                      <h3 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h3>
                       
-                      <div className="bg-white rounded-lg p-6 border border-gray-200">
-                        <div className="space-y-4">
+                      <div className="bg-white rounded-lg p-6 sm:p-6 md:p-8 border border-gray-200">
+                        <div className="space-y-10 sm:space-y-10 md:space-y-8">
                           {/* Product Info */}
-                          <div className="border-b border-gray-200 pb-4">
-                            <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Product</span>
-                                <span className="font-medium text-gray-900">Polaroid Card</span>
-                              </div>
+                          <div className="pb-6 border-b border-gray-200">
+                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Product Details</h4>
+                            <div className="grid grid-cols-2 gap-6 sm:gap-6 md:gap-6">
+                              <div className="text-gray-600">Product</div>
+                              <div className="font-medium text-gray-900 text-right">Polaroid Card</div>
                               {fileList.length > 0 && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">Files Uploaded</span>
-                                  <span className="font-medium text-gray-900">{fileList.length} files</span>
-                                </div>
+                                <>
+                                  <div className="text-gray-600">Files Uploaded</div>
+                                  <div className="font-medium text-gray-900 text-right">{fileList.length} files</div>
+                                </>
                               )}
                             </div>
                           </div>
 
                           {/* Print Specifications */}
-                          <div className="border-b border-gray-200 pb-4">
-                            <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Size</span>
-                                <span className="font-medium text-gray-900">{selectedSize}</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Quantity</span>
-                                <span className="font-medium text-gray-900">{selectedQuantity || 1}</span>
-                              </div>
+                          <div className="pb-6 border-b border-gray-200">
+                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Print Specifications</h4>
+                            <div className="grid grid-cols-2 gap-6 sm:gap-6 md:gap-6">
+                              <div className="text-gray-600">Size</div>
+                              <div className="font-medium text-gray-900 text-right">{selectedSize}</div>
+                              <div className="text-gray-600">Quantity</div>
+                              <div className="font-medium text-gray-900 text-right">{selectedQuantity || 1}</div>
                             </div>
                           </div>
 
                           {/* Pricing */}
                           {calculatedPrice && (
                             <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
-                              <div className="space-y-2">
-                                <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                              <h4 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h4>
+                              <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex justify-between items-center">
                                   <span className="text-lg font-semibold text-gray-900">Total Price</span>
                                   <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
                                 </div>
