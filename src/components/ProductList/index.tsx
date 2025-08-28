@@ -58,7 +58,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="relative">
                 <img
-                  src="/images/product/photoframe.jpg"
+                  src="/images/product/onam.jpg"
                   alt="Onam Memories Album"
                   className="w-full h-32 object-cover"
                 />
@@ -221,7 +221,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
            onClick={() => router.push("/ProductDetails/onam-memories-album?dataId=9")}
          >
            <img
-             src="/images/product/photoframe.jpg"
+             src="/images/product/onam.jpg"
              alt="Onam Memories Album"
              loading="eager"
              className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
