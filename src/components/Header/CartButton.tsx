@@ -1,14 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
+
 
 const CartButton = () => {
   const router = useRouter();
+  const { openLoginModal } = useModal();
+
 
   useEffect(() => {
     // Preload the Cart and Signin pages
     router.prefetch("/Cart");
-    router.prefetch("/auth/signin");
   }, [router]);
   
   const handleClick = () => {
@@ -18,8 +21,8 @@ const CartButton = () => {
       if (token) {
         router.push("/Cart");
       } else {
-        localStorage.setItem("redirectAfterLogin", "/Order");
-        router.push("/auth/signin");
+        localStorage.setItem("redirectAfterLogin", "/Cart");
+        openLoginModal();
       }
     } catch (error) {
     }

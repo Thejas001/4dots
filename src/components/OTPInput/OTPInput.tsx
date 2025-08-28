@@ -79,12 +79,16 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
       // Show success message
       toast.success("Login successful!");
 
+        const redirectAfterLogin =
+      localStorage.getItem("redirectAfterLogin") || redirectPath || "/";
+    localStorage.removeItem("redirectAfterLogin");
+
       // Call the callback if provided, otherwise redirect
       if (onLoginSuccess) {
         onLoginSuccess();
       } else {
         // Fallback to redirect if no callback provided
-        router.push(redirectPath);
+        router.push(redirectAfterLogin);
       }
       
     } catch (err) {
@@ -185,15 +189,20 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
                 <span className="font-medium text-gray-400">+91</span>
               </div>
               <input
-                type="number"
+                  inputMode="numeric"      // Shows numeric keyboard on mobile
+                  pattern="\d*"
                 placeholder=""
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+                    setPhoneNumber(value);
+                  }}
                 className={`flex-1 p-3 outline-none ${
                   error
                     ? "border-red-500"
                     : "border-gray-300 focus:ring focus:ring-blue-300"
-                }`}
+                }`}  maxLength={10}           // Optional: limit digits
+
               />
             </div>
           </div>
@@ -223,13 +232,19 @@ function OTPInputComponent({ onLoginSuccess }: OTPInputComponentProps = {}) {
                 <input
                   key={index}
                   id={`otp-input-${index}`}
-                  type="number"
+                  type="text"
+                  inputMode="numeric"       // Numeric keyboard on mobile
+                  pattern="\d*"             // Only digits allowed
                   maxLength={1}
                   value={digit}
-                  onChange={(e) => handleOtpChange(e.target.value, index)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+                    handleOtpChange(value, index);
+                  }}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg border border-gray-300 text-center text-base sm:text-lg focus:outline-none focus:ring focus:ring-blue-300 flex-shrink-0"
                 />
+
               ))}
             </div>
           </div>

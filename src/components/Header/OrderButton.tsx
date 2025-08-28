@@ -1,9 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 
 const OrderButton = () => { 
     const router = useRouter(); 
+    const { openLoginModal } = useModal();
+
     const handleClick = () => {
         const token = localStorage.getItem("jwtToken");
     
@@ -11,7 +14,7 @@ const OrderButton = () => {
           router.push("/Order");
         } else {
           localStorage.setItem("redirectAfterLogin", "/Order");
-          router.push("/auth/signin");
+      openLoginModal();
         }
       };
 
