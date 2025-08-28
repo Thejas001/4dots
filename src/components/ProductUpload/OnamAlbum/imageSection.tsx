@@ -58,47 +58,46 @@ const ImageSection: React.FC<ImageSectionProps> = ({
   };
 
   // Upload configuration
-  const uploadProps = {
-    accept: ".jpg,.jpeg,.png,.pdf,.psd",
-    multiple: true,
-    showUploadList: false,
-    beforeUpload: (file: File) => {
-      const allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".psd"];
-      const fileExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+const uploadProps = {
+  accept: ".jpg,.jpeg,.png,.pdf,.psd",
+  multiple: true,
+  showUploadList: false,
+  beforeUpload: (file: File, fileList: File[]) => {
+    const allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".psd"];
+    const fileExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
 
-      if (!allowedExtensions.includes(fileExt)) {
-        message.error("Unsupported file type.");
-        return Upload.LIST_IGNORE;
-      }
+    if (!allowedExtensions.includes(fileExt)) {
+      message.error("Unsupported file type.");
+      return Upload.LIST_IGNORE;
+    }
 
-      if (uploadedImages.length >= maxAllowed) {
+    // Check if the total number of files (existing + new) exceeds maxAllowed
+    if (uploadedImages.length + fileList.length > maxAllowed) {
+      // Show warning only for the first file that triggers the limit
+      if (file === fileList[0]) {
         message.warning(`You can upload a maximum of ${maxAllowed} files.`);
-        return Upload.LIST_IGNORE;
       }
+      return Upload.LIST_IGNORE;
+    }
 
-      return true;
-    },
-    onChange: (info: any) => {
-      let updated = info.fileList.map((file: UploadFile) => {
+    return true;
+  },
+  onChange: (info: any) => {
+    // Update the file list, ensuring it doesn't exceed maxAllowed
+    let updated = info.fileList
+      .slice(0, maxAllowed) // Limit to maxAllowed files
+      .map((file: UploadFile) => {
         if (!file.url && file.originFileObj) {
           file.url = URL.createObjectURL(file.originFileObj);
         }
         return file;
       });
 
-      if (updated.length > maxAllowed) {
-        updated = updated.slice(0, maxAllowed);
-        message.warning(`Only ${maxAllowed} files are allowed.`);
-      }
-
-      setUploadedImages(updated);
-    },
-    fileList: uploadedImages,
-    disabled: uploadedImages.length >= maxAllowed,
-  };
-
-  // Debug log to check rendering
-  console.log("Rendering ImageSection, uploadedImages length:", uploadedImages.length, "selectedSize:", selectedSize, "maxAllowed:", maxAllowed);
+    setUploadedImages(updated);
+  },
+  fileList: uploadedImages,
+  disabled: uploadedImages.length >= maxAllowed,
+};
 
   return (
     <div className="relative w-full">
