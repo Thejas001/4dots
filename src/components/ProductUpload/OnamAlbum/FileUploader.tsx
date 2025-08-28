@@ -1,21 +1,19 @@
-"use client";
-
 import React, { useState } from "react";
 
 const defaultImages = [
- "/images/product/onam-car2.jpg",
+  "/images/product/onam-car2.jpg",
   "/images/product/onam-car3.jpg",
-  "/images/product/onam-car4.jpg", // Replace with the actual image path of the business card
-   "/images/product/onam-car5.gif",
+  "/images/product/onam-car4.jpg",
+  "/images/product/onam-car5.gif",
 ];
 
 const FileUploader: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center bg-white">
       {/* Main Business Card */}
-      <div className="relative w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+      <div className="relative w-full h-96 bg-white rounded-lg flex items-center justify-center">
         <img
           src={defaultImages[currentImageIndex]}
           alt="Business Card"

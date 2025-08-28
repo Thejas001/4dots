@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -72,14 +73,16 @@ const NewFileUploader: React.FC<FileUploaderProps> = ({
   if (!pageCountSelected) return null;
 
   return (
-    <Upload {...props}>
-      <Button
-        icon={<UploadOutlined />}
-        className="flex justify-center mt-5 items-center bg-[#242424] w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-white text-base font-medium"
-      >
-        Upload Files
-      </Button>
-    </Upload>
+    <div className="bg-white">
+      <Upload {...props}>
+        <Button
+          icon={<UploadOutlined />}
+          className="flex justify-center mt-5 items-center bg-white w-[164px] py-2 px-5 h-10 rounded-[30px] cursor-pointer gap-1.5 text-gray-900 text-base font-medium"
+        >
+          Upload Files
+        </Button>
+      </Upload>
+    </div>
   );
 };
 
