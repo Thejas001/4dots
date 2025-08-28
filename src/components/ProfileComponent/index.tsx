@@ -18,12 +18,11 @@ const ProfileComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [loadingAddress, setLoadingAddress] = useState(false); // ✅ Added
+  const [loadingAddress, setLoadingAddress] = useState(false);
   const [addresses, setAddresses] = useState<AddressType[]>([]);
   const [addressError, setAddressError] = useState(false);
   const router = useRouter();
 
-  // ✅ Dummy fetchAddress function just to fulfill props requirement
   const fetchAddress = async () => {
     setLoadingAddress(true);
     setAddressError(false);
@@ -55,7 +54,7 @@ const ProfileComponent = () => {
 
   useEffect(() => {
     refreshUser();
-    fetchAddress(); // Fetch addresses on mount
+    fetchAddress();
   }, []);
 
   const handleLogout = () => {
@@ -165,7 +164,7 @@ const ProfileComponent = () => {
         </div>
 
         {/* Right Column - Address Section */}
-        <div className="border border-[#ECECEC] rounded-[10px] p-4 w-full min-h-[300px]">
+        <div className="border border-[#ECECEC] rounded-[10px] p-4 w-full min-h-[300px] overflow-wrap break-word word-break break-all white-space normal">
           <Address
             hideLabel
             buttonAlignment="left"

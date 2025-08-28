@@ -1,16 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
 
 const CartButton = () => {
   const router = useRouter();
+  const { openLoginModal } = useModal();
 
   useEffect(() => {
-    // Preload the Cart and Signin pages
+    // Preload the Cart page
     router.prefetch("/Cart");
-    router.prefetch("/auth/signin");
   }, [router]);
-  
+
   const handleClick = () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -18,10 +19,11 @@ const CartButton = () => {
       if (token) {
         router.push("/Cart");
       } else {
-        localStorage.setItem("redirectAfterLogin", "/Order");
-        router.push("/auth/signin");
+        localStorage.setItem("redirectAfterLogin", "/Cart"); // Store redirect path
+        openLoginModal(); // Trigger the sign-in modal
       }
     } catch (error) {
+      console.error("Error in CartButton:", error);
     }
   };
 
