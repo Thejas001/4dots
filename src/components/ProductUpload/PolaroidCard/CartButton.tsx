@@ -33,19 +33,16 @@ const CartButton: React.FC<CartButtonProps> = ({
     return !!token;
   };
 
-  // Handle continue shopping
   const handleContinueShopping = () => {
     setShowCartPopUp(false);
     router.push("/");
   };
 
-  // Handle proceed to payment
   const handleProceedToPayment = () => {
     setShowCartPopUp(false);
     router.push("/Cart");
   };
 
-  // Handle close popup
   const handleClosePopUp = () => {
     setShowCartPopUp(false);
   };
@@ -54,9 +51,8 @@ const CartButton: React.FC<CartButtonProps> = ({
     !selectedPricingRule ||
     !uploadedImages ||
     uploadedImages.length === 0 ||
-    isLoading; // disable while loading
+    isLoading;
 
-  // Process pending cart item
   const processPendingCartItem = async () => {
     const pendingCartItem = sessionStorage.getItem("pendingCartItem");
     if (!pendingCartItem) return;
@@ -144,154 +140,77 @@ const CartButton: React.FC<CartButtonProps> = ({
     ));
   };
 
-  // Add a function to check missing options
-  const getMissingOptions = () => {
-    const missing = [];
-    if (!selectedSize) missing.push("size");
-    if (!uploadedImages || uploadedImages.length === 0) missing.push("image upload");
-    return missing;
-  };
-  {/* Check if all required options are selected 
-
   const handleAddToCart = async () => {
-    if (!selectedPricingRule) {
-      showErrorToast("Please select all required options before continuing.");
-      return;
-    }
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      let documentIds: number[] = [];
-      for (const image of uploadedImages) {
-        if (!image.originFileObj) continue;
-        const formData = new FormData();
-        formData.append("document", image.originFileObj);
-        const response = await fetch(
-          "https://fourdotsapp.azurewebsites.net/api/document/upload",
-          { method: "POST", body: formData }
-        );
-        if (!response.ok) throw new Error("Image upload failed");
-        const result = await response.json();
-        if (result?.Data?.Id) {
-          documentIds.push(result.Data.Id);
-        } else {
-        }
-      }
-      if (!isLoggedIn()) {
-        const pendingItem = {
-          productType: "polaroidCard",
-          dataId,
-          selectedPricingRule,
-          selectedQuantity: uploadedImages.length,
-          uploadedDocumentIds: documentIds,
-        };
-        sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-        router.push(`/auth/signin?redirect=/`);
-        toast.success("Product added to cart!");
+      if (!selectedPricingRule || !selectedSize) {
+        showErrorToast("Please select a size");
+        setIsLoading(false);
         return;
       }
-      await addToCartPolaroidCard(
-        dataId,
-        selectedPricingRule,
-        uploadedImages.length,
-        documentIds
-      );
-      sessionStorage.removeItem("pendingCartItem");
-      incrementCart();
-      toast.success("Product added to cart!");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/");
-    } catch (error) {
-      toast.error("Failed to add to cart. Please try again.");
-      setIsLoading(false);
-    }
-  };  */}
 
-const handleAddToCart = async () => {
-  setIsLoading(true);
+      if (!uploadedImages || uploadedImages.length === 0) {
+        showErrorToast("Please upload at least one image");
+        setIsLoading(false);
+        return;
+      }
 
-  try {
-    if (!selectedPricingRule) {
-      showErrorToast("Please select a size first");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!uploadedImages || uploadedImages.length === 0) {
-      showErrorToast("Please upload at least one file");
-      setIsLoading(false);
-      return;
-    }
-
-    // Step 1: Upload any images without a documentId
-    const uploadedFileList = await Promise.all(
-      uploadedImages.map(async (file) => {
-        if (!file.documentId && file.originFileObj) {
-          const formData = new FormData();
-          formData.append("document", file.originFileObj);
-          const response = await fetch(
-            "https://fourdotsapp.azurewebsites.net/api/document/upload",
-            { method: "POST", body: formData }
-          );
-          if (!response.ok) throw new Error("Image upload failed");
-          const result = await response.json();
-          return { ...file, documentId: result?.Data?.Id ?? null };
-        }
-        return file;
-      })
-    );
-
-    // Step 2: Update local state so files now have documentIds
-    // (you’d need to lift uploadedImages into state with setUploadedImages)
-    // setUploadedImages(uploadedFileList);
-
-    // Step 3: Extract IDs
-    const documentIds = uploadedFileList
-      .map((f) => f.documentId)
-      .filter((id) => id != null);
-
-    if (documentIds.length === 0) {
-      showErrorToast("File upload failed, please try again");
-      setIsLoading(false);
-      return;
-    }
-
-    // Step 4: Quantity = uploaded file count
-    const quantity = uploadedFileList.length;
-
-    // Step 5: If not logged in, store in session and redirect
-    if (!isLoggedIn()) {
-      sessionStorage.setItem(
-        "pendingCartItem",
-        JSON.stringify({
-          productType: "polaroidCard",
-          dataId,
-          selectedPricingRule,
-          selectedQuantity: quantity,
-          uploadedDocumentIds: documentIds,
+      const uploadedFileList = await Promise.all(
+        uploadedImages.map(async (file) => {
+          if (!file.documentId && file.originFileObj) {
+            const formData = new FormData();
+            formData.append("document", file.originFileObj);
+            const response = await fetch(
+              "https://fourdotsapp.azurewebsites.net/api/document/upload",
+              { method: "POST", body: formData }
+            );
+            if (!response.ok) throw new Error("Image upload failed");
+            const result = await response.json();
+            return { ...file, documentId: result?.Data?.Id ?? null };
+          }
+          return file;
         })
       );
-      router.push(`/auth/signin?redirect=/Cart`);
-      return;
+
+      const documentIds = uploadedFileList
+        .map((f) => f.documentId)
+        .filter((id) => id != null);
+
+      if (documentIds.length === 0) {
+        showErrorToast("File upload failed, please try again");
+        setIsLoading(false);
+        return;
+      }
+
+      const quantity = uploadedFileList.length;
+
+      if (!isLoggedIn()) {
+        sessionStorage.setItem(
+          "pendingCartItem",
+          JSON.stringify({
+            productType: "polaroidCard",
+            dataId,
+            selectedPricingRule,
+            selectedQuantity: quantity,
+            uploadedDocumentIds: documentIds,
+          })
+        );
+        router.push(`/auth/signin?redirect=/Cart`);
+        return;
+      }
+
+      await addToCartPolaroidCard(dataId, selectedPricingRule, quantity, documentIds);
+
+      incrementCart();
+      toast.success("Product added to cart!");
+      setShowCartPopUp(true);
+    } catch (error) {
+      showErrorToast("Failed to add to cart");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Step 6: Add to cart API call
-    await addToCartPolaroidCard(
-      dataId,
-      selectedPricingRule,
-      quantity,
-      documentIds
-    );
-
-    incrementCart();
-    toast.success("Product added to cart!");
-    setShowCartPopUp(true);
-  } catch (error) {
-    showErrorToast("Failed to add to cart");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   return (
     <>
@@ -305,19 +224,21 @@ const handleAddToCart = async () => {
           onClick={handleAddToCart}
           disabled={isAddToCartDisabled}
           className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-          isAddToCartDisabled
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-black text-white hover:bg-gray-800"
-            }`}
-          >
-          {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
+            isAddToCartDisabled
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          {calculatedPrice
+            ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}`
+            : "Proceed to Cart"}
         </button>
 
         {errorMessage && (
           <div className="mt-2 text-sm text-red-500">{errorMessage}</div>
         )}
       </div>
-      
+
       {showCartPopUp && (
         <CartProceedPopUp
           onContinueShopping={handleContinueShopping}
@@ -327,7 +248,7 @@ const handleAddToCart = async () => {
             name: "Polaroid Card",
             size: selectedSize,
             quantity: uploadedImages.length || undefined,
-            price: calculatedPrice || undefined
+            price: calculatedPrice || undefined,
           }}
         />
       )}

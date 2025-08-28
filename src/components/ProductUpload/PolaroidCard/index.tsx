@@ -89,19 +89,17 @@ const ProductUpload = ({ product }: { product: any }) => {
   const dataId = product.id;
   const productDetails = product;
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
-  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(null);
   const [selectedPricingRule, setSelectedPricingRule] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [uploadedImages, setUploadedImages] = useState<any[]>([]);
+  const [fileList, setFileList] = useState<any[]>([]);
   const [showImageSection, setShowImageSection] = useState<boolean>(false);
   const [showCartPopUp, setShowCartPopUp] = useState<boolean>(false);
-  const [fileList, setFileList] = useState<any[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [price, setPrice] = useState<number | null>(null);
 
@@ -131,26 +129,56 @@ const ProductUpload = ({ product }: { product: any }) => {
   };
 
   const handleUploadSuccess = (documentId: number, file?: File, name?: string) => {
-    setUploadedDocumentId(documentId);
+    setFileList((prev) => [...prev, { documentId, originFileObj: file, name: name || file?.name }]);
     if (file) {
       setUploadedFile(file);
       setFileName(name || file.name);
       const url = URL.createObjectURL(file);
       setPdfUrl(url);
     }
-    // Show size selection after file upload
     setShowSizeSelection(true);
   };
 
+  // Update selectedQuantity and recalculate price when fileList changes
   useEffect(() => {
+    setSelectedQuantity(fileList.length);
     if (fileList.length > 0) {
       setShowSizeSelection(true);
-      setSelectedQuantity(fileList.length); // keep quantity in sync with uploaded files
+      setShowImageSection(true);
     } else {
       setShowSizeSelection(false);
-      setSelectedQuantity(0); // or 1, depending on your default
+      setShowImageSection(false);
+      setCalculatedPrice(null);
+      setPrice(null);
+      setSelectedPricingRule(null);
     }
   }, [fileList]);
+
+  // Recalculate price when selectedSize or fileList changes
+  useEffect(() => {
+    if (selectedSize && fileList.length > 0 && productDetails?.PolaroidCardPricingRules) {
+      const pricingRule = findPolaroidCardPricingRule(
+        productDetails.PolaroidCardPricingRules,
+        selectedSize,
+        fileList.length.toString()
+      );
+      if (pricingRule) {
+        const totalPrice = pricingRule.Price * fileList.length;
+        setSelectedPricingRule(pricingRule);
+        setCalculatedPrice(totalPrice);
+        setPrice(totalPrice);
+        setErrorMessage("");
+      } else {
+        setCalculatedPrice(null);
+        setPrice(null);
+        setErrorMessage("Price not available for the selected size and quantity");
+      }
+    } else {
+      setCalculatedPrice(null);
+      setPrice(null);
+      setSelectedPricingRule(null);
+    }
+  }, [selectedSize, fileList, productDetails]);
 
   const handleNext = () => {
     if (fileList.length > 1) {
@@ -163,12 +191,6 @@ const ProductUpload = ({ product }: { product: any }) => {
       setCurrentImageIndex((prev) => (prev - 1 + fileList.length) % fileList.length);
     }
   };
-
-  useEffect(() => {
-    if (fileList.length > 0) {
-      setCurrentImageIndex(0);
-    }
-  }, [fileList]);
 
   const handlePriceCalculation = (price: number | null, error: string | null) => {
     if (price !== null) {
@@ -192,15 +214,11 @@ const ProductUpload = ({ product }: { product: any }) => {
         return;
       }
 
-      // Get document IDs from uploaded files
-      const documentIds = fileList.map(file => file.documentId).filter(id => id !== null) as number[];
+      const documentIds = fileList
+        .map((file) => file.documentId)
+        .filter((id) => id !== null) as number[];
 
-      await addToCartPolaroidCard(
-        dataId,
-        selectedPricingRule,
-        selectedQuantity || 1,
-        documentIds
-      );
+      await addToCartPolaroidCard(dataId, selectedPricingRule, fileList.length, documentIds);
 
       incrementCart();
       setShowCartPopUp(true);
@@ -244,7 +262,7 @@ const ProductUpload = ({ product }: { product: any }) => {
 
   // Memoized size options with pricing
   const memoizedSizeOptions = useMemo(() => {
-    if (!productDetails?.sizes || !selectedQuantity || selectedQuantity <= 0) {
+    if (!productDetails?.sizes || fileList.length === 0) {
       return [];
     }
 
@@ -252,10 +270,9 @@ const ProductUpload = ({ product }: { product: any }) => {
       const pricingRule = findPolaroidCardPricingRule(
         productDetails.PolaroidCardPricingRules,
         size,
-        selectedQuantity.toString()
+        fileList.length.toString()
       );
-      
-      const totalPrice = pricingRule ? pricingRule.Price * selectedQuantity : 0;
+      const totalPrice = pricingRule ? pricingRule.Price * fileList.length : 0;
       const isSelected = selectedSize === size;
 
       return (
@@ -268,32 +285,25 @@ const ProductUpload = ({ product }: { product: any }) => {
           }`}
           onClick={() => {
             setSelectedSize(size);
-            setCalculatedPrice(totalPrice);
-            setPrice(totalPrice);
-            setSelectedPricingRule(pricingRule);
             setShowSizeOptions(false);
           }}
         >
           <div className="flex items-center justify-between">
-            <div className="font-medium text-gray-900">
-              {size}
-            </div>
+            <div className="font-medium text-gray-900">{size}</div>
             <div className="text-right">
               {totalPrice > 0 ? (
                 <div className="text-sm font-semibold text-gray-900">
                   ₹{totalPrice.toFixed(2)}
                 </div>
               ) : (
-                <div className="text-sm text-gray-500">
-                  Price not available
-                </div>
+                <div className="text-sm text-gray-500">Price not available</div>
               )}
             </div>
           </div>
         </div>
       );
     });
-  }, [productDetails?.sizes, selectedQuantity, selectedSize]);
+  }, [productDetails?.sizes, fileList, selectedSize]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -302,24 +312,23 @@ const ProductUpload = ({ product }: { product: any }) => {
           <Loader />
         </div>
       )}
-      
+
       <div className="w-[99vw] py-4">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid grid-cols-1 xl:grid-cols-5 min-h-[600px]">
-            
             {/* Left Section - File Preview */}
             <div className="bg-gray-100 p-8 flex flex-col sticky top-0 h-screen overflow-y-auto hide-scrollbar xl:col-span-2">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Preview</h2>
                 <p className="text-gray-600">Upload your files to see a preview</p>
               </div>
-              
+
               {/* Upload Area */}
               <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <div className="w-full max-w-md">
-                  <FileUploader 
+                  <FileUploader
                     onUploadSuccess={handleUploadSuccess}
-                    quantity={selectedQuantity}
+                    quantity={fileList.length}
                     uploadedImages={fileList}
                     setUploadedImages={setFileList}
                     currentImageIndex={currentImageIndex}
@@ -340,12 +349,11 @@ const ProductUpload = ({ product }: { product: any }) => {
 
                 {/* Configuration Steps */}
                 <div className="space-y-4">
-                  
                   {/* Step 1: Upload Message - Always show first */}
                   <div className="bg-gray-50 rounded-xl p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Images</h3>
                     <p className="text-sm text-gray-600 mb-4">Upload your images for printing</p>
-                    
+
                     {fileList.length === 0 ? (
                       <div className="text-center py-8">
                         <p className="text-gray-500">Please upload images in the left column first</p>
@@ -356,7 +364,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                         <ImageSection
                           uploadedImages={fileList}
                           setUploadedImages={setFileList}
-                          setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 1)}
+                          setSelectedQuantity={(quantity) => setSelectedQuantity(quantity || 0)}
                         />
                       </div>
                     )}
@@ -367,7 +375,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                     <div className="bg-gray-50 rounded-xl p-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Polaroid Size</h3>
                       <p className="text-sm text-gray-600 mb-4">Select your preferred size</p>
-                      
+
                       {!showSizeOptions ? (
                         <button
                           onClick={() => setShowSizeOptions(true)}
@@ -398,9 +406,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                               </svg>
                             </button>
                           </div>
-                          <div className="space-y-3">
-                            {memoizedSizeOptions}
-                          </div>
+                          <div className="space-y-3">{memoizedSizeOptions}</div>
                         </div>
                       )}
                     </div>
@@ -413,11 +419,14 @@ const ProductUpload = ({ product }: { product: any }) => {
                     </div>
                   )}
 
-                  {/* Order Summary - Updated Section for Wider Mobile View with Original Two-Column Grid */}
+                  {/* Order Summary */}
                   {selectedSize && fileList.length > 0 && (
-                    <div id="order-summary" className="bg-gray-50 rounded-xl p-4 sm:p-4 md:p-8 w-full mx-0 sm:mx-0 md:mx-auto md:max-w-6xl">
+                    <div
+                      id="order-summary"
+                      className="bg-gray-50 rounded-xl p-4 sm:p-4 md:p-8 w-full mx-0 sm:mx-0 md:mx-auto md:max-w-6xl"
+                    >
                       <h3 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h3>
-                      
+
                       <div className="bg-white rounded-lg p-6 sm:p-6 md:p-8 border border-gray-200">
                         <div className="space-y-10 sm:space-y-10 md:space-y-8">
                           {/* Product Info */}
@@ -442,7 +451,7 @@ const ProductUpload = ({ product }: { product: any }) => {
                               <div className="text-gray-600">Size</div>
                               <div className="font-medium text-gray-900 text-right">{selectedSize}</div>
                               <div className="text-gray-600">Quantity</div>
-                              <div className="font-medium text-gray-900 text-right">{selectedQuantity || 1}</div>
+                              <div className="font-medium text-gray-900 text-right">{fileList.length}</div>
                             </div>
                           </div>
 
@@ -491,8 +500,8 @@ const ProductUpload = ({ product }: { product: any }) => {
           productInfo={{
             name: "Polaroid Card",
             size: selectedSize,
-            quantity: selectedQuantity || 1,
-            price: calculatedPrice || 0
+            quantity: fileList.length,
+            price: calculatedPrice || 0,
           }}
         />
       )}
