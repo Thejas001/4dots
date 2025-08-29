@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface UploadProgressProps {
   isOpen: boolean;
@@ -11,18 +11,34 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
   uploadedCount,
   totalCount,
 }) => {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const messages = [
+    "Uploading Files...",
+    "Processing..."
+  ];
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % messages.length);
+    }, 2000); // change message every 2s
+
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
-  const radius = 40; // circle radius
-  const stroke = 6; // stroke width
+  const radius = 40;
+  const stroke = 6;
   const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset =
     circumference - (progress / 100) * circumference;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-black">
       <div className="flex flex-col items-center">
         {/* Circle + Text wrapper */}
         <div className="relative flex items-center justify-center">
@@ -41,7 +57,7 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
               cy={radius}
             />
 
-            {/* Progress ring (black) */}
+            {/* Progress ring */}
             <circle
               stroke="#000000"
               fill="transparent"
@@ -62,9 +78,9 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
           </span>
         </div>
 
-        {/* Label below circle */}
-        <p className="mt-4 text-base text-black font-bold">
-          Uploading Files...
+        {/* Floating word */}
+        <p className="mt-4 text-base text-black font-bold animate-pulse">
+          {messages[messageIndex]}
         </p>
       </div>
     </div>
