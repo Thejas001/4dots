@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useState, useEffect , useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CartButton from "./CartButton";
 import OrderButton from "./OrderButton";
 import LoginButton from "./LoginButton";
@@ -13,7 +13,6 @@ const Header = () => {
   const { cartCount, refreshCart } = useCartStore();
   const orderBadgeCount = useCartStore((state) => state.orderBadgeCount);
   const [cartData, setCartData] = useState<CartData | null>(null);
-
 
   // Toggle function to open/close the dropdown
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -116,11 +115,34 @@ const Header = () => {
         </div>
       </div>
 
-
-      {isOpen && (
-        <div id="mobile-menu" className="sm:hidden absolute top-[60px] right-0 w-full shadow-lg py-4 z-50 bg-white">
+      <div
+        id="mobile-menu"
+        className={`sm:hidden absolute top-[60px] right-0 w-2/3 bg-white/95 backdrop-blur-sm shadow-lg py-2 z-50 transition-all duration-300 ease-out origin-right ${
+          isOpen ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-full scale-95"
+        }`}
+        style={{ animation: isOpen ? "slideInWithBounce 300ms ease-out" : "none" }}
+      >
+        <style>
+          {`
+            @keyframes slideInWithBounce {
+              0% {
+                opacity: 0;
+                transform: translateX(100%) scale(0.95);
+              }
+              70% {
+                opacity: 0.8;
+                transform: translateX(-5%) scale(1.02);
+              }
+              100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+              }
+            }
+          `}
+        </style>
+        <div className="flex flex-col gap-1 px-3">
           <button
-            className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]"
+            className="w-full text-right px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
               const token = localStorage.getItem("jwtToken");
               if (token) {
@@ -133,7 +155,7 @@ const Header = () => {
             Your Cart
           </button>
           <button
-            className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]"
+            className="w-full text-right px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
               const token = localStorage.getItem("jwtToken");
               if (token) {
@@ -146,7 +168,7 @@ const Header = () => {
             Your Order
           </button>
           <button
-            className="block w-full text-right px-4 py-2 bg-[#242424] text-[#fff] hover:bg-[#fff] hover:text-[#242424]"
+            className="w-full text-right px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
               const token = localStorage.getItem("jwtToken");
               if (token) {
@@ -159,9 +181,8 @@ const Header = () => {
             {typeof window !== 'undefined' && localStorage.getItem("jwtToken") ? "Profile" : "Login"}
           </button>
         </div>
-      )}
-</header>
-
+      </div>
+    </header>
   );
 };
 
