@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Loader from "@/components/common/Loader";
-import { addToCartOnamAlbum } from "@/utils/cart";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import { addToCartOnamAlbum } from "@/utils/cart";
+import UploadProgress from "@/components/UploadToast"; // 👈 import progress bar
 
 interface CartButtonProps {
   selectedPricingRule: any;
@@ -26,6 +26,7 @@ const CartButton: React.FC<CartButtonProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
+  const [uploadedCount, setUploadedCount] = useState(0); // 👈 track uploaded files
   const incrementCart = useCartStore((state) => state.incrementCart);
 
   const isLoggedIn = () => {
@@ -33,19 +34,16 @@ const CartButton: React.FC<CartButtonProps> = ({
     return !!token;
   };
 
-  // Handle continue shopping
   const handleContinueShopping = () => {
     setShowCartPopUp(false);
     router.push("/");
   };
 
-  // Handle proceed to payment
   const handleProceedToPayment = () => {
     setShowCartPopUp(false);
     router.push("/Cart");
   };
 
-  // Handle close popup
   const handleClosePopUp = () => {
     setShowCartPopUp(false);
   };
@@ -54,60 +52,7 @@ const CartButton: React.FC<CartButtonProps> = ({
     !selectedPricingRule ||
     !uploadedImages ||
     uploadedImages.length === 0 ||
-    isLoading; // disable while loading
-
-  // Process pending cart item
-  const processPendingCartItem = async () => {
-    const pendingCartItem = sessionStorage.getItem("pendingCartItem");
-    if (!pendingCartItem) return;
-
-    const {
-      dataId: pendingDataId,
-      selectedPricingRule: pendingPricingRule,
-      selectedQuantity: pendingQuantity,
-      uploadedDocumentIds: pendingDocumentIds,
-    } = JSON.parse(pendingCartItem);
-
-    try {
-      setIsLoading(true);
-      await addToCartOnamAlbum(
-        pendingDataId,
-        pendingPricingRule,
-        Number(pendingQuantity),
-        pendingDocumentIds
-      );
-      sessionStorage.removeItem("pendingCartItem");
-      incrementCart();
-      toast.success("Product added to cart!");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/Cart");
-    } catch (error) {
-      setErrorMessage("Failed to process pending cart item. Please try again.");
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isLoggedIn()) {
-      const pendingCartItem = sessionStorage.getItem("pendingCartItem");
-      if (pendingCartItem) {
-        processPendingCartItem();
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoading) {
-      const currentPath = pathname;
-      const interval = setInterval(() => {
-        if (window.location.pathname !== currentPath) {
-          setIsLoading(false);
-          clearInterval(interval);
-        }
-      }, 100);
-      return () => clearInterval(interval);
-    }
-  }, [isLoading, pathname]);
+    isLoading;
 
   const showErrorToast = (message: string) => {
     toast.custom((t) => (
@@ -144,87 +89,27 @@ const CartButton: React.FC<CartButtonProps> = ({
     ));
   };
 
-  // Add a function to check missing options
-  const getMissingOptions = () => {
-    const missing = [];
-    if (!selectedSize) missing.push("size");
-    if (!uploadedImages || uploadedImages.length === 0) missing.push("image upload");
-    return missing;
-  };
-  {/* Check if all required options are selected 
-
   const handleAddToCart = async () => {
-    if (!selectedPricingRule) {
-      showErrorToast("Please select all required options before continuing.");
-      return;
-    }
+    setIsLoading(true);
+    setUploadedCount(0); // reset count
+
     try {
-      setIsLoading(true);
-      let documentIds: number[] = [];
-      for (const image of uploadedImages) {
-        if (!image.originFileObj) continue;
-        const formData = new FormData();
-        formData.append("document", image.originFileObj);
-        const response = await fetch(
-          "https://fourdotsapp.azurewebsites.net/api/document/upload",
-          { method: "POST", body: formData }
-        );
-        if (!response.ok) throw new Error("Image upload failed");
-        const result = await response.json();
-        if (result?.Data?.Id) {
-          documentIds.push(result.Data.Id);
-        } else {
-        }
-      }
-      if (!isLoggedIn()) {
-        const pendingItem = {
-          productType: "polaroidCard",
-          dataId,
-          selectedPricingRule,
-          selectedQuantity: uploadedImages.length,
-          uploadedDocumentIds: documentIds,
-        };
-        sessionStorage.setItem("pendingCartItem", JSON.stringify(pendingItem));
-        router.push(`/auth/signin?redirect=/`);
-        toast.success("Product added to cart!");
+      if (!selectedPricingRule) {
+        showErrorToast("Please select a size first");
+        setIsLoading(false);
         return;
       }
-      await addToCartPolaroidCard(
-        dataId,
-        selectedPricingRule,
-        uploadedImages.length,
-        documentIds
-      );
-      sessionStorage.removeItem("pendingCartItem");
-      incrementCart();
-      toast.success("Product added to cart!");
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/");
-    } catch (error) {
-      toast.error("Failed to add to cart. Please try again.");
-      setIsLoading(false);
-    }
-  };  */}
 
-const handleAddToCart = async () => {
-  setIsLoading(true);
+      if (!uploadedImages || uploadedImages.length === 0) {
+        showErrorToast("Please upload at least one file");
+        setIsLoading(false);
+        return;
+      }
 
-  try {
-    if (!selectedPricingRule) {
-      showErrorToast("Please select a size first");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!uploadedImages || uploadedImages.length === 0) {
-      showErrorToast("Please upload at least one file");
-      setIsLoading(false);
-      return;
-    }
-
-    // Step 1: Upload any images without a documentId
-    const uploadedFileList = await Promise.all(
-      uploadedImages.map(async (file) => {
+      // Step 1: Upload images one by one and update progress
+      const uploadedFileList = [];
+      for (let i = 0; i < uploadedImages.length; i++) {
+        const file = uploadedImages[i];
         if (!file.documentId && file.originFileObj) {
           const formData = new FormData();
           formData.append("document", file.originFileObj);
@@ -234,90 +119,93 @@ const handleAddToCart = async () => {
           );
           if (!response.ok) throw new Error("Image upload failed");
           const result = await response.json();
-          return { ...file, documentId: result?.Data?.Id ?? null };
+          uploadedFileList.push({
+            ...file,
+            documentId: result?.Data?.Id ?? null,
+          });
+        } else {
+          uploadedFileList.push(file);
         }
-        return file;
-      })
-    );
 
-    // Step 2: Update local state so files now have documentIds
-    // (you’d need to lift uploadedImages into state with setUploadedImages)
-    // setUploadedImages(uploadedFileList);
+        // ✅ update progress as each file finishes
+        setUploadedCount(i + 1);
+      }
 
-    // Step 3: Extract IDs
-    const documentIds = uploadedFileList
-      .map((f) => f.documentId)
-      .filter((id) => id != null);
+      const documentIds = uploadedFileList
+        .map((f) => f.documentId)
+        .filter((id) => id != null);
 
-    if (documentIds.length === 0) {
-      showErrorToast("File upload failed, please try again");
-      setIsLoading(false);
-      return;
-    }
+      if (documentIds.length === 0) {
+        showErrorToast("File upload failed, please try again");
+        setIsLoading(false);
+        return;
+      }
 
-    // Step 4: Quantity = uploaded file count
-    const quantity = uploadedFileList.length;
+      const quantity = uploadedFileList.length;
 
-    // Step 5: If not logged in, store in session and redirect
-    if (!isLoggedIn()) {
-      sessionStorage.setItem(
-        "pendingCartItem",
-        JSON.stringify({
-          productType: "polaroidCard",
-          dataId,
-          selectedPricingRule,
-          selectedQuantity: quantity,
-          uploadedDocumentIds: documentIds,
-        })
+      if (!isLoggedIn()) {
+        sessionStorage.setItem(
+          "pendingCartItem",
+          JSON.stringify({
+            productType: "polaroidCard",
+            dataId,
+            selectedPricingRule,
+            selectedQuantity: quantity,
+            uploadedDocumentIds: documentIds,
+          })
+        );
+        router.push(`/auth/signin?redirect=/Cart`);
+        return;
+      }
+
+      await addToCartOnamAlbum(
+        dataId,
+        selectedPricingRule,
+        quantity,
+        documentIds
       );
-      router.push(`/auth/signin?redirect=/Cart`);
-      return;
+
+      incrementCart();
+      toast.success("Product added to cart!");
+      setShowCartPopUp(true);
+    } catch (error) {
+      showErrorToast("Failed to add to cart");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Step 6: Add to cart API call
-    await addToCartOnamAlbum(
-      dataId,
-      selectedPricingRule,
-      quantity,
-      documentIds
-    );
-
-    incrementCart();
-    toast.success("Product added to cart!");
-    setShowCartPopUp(true);
-  } catch (error) {
-    showErrorToast("Failed to add to cart");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   return (
     <>
+      {/* ✅ Show circular upload progress instead of Loader */}
       {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
-          <Loader />
-        </div>
+        <UploadProgress
+          isOpen={isLoading}
+          uploadedCount={uploadedCount}
+          totalCount={uploadedImages.length}
+        />
       )}
+
       <div className="mt-4 flex flex-1 flex-col justify-center">
         <button
           onClick={handleAddToCart}
           disabled={isAddToCartDisabled}
           className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-          isAddToCartDisabled
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-black text-white hover:bg-gray-800"
-            }`}
-          >
-          {calculatedPrice ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}` : "Proceed to Cart"}
+            isAddToCartDisabled
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          {calculatedPrice
+            ? `Proceed to Cart - ₹${calculatedPrice.toFixed(2)}`
+            : "Proceed to Cart"}
         </button>
 
         {errorMessage && (
           <div className="mt-2 text-sm text-red-500">{errorMessage}</div>
         )}
       </div>
-      
+
       {showCartPopUp && (
         <CartProceedPopUp
           onContinueShopping={handleContinueShopping}
@@ -327,7 +215,7 @@ const handleAddToCart = async () => {
             name: "Onam Memories Album",
             size: selectedSize,
             quantity: uploadedImages.length || undefined,
-            price: calculatedPrice || undefined
+            price: calculatedPrice || undefined,
           }}
         />
       )}

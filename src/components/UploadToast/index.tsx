@@ -1,28 +1,74 @@
-import React from 'react';
+import React from "react";
 
-interface UploadToastProps {
+interface UploadProgressProps {
   isOpen: boolean;
   uploadedCount: number;
   totalCount: number;
 }
 
-const UploadToast: React.FC<UploadToastProps> = ({ isOpen, uploadedCount, totalCount }) => {
+const UploadProgress: React.FC<UploadProgressProps> = ({
+  isOpen,
+  uploadedCount,
+  totalCount,
+}) => {
   if (!isOpen) return null;
+
   const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
+  const radius = 40; // circle radius
+  const stroke = 6; // stroke width
+  const normalizedRadius = radius - stroke / 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset =
+    circumference - (progress / 100) * circumference;
 
   return (
-    <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg max-w-xs w-full z-50 animate-slide-in">
-      <p className="text-sm font-medium mb-2">
-        Uploading {uploadedCount}/{totalCount} images...
-      </p>
-      <div className="w-full bg-gray-200 rounded-full h-1.5">
-        <div
-          className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        ></div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
+      <div className="flex flex-col items-center">
+        {/* Circle + Text wrapper */}
+        <div className="relative flex items-center justify-center">
+          <svg
+            height={radius * 2}
+            width={radius * 2}
+            className="transform -rotate-90"
+          >
+            {/* Grey track */}
+            <circle
+              stroke="#e5e7eb"
+              fill="transparent"
+              strokeWidth={stroke}
+              r={normalizedRadius}
+              cx={radius}
+              cy={radius}
+            />
+
+            {/* Progress ring (black) */}
+            <circle
+              stroke="#000000"
+              fill="transparent"
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              r={normalizedRadius}
+              cx={radius}
+              cy={radius}
+              className="transition-all duration-300"
+            />
+          </svg>
+
+          {/* Centered progress text */}
+          <span className="absolute text-base font-semibold text-gray-900">
+            {uploadedCount}/{totalCount}
+          </span>
+        </div>
+
+        {/* Label below circle */}
+        <p className="mt-4 text-base text-black font-bold">
+          Uploading Files...
+        </p>
       </div>
     </div>
   );
 };
 
-export default UploadToast;
+export default UploadProgress;

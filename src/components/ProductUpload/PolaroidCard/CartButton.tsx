@@ -5,6 +5,7 @@ import { addToCartPolaroidCard } from "@/utils/cart";
 import toast from "react-hot-toast";
 import { useCartStore } from "@/utils/store/cartStore";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
+import UploadProgress from "@/components/UploadToast";
 
 interface CartButtonProps {
   selectedPricingRule: any;
@@ -27,6 +28,10 @@ const CartButton: React.FC<CartButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showCartPopUp, setShowCartPopUp] = useState(false);
   const incrementCart = useCartStore((state) => state.incrementCart);
+
+  const [showUploadToast, setShowUploadToast] = useState(false);
+const [uploadedCount, setUploadedCount] = useState(0);
+const [totalCount, setTotalCount] = useState(0);
 
   const isLoggedIn = () => {
     const token = localStorage.getItem("jwtToken");
@@ -156,22 +161,40 @@ const CartButton: React.FC<CartButtonProps> = ({
         return;
       }
 
-      const uploadedFileList = await Promise.all(
-        uploadedImages.map(async (file) => {
-          if (!file.documentId && file.originFileObj) {
-            const formData = new FormData();
-            formData.append("document", file.originFileObj);
-            const response = await fetch(
-              "https://fourdotsapp.azurewebsites.net/api/document/upload",
-              { method: "POST", body: formData }
-            );
-            if (!response.ok) throw new Error("Image upload failed");
-            const result = await response.json();
-            return { ...file, documentId: result?.Data?.Id ?? null };
-          }
-          return file;
-        })
+const uploadedFileList = await Promise.all(
+  uploadedImages.map(async (file, index) => {
+    if (!file.documentId && file.originFileObj) {
+      if (!showUploadToast) setShowUploadToast(true);
+      setTotalCount(uploadedImages.length);
+
+      const formData = new FormData();
+      formData.append("document", file.originFileObj);
+
+      const response = await fetch(
+        "https://fourdotsapp.azurewebsites.net/api/document/upload",
+        { method: "POST", body: formData }
       );
+      if (!response.ok) throw new Error("Image upload failed");
+
+      const result = await response.json();
+
+      // increment uploaded count
+      setUploadedCount((prev) => prev + 1);
+
+      return { ...file, documentId: result?.Data?.Id ?? null };
+    }
+
+    // If already uploaded, count it as done
+    setUploadedCount((prev) => prev + 1);
+    return file;
+  })
+);
+
+// hide toast once all uploads are done
+setShowUploadToast(false);
+setUploadedCount(0);
+setTotalCount(0);
+
 
       const documentIds = uploadedFileList
         .map((f) => f.documentId)
@@ -214,11 +237,6 @@ const CartButton: React.FC<CartButtonProps> = ({
 
   return (
     <>
-      {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70">
-          <Loader />
-        </div>
-      )}
       <div className="mt-4 flex flex-1 flex-col justify-center">
         <button
           onClick={handleAddToCart}
@@ -252,6 +270,13 @@ const CartButton: React.FC<CartButtonProps> = ({
           }}
         />
       )}
+<UploadProgress
+  isOpen={showUploadToast}
+  uploadedCount={uploadedCount}
+  totalCount={totalCount}
+/>
+
+
     </>
   );
 };
