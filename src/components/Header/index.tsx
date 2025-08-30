@@ -1,38 +1,57 @@
 "use client";
+
 import Link from "next/link";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import CartButton from "./CartButton";
 import OrderButton from "./OrderButton";
 import LoginButton from "./LoginButton";
 import { useCartStore } from "@/utils/store/cartStore";
 import { CartData } from "@/app/models/CartItems";
-import { fetchCartItems } from "@/utils/cart";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { cartCount, refreshCart } = useCartStore();
-  const orderBadgeCount = useCartStore((state) => state.orderBadgeCount);
+  const { cartCount, orderBadgeCount, hasNewCartItem, setHasNewCartItem } = useCartStore();
   const [cartData, setCartData] = useState<CartData | null>(null);
 
   // Toggle function to open/close the dropdown
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsOpen((prevState) => !prevState);
+
+    // Clear new item flag when opening dropdown
+    if (!isOpen && hasNewCartItem) {
+      setHasNewCartItem(false);
+    }
   };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
-      if (isOpen && !document.getElementById("mobile-menu")?.contains(event.target as Node)) {
+      if (
+        isOpen &&
+        !document.getElementById("mobile-menu")?.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("click", handleOutsideClick);
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [isOpen]);
 
-  const productCount = cartData?.Items.length ?? 0;
+  // Clear new item flag when navigating to cart
+  useEffect(() => {
+    const handleCartNavigation = () => {
+      if (hasNewCartItem) {
+        setHasNewCartItem(false);
+      }
+    };
+    const token = localStorage.getItem("jwtToken");
+    if (window.location.pathname === "/Cart" && token && hasNewCartItem) {
+      setHasNewCartItem(false);
+    }
+    window.addEventListener("popstate", handleCartNavigation);
+    return () => window.removeEventListener("popstate", handleCartNavigation);
+  }, [hasNewCartItem, setHasNewCartItem]);
 
   return (
     <header className="fixed top-0 left-0 z-[999] w-full bg-[#fff] shadow-[0px_4px_16px_0px_rgba(91,91,91,0.05)] border">
@@ -91,12 +110,11 @@ const Header = () => {
               ></span>
               <div className="transition-transform duration-100 group-hover:-translate-y-1">
                 <OrderButton />
-                {/** 
                 {orderBadgeCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                      {orderBadgeCount}
-                    </span>
-                  )}*/}
+                  <span className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                    {orderBadgeCount}
+                  </span>
+                )}
               </div>
             </button>
 
@@ -110,7 +128,7 @@ const Header = () => {
             aria-controls="mobile-menu"
             aria-expanded={isOpen}
             onClick={toggleDropdown}
-            className="sm:hidden block rounded-sm border border-stroke bg-white p-2 shadow-sm dark:border-strokedark dark:bg-boxdark"
+            className="relative sm:hidden block rounded-sm border border-stroke bg-white p-2 shadow-sm dark:border-strokedark dark:bg-boxdark"
           >
             <span className="relative block h-5.5 w-5.5 cursor-pointer">
               <span className="block absolute right-0 h-full w-full">
@@ -130,11 +148,9 @@ const Header = () => {
                   }`}
                 ></span>
               </span>
-
+              {/* X icon when open */}
               <span
-                className={`absolute right-0 h-full w-full rotate-45 bundler: {
-    presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
-  },transition-all duration-300 ${
+                className={`absolute right-0 h-full w-full rotate-45 transition-all duration-300 ${
                   isOpen ? "opacity-100 scale-100" : "opacity-0 scale-0"
                 }`}
               >
@@ -142,40 +158,44 @@ const Header = () => {
                 <span className="absolute left-0 top-2.5 block h-0.5 w-full bg-black dark:bg-white"></span>
               </span>
             </span>
+
+            {/* 🔴 Exclamation badge */}
+            {!isOpen && hasNewCartItem && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                !
+              </span>
+            )}
           </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <div
         id="mobile-menu"
         className={`sm:hidden absolute top-[60px] right-0 w-2/3 bg-white/95 backdrop-blur-sm shadow-lg py-2 z-50 transition-all duration-300 ease-out origin-right ${
           isOpen ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-full scale-95"
         }`}
-        style={{ animation: isOpen ? "slideInWithBounce 300ms ease-out" : "none" }}
+        style={{
+          animation: isOpen ? "slideInWithBounce 300ms ease-out" : "none",
+        }}
       >
         <style>
           {`
             @keyframes slideInWithBounce {
-              0% {
-                opacity: 0;
-                transform: translateX(100%) scale(0.95);
-              }
-              70% {
-                opacity: 0.8;
-                transform: translateX(-5%) scale(1.02);
-              }
-              100% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-              }
+              0% { opacity: 0; transform: translateX(100%) scale(0.95); }
+              70% { opacity: 0.8; transform: translateX(-5%) scale(1.02); }
+              100% { opacity: 1; transform: translateX(0) scale(1); }
             }
           `}
         </style>
+
         <div className="flex flex-col gap-1 px-3">
+          {/* Cart Button */}
           <button
-            className="w-full flex justify-between items-center px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
+            className="relative w-full flex justify-between items-center px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
               const token = localStorage.getItem("jwtToken");
+              setHasNewCartItem(false); // Clear new item flag on cart navigation
               if (token) {
                 window.location.href = "/Cart";
               } else {
@@ -183,20 +203,29 @@ const Header = () => {
               }
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="white"
-              viewBox="0 0 16 16"
-              className="mr-2"
-            >
-              <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h1A1.5 1.5 0 0 1 4 2.5V3h10.5a1 1 0 0 1 .95 1.3l-1.5 6A1 1 0 0 1 13 11H4.5a1 1 0 0 1-1-1L2 4H1.5A1.5 1.5 0 0 1 0 2.5zm4 2v5h8.45l1.2-4.8H4zm9 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-9 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-            </svg>
-            Your Cart
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="white"
+                viewBox="0 0 16 16"
+                className="mr-2"
+              >
+                <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h1A1.5 1.5 0 0 1 4 2.5V3h10.5a1 1 0 0 1 .95 1.3l-1.5 6A1 1 0 0 1 13 11H4.5a1 1 0 0 1-1-1L2 4H1.5A1.5 1.5 0 0 1 0 2.5zm4 2v5h8.45l1.2-4.8H4zm9 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-9 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+              </svg>
+              Your Cart
+            </div>
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
           </button>
+
+          {/* Order Button */}
           <button
-            className="w-full flex justify-between items-center px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
+            className="relative w-full flex justify-between items-center px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
               const token = localStorage.getItem("jwtToken");
               if (token) {
@@ -206,19 +235,28 @@ const Header = () => {
               }
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="white"
-              viewBox="0 0 16 16"
-              className="mr-2"
-            >
-              <path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9zM3.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-9z"/>
-              <path d="M5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-            </svg>
-            Your Order
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="white"
+                viewBox="0 0 16 16"
+                className="mr-2"
+              >
+                <path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9zM3.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-9z" />
+                <path d="M5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
+              </svg>
+              Your Order
+            </div>
+            {orderBadgeCount > 0 && (
+              <span className="absolute top-1 right-2 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                {orderBadgeCount}
+              </span>
+            )}
           </button>
+
+          {/* Login/Profile Button */}
           <button
             className="w-full flex justify-between items-center px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
@@ -230,17 +268,19 @@ const Header = () => {
               }
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="white"
-              viewBox="0 0 16 16"
-              className="mr-2"
-            >
-              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-2.67 0-8 1.34-8 4v1h16v-1c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            {typeof window !== "undefined" && localStorage.getItem("jwtToken") ? "Profile" : "Login"}
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="white"
+                viewBox="0 0 16 16"
+                className="mr-2"
+              >
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-2.67 0-8 1.34-8 4v1h16v-1c0-2.66-5.33-4-8-4z" />
+              </svg>
+              {typeof window !== "undefined" && localStorage.getItem("jwtToken") ? "Profile" : "Login"}
+            </div>
           </button>
         </div>
       </div>

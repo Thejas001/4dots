@@ -16,40 +16,46 @@ interface CartState {
   incrementOrderBadge: () => void;
   clearOrderBadge: () => void;
   setCartData: (data: CartData) => void;
+  
   refreshCart: () => Promise<void>;
+
+   hasNewCartItem: boolean;
+  setHasNewCartItem: (value: boolean) => void;
 }
 
 export const useCartStore = create<CartState>((set) => ({
   cartData: null,
   cartCount: 0,
-  cartCountHistory: [], // Initialize empty history array
+  cartCountHistory: [],
   orderBadgeCount: 0,
 
   setCartCount: (count) =>
     set((state) => ({
       cartCount: count,
-      cartCountHistory: [...state.cartCountHistory, count], // Append new count to history
+      cartCountHistory: [...state.cartCountHistory, count],
     })),
 
-  incrementCart: () =>
-    set((state) => ({
-      cartCount: state.cartCount + 1,
-      cartCountHistory: [...state.cartCountHistory, state.cartCount + 1], // Append incremented count
-    })),
+incrementCart: () =>
+  set((state) => ({
+    cartCount: state.cartCount + 1,
+    cartCountHistory: [...state.cartCountHistory, state.cartCount + 1],
+    hasNewCartItem: true, // 🔴 trigger badge
+  })),
+
 
   decrementCart: () =>
     set((state) => {
-      const newCount = state.cartCount > 0 ? state.cartCount - 1 : 0; // Prevent negative count
+      const newCount = state.cartCount > 0 ? state.cartCount - 1 : 0;
       return {
         cartCount: newCount,
-        cartCountHistory: [...state.cartCountHistory, newCount], // Append decremented count
+        cartCountHistory: [...state.cartCountHistory, newCount],
       };
     }),
 
   clearCartCount: () =>
     set((state) => ({
       cartCount: 0,
-      cartCountHistory: [...state.cartCountHistory, 0], // Append 0 to history
+      cartCountHistory: [...state.cartCountHistory, 0],
     })),
 
   incrementOrderBadge: () =>
@@ -63,12 +69,12 @@ export const useCartStore = create<CartState>((set) => ({
       return {
         cartData: data,
         cartCount: newCount,
-        cartCountHistory: [...state.cartCountHistory, newCount], // Append new count from API
+        cartCountHistory: [...state.cartCountHistory, newCount],
       };
     }),
 
   refreshCart: async () => {
-    if (cartLoading) return; // Prevent duplicate calls
+    if (cartLoading) return;
     cartLoading = true;
     try {
       const data = await fetchCartItems();
@@ -77,11 +83,15 @@ export const useCartStore = create<CartState>((set) => ({
         return {
           cartData: data,
           cartCount: newCount,
-          cartCountHistory: [...state.cartCountHistory, newCount], // Append API-fetched count
+          cartCountHistory: [...state.cartCountHistory, newCount],
         };
       });
     } finally {
       cartLoading = false;
     }
   },
+
+  // Add these to fix TS errors
+  hasNewCartItem: false,
+  setHasNewCartItem: (value: boolean) => set({ hasNewCartItem: value }),
 }));
