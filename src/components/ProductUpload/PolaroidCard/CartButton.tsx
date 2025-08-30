@@ -171,7 +171,7 @@ const uploadedFileList = await Promise.all(
       formData.append("document", file.originFileObj);
 
       const response = await fetch(
-        "https://fourdotsapp.azurewebsites.net/api/document/upload",
+        "https://fourdotsapp-prod.azurewebsites.net/api/document/upload",
         { method: "POST", body: formData }
       );
       if (!response.ok) throw new Error("Image upload failed");

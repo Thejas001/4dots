@@ -191,7 +191,7 @@ const getMissingOptions = () => {
         const formData = new FormData();
         formData.append("document", image.originFileObj);
         const response = await fetch(
-          "https://fourdotsapp.azurewebsites.net/api/document/upload",
+          "https://fourdotsapp-prod.azurewebsites.net/api/document/upload",
           { method: "POST", body: formData }
         );
 

@@ -20,7 +20,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
 
   const props: UploadProps = {
     name: "document",
-    action: "https://fourdotsapp.azurewebsites.net/api/document/upload?returnPageCount=true",
+    action: "https://fourdotsapp-prod.azurewebsites.net/api/document/upload?returnPageCount=true",
     method: "POST",
     accept: ".pdf",
     headers: {
@@ -71,7 +71,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ pageCount, setPageCount, on
 
       if (docId) {
         try {
-          await fetch(`https://fourdotsapp.azurewebsites.net/api/document/delete/${docId}`, {
+          await fetch(`https://fourdotsapp-prod.azurewebsites.net/api/document/delete/${docId}`, {
             method: "DELETE",
           });
 
