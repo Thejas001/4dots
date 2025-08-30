@@ -9,7 +9,6 @@ interface CartState {
   cartCount: number;
   cartCountHistory: number[]; // Array to store cart count history
   orderBadgeCount: number;
-  hasNewCartItem: boolean; // Track if new item was added
   setCartCount: (count: number) => void;
   incrementCart: () => void;
   decrementCart: () => void; // Action for decrementing cart count
@@ -17,7 +16,6 @@ interface CartState {
   incrementOrderBadge: () => void;
   clearOrderBadge: () => void;
   setCartData: (data: CartData) => void;
-  setHasNewCartItem: (hasNew: boolean) => void; // Action to set new item flag
   refreshCart: () => Promise<void>;
 }
 
@@ -26,7 +24,6 @@ export const useCartStore = create<CartState>((set) => ({
   cartCount: 0,
   cartCountHistory: [], // Initialize empty history array
   orderBadgeCount: 0,
-  hasNewCartItem: false, // Initialize new item flag
 
   setCartCount: (count) =>
     set((state) => ({
@@ -38,7 +35,6 @@ export const useCartStore = create<CartState>((set) => ({
     set((state) => ({
       cartCount: state.cartCount + 1,
       cartCountHistory: [...state.cartCountHistory, state.cartCount + 1], // Append incremented count
-      hasNewCartItem: true, // Set new item flag when incrementing
     })),
 
   decrementCart: () =>
@@ -54,7 +50,6 @@ export const useCartStore = create<CartState>((set) => ({
     set((state) => ({
       cartCount: 0,
       cartCountHistory: [...state.cartCountHistory, 0], // Append 0 to history
-      hasNewCartItem: false, // Clear new item flag when clearing cart
     })),
 
   incrementOrderBadge: () =>
@@ -65,16 +60,12 @@ export const useCartStore = create<CartState>((set) => ({
   setCartData: (data) =>
     set((state) => {
       const newCount = data.Items?.length ?? 0;
-      const hasNewItem = newCount > state.cartCount; // Set flag if new items added
       return {
         cartData: data,
         cartCount: newCount,
         cartCountHistory: [...state.cartCountHistory, newCount], // Append new count from API
-        hasNewCartItem: hasNewItem ? true : state.hasNewCartItem, // Preserve flag if no new items
       };
     }),
-
-  setHasNewCartItem: (hasNew) => set({ hasNewCartItem: hasNew }),
 
   refreshCart: async () => {
     if (cartLoading) return; // Prevent duplicate calls
@@ -83,12 +74,10 @@ export const useCartStore = create<CartState>((set) => ({
       const data = await fetchCartItems();
       set((state) => {
         const newCount = data.Items?.length ?? 0;
-        const hasNewItem = newCount > state.cartCount; // Set flag if new items added
         return {
           cartData: data,
           cartCount: newCount,
           cartCountHistory: [...state.cartCountHistory, newCount], // Append API-fetched count
-          hasNewCartItem: hasNewItem ? true : state.hasNewCartItem, // Preserve flag if no new items
         };
       });
     } finally {
