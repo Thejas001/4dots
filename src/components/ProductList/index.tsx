@@ -11,7 +11,7 @@ import NetworkErrorPage from "../NetworkErrorPage";
  const metadata: Metadata = {
   title: "4 Dots",
   description:
-    "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    "4 Dots",
 };
 
 interface ProductListProps {

@@ -19,7 +19,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "4 Dots",
   description:
-    "This is Next.js Settings page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
+    "4 Dots",
 };
 
 // ✅ Ensure correct mapping of product components
