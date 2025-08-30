@@ -9,14 +9,17 @@ import { CartData } from "@/app/models/CartItems";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { cartCount } = useCartStore();
-  const orderBadgeCount = useCartStore((state) => state.orderBadgeCount);
+  const { cartCount, orderBadgeCount, hasNewCartItem, setHasNewCartItem } = useCartStore();
   const [cartData, setCartData] = useState<CartData | null>(null);
 
   // Toggle function to open/close the dropdown
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsOpen((prevState) => !prevState);
+    // Clear new item flag when opening dropdown
+    if (!isOpen && hasNewCartItem) {
+      setHasNewCartItem(false);
+    }
   };
 
   // Close dropdown when clicking outside
@@ -33,6 +36,23 @@ const Header = () => {
     document.addEventListener("click", handleOutsideClick);
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [isOpen]);
+
+  // Clear new item flag when navigating to cart
+  useEffect(() => {
+    const handleCartNavigation = () => {
+      if (hasNewCartItem) {
+        setHasNewCartItem(false);
+      }
+    };
+
+    const token = localStorage.getItem("jwtToken");
+    if (window.location.pathname === "/Cart" && token && hasNewCartItem) {
+      setHasNewCartItem(false);
+    }
+
+    window.addEventListener("popstate", handleCartNavigation);
+    return () => window.removeEventListener("popstate", handleCartNavigation);
+  }, [hasNewCartItem, setHasNewCartItem]);
 
   return (
     <header className="fixed top-0 left-0 z-[999] w-full bg-[#fff] shadow-[0px_4px_16px_0px_rgba(91,91,91,0.05)] border">
@@ -141,8 +161,8 @@ const Header = () => {
               </span>
             </span>
 
-            {/* 🔴 Exclamation badge for hamburger */}
-            {(cartCount > 0 || orderBadgeCount > 0) && (
+            {/* 🔴 Exclamation badge (hide when open or no new items) */}
+            {!isOpen && hasNewCartItem && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                 !
               </span>
@@ -187,6 +207,7 @@ const Header = () => {
             className="relative w-full flex justify-between items-center px-3 py-2 rounded-md bg-[#242424] text-white font-medium text-base border border-[#3a3a3a] hover:bg-[#3a3a3a] transition-all duration-200 shadow-sm hover:scale-102"
             onClick={() => {
               const token = localStorage.getItem("jwtToken");
+              setHasNewCartItem(false); // Clear new item flag on cart navigation
               if (token) {
                 window.location.href = "/Cart";
               } else {
