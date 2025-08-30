@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
@@ -17,7 +18,7 @@ import Loader from "@/components/common/Loader";
 import CartProceedPopUp from "@/components/CartProceedPopUp";
 import CartButton from "./CartButton";
 
-// Toast functions remain unchanged
+// Toast functions
 const showErrorToast = (message: string) => {
   toast.custom((t) => (
     <div
@@ -107,8 +108,6 @@ const ProductUpload = ({ product }: { product: any }) => {
   const [fileList, setFileList] = useState<any[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [price, setPrice] = useState<number | null>(null);
-
-  // New flow states
   const [pageCountSelected, setPageCountSelected] = useState<boolean>(false);
   const [showPageCountSelection, setShowPageCountSelection] = useState<boolean>(true);
   const [imageUploadEnabled, setImageUploadEnabled] = useState<boolean>(false);
@@ -123,14 +122,12 @@ const ProductUpload = ({ product }: { product: any }) => {
     minRequired: 0,
     maxAllowed: 0,
   });
-
   const [showSizeSelection, setShowSizeSelection] = useState<boolean>(false);
   const [showSizeOptions, setShowSizeOptions] = useState<boolean>(false);
 
   const router = useRouter();
   const incrementCart = useCartStore((state) => state.incrementCart);
 
-  // Debug and other functions remain unchanged
   useEffect(() => {
     if (productDetails?.PricingRules) {
       productDetails.PricingRules.forEach((rule: any, index: number) => {
@@ -492,7 +489,7 @@ const ProductUpload = ({ product }: { product: any }) => {
             </div>
 
             {/* Right Section - Configuration and Mobile Slideshow */}
-            <div className="p-4 md:p-8 bg-white xl:col-span-3 overflow-y-auto max-h-[calc(100vh-64px)] hide-scrollbar">
+            <div className="p-4 md:p-8 bg-white xl:col-span-3 xl:overflow-y-auto xl:max-h-[calc(100vh-64px)]">
               {/* Mobile Slideshow - Shown in mobile view */}
               <div className="xl:hidden mb-6">
                 <div className="w-full min-h-[250px] bg-white">
@@ -615,9 +612,9 @@ const ProductUpload = ({ product }: { product: any }) => {
                   )}
 
                   {imageUploadEnabled && (
-                    <div className="bg-white rounded-xl p-6">
+                    <div className="bg-white rounded-xl p-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">Uploaded Images</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Upload Images</h3>
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
@@ -635,23 +632,20 @@ const ProductUpload = ({ product }: { product: any }) => {
                                 maxAllowed: 0,
                               });
                             }}
-                            className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                            className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-lg hover:bg-blue-50 transition-all duration-200"
                           >
                             ← Change Page Count
                           </button>
-                          <div className="px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg">
-                            Selected: {selectedSize} Pages
+                          <div className="px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-lg">
+                            {selectedSize} Pages
                           </div>
                         </div>
                       </div>
 
-                      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-blue-900">{selectedSize}-Page Album Selected</p>
-                          <p className="text-xs text-blue-700">
-                            Requires {selectedSize === "4" ? "8-16" : "16-34"} images
-                          </p>
-                        </div>
+                      <div className="xl:hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-xs text-blue-700 text-center">
+                          Requires {selectedSize === "4" ? "8-16" : "16-34"} images
+                        </p>
                       </div>
 
                       <div className="hidden xl:block">
@@ -688,29 +682,21 @@ const ProductUpload = ({ product }: { product: any }) => {
                       </div>
 
                       <div className="xl:hidden">
-                        <div
-                          className={`mt-4 p-3 rounded-lg ${
-                            fileList.length === 0
-                              ? "bg-blue-50 border border-blue-200"
-                              : imageCountValidation.isValid
-                              ? "bg-green-50 border border-green-200"
-                              : "bg-yellow-50 border border-yellow-200"
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <div
-                              className={`w-3 h-3 rounded-full mr-2 ${
-                                fileList.length === 0
-                                  ? "bg-blue-500"
-                                  : imageCountValidation.isValid
-                                  ? "bg-green-500"
-                                  : "bg-yellow-500"
-                              }`}
-                            ></div>
-                            <div>
-                              {fileList.length === 0 ? (
-                                <p className="text-xs font-medium text-blue-800">Ready to upload images</p>
-                              ) : (
+                        {fileList.length > 0 && (
+                          <div
+                            className={`mb-4 p-3 rounded-lg ${
+                              imageCountValidation.isValid
+                                ? "bg-green-50 border border-green-200"
+                                : "bg-yellow-50 border border-yellow-200"
+                            }`}
+                          >
+                            <div className="flex items-center">
+                              <div
+                                className={`w-3 h-3 rounded-full mr-2 ${
+                                  imageCountValidation.isValid ? "bg-green-500" : "bg-yellow-500"
+                                }`}
+                              ></div>
+                              <div>
                                 <p
                                   className={`text-xs font-medium ${
                                     imageCountValidation.isValid ? "text-green-800" : "text-yellow-800"
@@ -718,21 +704,19 @@ const ProductUpload = ({ product }: { product: any }) => {
                                 >
                                   {imageCountValidation.message}
                                 </p>
-                              )}
-                              <p className="text-xs text-gray-600 mt-1">
-                                {fileList.length === 0
-                                  ? `Required: ${imageCountValidation.minRequired}-${imageCountValidation.maxAllowed} images`
-                                  : `Uploaded: ${fileList.length} images | Required: ${imageCountValidation.minRequired}-${imageCountValidation.maxAllowed} images`}
-                              </p>
+                                <p className="text-xs text-gray-600 mt-1">
+                                  Uploaded: {fileList.length} images | Required: {imageCountValidation.minRequired}-
+                                  {imageCountValidation.maxAllowed} images
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       <div className="space-y-4">
                         {selectedSize && (
-                          <div className="space-y-4">
-                            <h4 className="text-base font-semibold text-gray-900">File Selection</h4>
+                          <div>
                             <ImageSection
                               uploadedImages={fileList}
                               setUploadedImages={setFileList}
@@ -744,11 +728,81 @@ const ProductUpload = ({ product }: { product: any }) => {
                           </div>
                         )}
                       </div>
+
+                      {/* Order Summary for Mobile View */}
+                      <div className="xl:hidden">
+                        {selectedSize && fileList.length > 0 && imageCountValidation.isValid && (
+                          <div className="mt-4 bg-white rounded-xl p-4">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Order Summary</h3>
+                            <div className="bg-white rounded-lg p-4 border border-gray-200">
+                              <div className="space-y-3">
+                                <div className="border-b border-gray-200 pb-3">
+                                  <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-600 text-sm">Product</span>
+                                      <span className="font-medium text-gray-900 text-sm">Onam Memories Album</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-600 text-sm">Files Uploaded</span>
+                                      <span className="font-medium text-gray-900 text-sm">{fileList.length} files</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="border-b border-gray-200 pb-3">
+                                  <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-600 text-sm">Page Count</span>
+                                      <span className="font-medium text-gray-900 text-sm">{selectedSize} pages</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-600 text-sm">Quantity</span>
+                                      <span className="font-medium text-gray-900 text-sm">{selectedQuantity || 1}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                                  <div className="space-y-2">
+                                    {calculatedPrice ? (
+                                      <>
+                                        <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                          <span className="text-base font-semibold text-gray-900">Total Price</span>
+                                          <span className="text-base font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 text-center">
+                                          Price for {selectedQuantity} images in {selectedSize}-page album
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                        <span className="text-base font-semibold text-gray-900">Total Price</span>
+                                        <span className="text-base font-bold text-gray-900">Price not available</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mt-3">
+                              <CartButton
+                                selectedPricingRule={selectedPricingRule}
+                                dataId={dataId}
+                                uploadedImages={fileList}
+                                selectedSize={selectedSize}
+                                calculatedPrice={calculatedPrice ?? 0}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
+                  {/* Album Specifications for Desktop View */}
                   {showSizeSelection && fileList.length > 0 && imageCountValidation.isValid && (
-                    <div className="bg-white rounded-xl p-6">
+                    <div className="bg-white rounded-xl p-6 hidden xl:block">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Album Specifications</h3>
                       <p className="text-sm text-gray-600 mb-4">Confirm your album specifications</p>
 
@@ -792,79 +846,74 @@ const ProductUpload = ({ product }: { product: any }) => {
                     </div>
                   )}
 
-                  {selectedSize && fileList.length > 0 && imageCountValidation.isValid && (
-                    <div className="bg-white rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
-
-                      <div className="bg-white rounded-lg p-6 border border-gray-200">
-                        <div className="space-y-4">
-                          <div className="border-b border-gray-200 pb-4">
-                            <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Product</span>
-                                <span className="font-medium text-gray-900">Onam Memories Album</span>
-                              </div>
-                              {fileList.length > 0 && (
+                  {/* Order Summary for Desktop View */}
+                  <div className="hidden xl:block">
+                    {selectedSize && fileList.length > 0 && imageCountValidation.isValid && (
+                      <div className="bg-white rounded-xl p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                        <div className="bg-white rounded-lg p-6 border border-gray-200">
+                          <div className="space-y-4">
+                            <div className="border-b border-gray-200 pb-4">
+                              <h4 className="font-semibold text-gray-900 mb-2">Product Details</h4>
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">Product</span>
+                                  <span className="font-medium text-gray-900">Onam Memories Album</span>
+                                </div>
                                 <div className="flex justify-between items-center">
                                   <span className="text-gray-600">Files Uploaded</span>
                                   <span className="font-medium text-gray-900">{fileList.length} files</span>
                                 </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="border-b border-gray-200 pb-4">
-                            <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Page Count</span>
-                                <span className="font-medium text-gray-900">{selectedSize} pages</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Quantity</span>
-                                <span className="font-medium text-gray-900">{selectedQuantity || 1}</span>
                               </div>
                             </div>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
-                            <div className="space-y-2">
-                              {calculatedPrice ? (
-                                <>
+                            <div className="border-b border-gray-200 pb-4">
+                              <h4 className="font-semibold text-gray-900 mb-2">Print Specifications</h4>
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">Page Count</span>
+                                  <span className="font-medium text-gray-900">{selectedSize} pages</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">Quantity</span>
+                                  <span className="font-medium text-gray-900">{selectedQuantity || 1}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900 mb-2">Pricing</h4>
+                              <div className="space-y-2">
+                                {calculatedPrice ? (
+                                  <>
+                                    <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                                      <span className="text-lg font-semibold text-gray-900">Total Price</span>
+                                      <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-500 text-center">
+                                      Price for {selectedQuantity} images in {selectedSize}-page album
+                                    </div>
+                                  </>
+                                ) : (
                                   <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
                                     <span className="text-lg font-semibold text-gray-900">Total Price</span>
-                                    <span className="text-lg font-bold text-gray-900">₹{calculatedPrice.toFixed(2)}</span>
+                                    <span className="text-lg font-bold text-gray-900">Price not available</span>
                                   </div>
-                                  <div className="text-xs text-gray-500 text-center">
-                                    Price for {selectedQuantity} images in {selectedSize}-page album
-                                  </div>
-                                </>
-                              ) : (
-                                <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
-                                  <span className="text-lg font-semibold text-gray-900">Total Price</span>
-                                  <span className="text-lg font-bold text-gray-900">Price not available</span>
-                                </div>
-                              )}
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
+                        <div className="mt-4">
+                          <CartButton
+                            selectedPricingRule={selectedPricingRule}
+                            dataId={dataId}
+                            uploadedImages={fileList}
+                            selectedSize={selectedSize}
+                            calculatedPrice={calculatedPrice ?? 0}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
-
-                  {selectedSize && fileList.length > 0 && imageCountValidation.isValid && (
-                    <div className="bg-white rounded-xl p-6">
-                      <CartButton
-                        selectedPricingRule={selectedPricingRule}
-                        dataId={dataId}
-                        uploadedImages={fileList}
-                        selectedSize={selectedSize}
-                        calculatedPrice={calculatedPrice ?? 0}
-                      />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
