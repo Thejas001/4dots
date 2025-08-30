@@ -14,7 +14,7 @@ const PaymentCal: React.FC<PaymentCalProps> = ({cartItemIds, totalPrice, deliver
     const router = useRouter(); // if you're using Next.js router
   const incrementOrderBadge = useCartStore((state) => state.incrementOrderBadge);
   const [showPaymentPopUp, setShowPaymentPopUp] = useState<null | { status: 'success' | 'failed' }>(null);
-
+const { clearCartCount, refreshCart } = useCartStore();
   // Placeholder product info (replace with real data as needed)
   const product = {
     name: "Product Name",
@@ -52,7 +52,8 @@ const handlePlaceOrder = async () => {
     if (paymentMethod === "cash") {
       // ✅ Skip Razorpay, redirect or show success
       incrementOrderBadge(); // Increment order badge count
-      setShowPaymentPopUp({ status: "success" });
+      clearCartCount();
+      await refreshCart();      setShowPaymentPopUp({ status: "success" });
       return;
     }
 
@@ -81,6 +82,8 @@ const handlePlaceOrder = async () => {
 
         // ✅ Redirect after success
         incrementOrderBadge(); // Increment order badge count
+clearCartCount();
+
         setShowPaymentPopUp({ status: "success" });
 
       },
@@ -95,6 +98,8 @@ const handlePlaceOrder = async () => {
       modal: {
         ondismiss: function () {
           setShowPaymentPopUp({ status: "failed" });
+          clearCartCount();
+
         }
       }
     };
@@ -103,6 +108,8 @@ const handlePlaceOrder = async () => {
     razorpay.open();
   } catch (error) {
     setShowPaymentPopUp({ status: "failed" });
+    clearCartCount();
+
   }
 };
 
