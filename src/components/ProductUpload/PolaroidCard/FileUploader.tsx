@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, PictureOutlined } from "@ant-design/icons"; // Added PictureOutlined
 import type { UploadProps, UploadFile } from "antd";
 import { Button, message, Upload } from "antd";
 
@@ -98,7 +98,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         return file;
       });
 
-        const currentFile = updatedFileList[currentImageIndex || 0]?.originFileObj;
+      const currentFile = updatedFileList[currentImageIndex || 0]?.originFileObj;
       if (currentFile) {
         const ext = currentFile.name.split('.').pop()?.toLowerCase();
         if (ext === "pdf") {
@@ -161,7 +161,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             />
           )
         ) : (
-          <img src="/images/product/Rectangle970.svg" alt="Placeholder" className="w-full h-full object-cover rounded-md" />
+          <div className="flex items-center justify-center w-full h-full bg-gray-200 rounded-md">
+            <PictureOutlined style={{ fontSize: '48px', color: '#888' }} />
+          </div>
         )}
 
         {/* Navigation Arrows */}
